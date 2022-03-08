@@ -1,6 +1,7 @@
 #include "vga.h"
 
 // Index pour le buffer video
+enum vga_mode current_mode = TEXT;
 uint32 vga_index;
 // compteur pour la prochaine ligne
 static uint32 next_line_index = 1;
@@ -8,6 +9,23 @@ static uint32 next_line_index = 1;
 uint8 g_fore_color = WHITE, g_back_color = BLACK;
 // Les chiffres en ascii
 uint32 digit_ascii[10] = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39};
+
+void change_mode(enum vga_mode mode){
+	switch(mode){
+		case TEXT :
+			asm("mov $0x03, %ax");
+			asm("int $0x10");
+			break;
+		case GRAPHIC:
+			asm("mov $0x12, %ax");
+			asm("int $0x10");
+			break;
+		default:
+			asm("mov $0x03, %ax");
+			asm("int $0x10");
+			break;
+	}
+}
 
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color){
 	/*
@@ -28,7 +46,7 @@ uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color){
 }
 
 // clear video buffer array
-void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color){
+void clear_vga_buffer_text(uint16 **buffer, uint8 fore_color, uint8 back_color){
 	uint32 i;
 	for(i = 0; i < BUFSIZE; i++)
 		(*buffer)[i] = vga_entry(NULL,fore_color, back_color);
@@ -37,8 +55,10 @@ void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color){
 //initialize vga buffer 
 
 void init_vga(uint8 fore_color, uint8 back_color){
-	vga_buffer = (uint16*)VGA_ADDRESS_CHAR;
-	clear_vga_buffer(&vga_buffer, fore_color, back_color);
+//	if(current_mode != TEXT)
+//		change_mode(TEXT);
+	vga_buffer_text = (uint16*)VGA_ADDRESS_TEXT;
+	clear_vga_buffer_text(&vga_buffer_text, fore_color, back_color);
 	g_fore_color = fore_color;
 	g_back_color = back_color;
 }
@@ -83,12 +103,12 @@ void itoa(int num, char* number){
 // Printing 
 
 void print_new_line(){
-	if(next_line_index >= HEIGHT){
+	if(next_line_index >= TEXT_HEIGHT){
 		// On revient au début de l'écran et on clear tout
 		next_line_index = 0;
-		clear_vga_buffer(&vga_buffer, g_fore_color, g_back_color);
+		clear_vga_buffer_text(&vga_buffer_text, g_fore_color, g_back_color);
 	}
-	vga_index = WIDTH * next_line_index;
+	vga_index = TEXT_WIDTH * next_line_index;
 	next_line_index++;
 }
 
@@ -96,7 +116,7 @@ void print_char(char ch){
 	if(ch == '\n')
 		print_new_line();
 	else
-		vga_buffer[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
+		vga_buffer_text[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
 }
 
 void print_string(char *str){
@@ -113,32 +133,36 @@ void print_int(int num){
 	print_string(str);
 }
 
+void write_char(int x, int y, char c){
+	vga_buffer_text[TEXT_WIDTH*y + x] = vga_entry(c, g_fore_color, g_back_color);
+
+}
+
 
 // Pixel manipulation
 
-void change_pixel(int x, int y, char ch){
-	vga_buffer[WIDTH*y+x] =  vga_entry(ch, g_fore_color, g_back_color);
+
+void init_vga_graphic(uint8 fore_color, uint8 back_color){
+	if(current_mode != GRAPHIC)
+		change_mode(GRAPHIC);
+	vga_buffer_graphic = (uint16*) VGA_ADDRESS_GRAPHIC;
+	g_fore_color = fore_color;
+	g_back_color = back_color;
+
 }
 
-void change_pixel_color(int x, int y, char ch, uint8 fore_color, uint8 back_color){
-	vga_buffer[WIDTH*y+x] =  vga_entry(ch, fore_color, back_color);
+void draw_pixel(int x, int y, uint8 color){
+	vga_buffer_graphic[GRAPHIC_WIDTH*y+x] = color;
 }
 
-void draw_rectangle(int tx, int ty, int bx, int by, char ch){ // 
+void draw_rectangle(int bx, int by, int tx, int ty, uint8 color){ // 
 	for(int y = by; y < ty; y++){
 		for(int x = bx; x < tx; x++){
-			vga_buffer[WIDTH*y+x] = vga_entry(ch, g_fore_color, g_back_color);
+			vga_buffer_graphic[GRAPHIC_WIDTH*y+x] = color;
 		}
 	}
 }
 
-void draw_rectangle_color(int tx, int ty, int bx, int by, char ch, uint8 fore_color, uint8 back_color){ // 
-	for(int y = by; y < ty; y++){
-		for(int x = bx; x < tx; x++){
-			vga_buffer[WIDTH*y+x] = vga_entry(ch, fore_color, back_color);
-		}
-	}
-}
 
 // test entry - TO BE DELETED LATER ON -
 void test_entry()
@@ -150,8 +174,19 @@ void test_entry()
 	print_string("Test");
 	print_new_line();
 	print_int(12345);
-	clear_vga_buffer(&vga_buffer, WHITE,BLACK);
 	print_char(0x3d);
-	draw_rectangle(10,10,0,0,'@');
-	draw_rectangle_color(20,20,10,10, '@', BLACK,WHITE);
+	print_new_line();
+	print_string("Vim est le meilleur logiciel de tout les temps\n");
+	/*
+	change_mode(GRAPHIC);
+	int d = 0;
+	while(1){
+		draw_pixel(d%GRAPHIC_HEIGHT,d%GRAPHIC_WIDTH,9);
+	}	
+	change_mode(TEXT);
+	*/
+//	draw_rectangle(10,10,0,0,'@');
+//	draw_rectangle_color(20,20,10,10, '@', BLACK,WHITE);
+//	init_vga_graphic(WHITE,BLACK);
+
 }

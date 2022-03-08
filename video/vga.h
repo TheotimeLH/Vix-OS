@@ -5,18 +5,28 @@ typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
 
-#define VGA_ADDRESS_CHAR 0xB8000
+#define VGA_ADDRESS_TEXT 0xB8000
 #define BUFSIZE 2200
 
-#define VGA_ADRESS_PIX 0xA000
+#define VGA_ADDRESS_GRAPHIC 0xA0000
+#define BUFSIZE_PIX 64000
 
+#define TEXT_WIDTH 80
+#define TEXT_HEIGHT 55
 
-#define WIDTH 80
-#define HEIGHT 55
+#define GRAPHIC_WIDTH 80
+#define GRAPHIC_HEIGHT 55
 
-uint16* vga_buffer;
+uint16* vga_buffer_text; // Le buffer chargé des caracteres
+
+uint16* vga_buffer_graphic;
 
 #define NULL 0
+
+enum vga_mode {
+	TEXT,
+	GRAPHIC,
+};
 
 enum vga_color {
 	BLACK,
