@@ -5,8 +5,11 @@ typedef unsigned char uint8;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
 
-#define VGA_ADDRESS 0xB8000
+#define VGA_ADDRESS_CHAR 0xB8000
 #define BUFSIZE 2200
+
+#define VGA_ADRESS_PIX 0xA000
+
 
 #define WIDTH 80
 #define HEIGHT 55

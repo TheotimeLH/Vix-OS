@@ -37,7 +37,7 @@ void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color){
 //initialize vga buffer 
 
 void init_vga(uint8 fore_color, uint8 back_color){
-	vga_buffer = (uint16*)VGA_ADDRESS;
+	vga_buffer = (uint16*)VGA_ADDRESS_CHAR;
 	clear_vga_buffer(&vga_buffer, fore_color, back_color);
 	g_fore_color = fore_color;
 	g_back_color = back_color;
@@ -93,7 +93,10 @@ void print_new_line(){
 }
 
 void print_char(char ch){
-	vga_buffer[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
+	if(ch == '\n')
+		print_new_line();
+	else
+		vga_buffer[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
 }
 
 void print_string(char *str){
@@ -110,6 +113,34 @@ void print_int(int num){
 	print_string(str);
 }
 
+
+// Pixel manipulation
+
+void change_pixel(int x, int y, char ch){
+	vga_buffer[WIDTH*y+x] =  vga_entry(ch, g_fore_color, g_back_color);
+}
+
+void change_pixel_color(int x, int y, char ch, uint8 fore_color, uint8 back_color){
+	vga_buffer[WIDTH*y+x] =  vga_entry(ch, fore_color, back_color);
+}
+
+void draw_rectangle(int tx, int ty, int bx, int by, char ch){ // 
+	for(int y = by; y < ty; y++){
+		for(int x = bx; x < tx; x++){
+			vga_buffer[WIDTH*y+x] = vga_entry(ch, g_fore_color, g_back_color);
+		}
+	}
+}
+
+void draw_rectangle_color(int tx, int ty, int bx, int by, char ch, uint8 fore_color, uint8 back_color){ // 
+	for(int y = by; y < ty; y++){
+		for(int x = bx; x < tx; x++){
+			vga_buffer[WIDTH*y+x] = vga_entry(ch, fore_color, back_color);
+		}
+	}
+}
+
+// test entry - TO BE DELETED LATER ON -
 void test_entry()
 {
 	init_vga(WHITE,BLACK);
@@ -119,4 +150,8 @@ void test_entry()
 	print_string("Test");
 	print_new_line();
 	print_int(12345);
+	clear_vga_buffer(&vga_buffer, WHITE,BLACK);
+	print_char(0x3d);
+	draw_rectangle(10,10,0,0,'@');
+	draw_rectangle_color(20,20,10,10, '@', BLACK,WHITE);
 }
