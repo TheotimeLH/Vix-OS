@@ -1,7 +1,6 @@
 #include "vga.h"
 
 // Index pour le buffer video
-enum vga_mode current_mode = TEXT;
 uint32 vga_index;
 // compteur pour la prochaine ligne
 static uint32 next_line_index = 1;
@@ -9,23 +8,6 @@ static uint32 next_line_index = 1;
 uint8 g_fore_color = WHITE, g_back_color = BLACK;
 // Les chiffres en ascii
 uint32 digit_ascii[10] = {0x30, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39};
-
-void change_mode(enum vga_mode mode){
-	switch(mode){
-		case TEXT :
-			asm("mov $0x03, %ax");
-			asm("int $0x10");
-			break;
-		case GRAPHIC:
-			asm("mov $0x12, %ax");
-			asm("int $0x10");
-			break;
-		default:
-			asm("mov $0x03, %ax");
-			asm("int $0x10");
-			break;
-	}
-}
 
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color){
 	/*
@@ -46,7 +28,7 @@ uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color){
 }
 
 // clear video buffer array
-void clear_vga_buffer_text(uint16 **buffer, uint8 fore_color, uint8 back_color){
+void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color){
 	uint32 i;
 	for(i = 0; i < BUFSIZE; i++)
 		(*buffer)[i] = vga_entry(NULL,fore_color, back_color);
@@ -57,8 +39,8 @@ void clear_vga_buffer_text(uint16 **buffer, uint8 fore_color, uint8 back_color){
 void init_vga(uint8 fore_color, uint8 back_color){
 //	if(current_mode != TEXT)
 //		change_mode(TEXT);
-	vga_buffer_text = (uint16*)VGA_ADDRESS_TEXT;
-	clear_vga_buffer_text(&vga_buffer_text, fore_color, back_color);
+	vga_buffer = (uint16*)VGA_ADDRESS_TEXT;
+	clear_vga_buffer(&vga_buffer, fore_color, back_color);
 	g_fore_color = fore_color;
 	g_back_color = back_color;
 }
@@ -106,7 +88,7 @@ void print_new_line(){
 	if(next_line_index >= TEXT_HEIGHT){
 		// On revient au début de l'écran et on clear tout
 		next_line_index = 0;
-		clear_vga_buffer_text(&vga_buffer_text, g_fore_color, g_back_color);
+		clear_vga_buffer(&vga_buffer, g_fore_color, g_back_color);
 	}
 	vga_index = TEXT_WIDTH * next_line_index;
 	next_line_index++;
@@ -116,7 +98,7 @@ void print_char(char ch){
 	if(ch == '\n')
 		print_new_line();
 	else
-		vga_buffer_text[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
+		vga_buffer[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
 }
 
 void print_string(char *str){
@@ -134,40 +116,20 @@ void print_int(int num){
 }
 
 void write_char(int x, int y, char c){
-	vga_buffer_text[TEXT_WIDTH*y + x] = vga_entry(c, g_fore_color, g_back_color);
+	vga_buffer[TEXT_WIDTH*y + x] = vga_entry(c, g_fore_color, g_back_color);
 
 }
+// Color manager 
 
-
-// Pixel manipulation
-
-
-void init_vga_graphic(uint8 fore_color, uint8 back_color){
-	if(current_mode != GRAPHIC)
-		change_mode(GRAPHIC);
-	vga_buffer_graphic = (uint16*) VGA_ADDRESS_GRAPHIC;
+void change_color(uint8 fore_color, uint8 back_color){
 	g_fore_color = fore_color;
 	g_back_color = back_color;
-
 }
-
-void draw_pixel(int x, int y, uint8 color){
-	vga_buffer_graphic[GRAPHIC_WIDTH*y+x] = color;
-}
-
-void draw_rectangle(int bx, int by, int tx, int ty, uint8 color){ // 
-	for(int y = by; y < ty; y++){
-		for(int x = bx; x < tx; x++){
-			vga_buffer_graphic[GRAPHIC_WIDTH*y+x] = color;
-		}
-	}
-}
-
 
 // test entry - TO BE DELETED LATER ON -
 void test_entry()
 {
-	init_vga(WHITE,BLACK);
+	init_vga(RED,BLUE);
 	print_new_line();
 	print_string("Bienvenue sur le Vix-OS");
 	print_new_line();
@@ -177,6 +139,9 @@ void test_entry()
 	print_char(0x3d);
 	print_new_line();
 	print_string("Vim est le meilleur logiciel de tout les temps\n");
+	change_color(RED,WHITE);
+	print_string("EMACS est un éditeur pour hérétique\n");
+	print_string("    ");
 	/*
 	change_mode(GRAPHIC);
 	int d = 0;
