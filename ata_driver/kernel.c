@@ -61,5 +61,9 @@ void kernel_main()
 	print_int(ata_read(hda,1,0,buffer));
 	terminal_newline();
 	print_int(((uint32_t*)buffer)[0]);
-
+	terminal_newline();
+	for(int i=0;i<256;i++)
+		buffer[i]=0x4242;
+	print_int(ata_write(hda,1,0,buffer));
+	while(1);
 }
