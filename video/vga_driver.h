@@ -6,7 +6,7 @@
 #define BUFSIZE 2200
 
 #define TEXT_WIDTH 80
-#define TEXT_HEIGHT 55 
+#define TEXT_HEIGHT 25 
 
 
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color);

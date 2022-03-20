@@ -105,6 +105,11 @@ void change_color(uint8 fore_color, uint8 back_color){
 // Scrolling 
 
 void scroll(){
+	if(vga_index < TEXT_WIDTH)
+		vga_index = 0;
+	else
+		vga_index -= TEXT_WIDTH;
+	
 	for(int i = 0; i < (TEXT_HEIGHT - 1) * TEXT_WIDTH ; i++){
 		vga_buffer[i] = vga_buffer[i+80];
 	}
@@ -136,9 +141,12 @@ void test_entry()
 {
 	init_vga(BLACK, WHITE);
 	print_string("On écrit sur les murs à l'aide de nos mains");
+	print_new_line();
+	print_string("OK dok");
 	write_char(10, 10, 'a');
+	scroll();
+	scroll();
 	move_to_text();
-	
 	//scroll();
 	/*
 	change_mode(GRAPHIC);
