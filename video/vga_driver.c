@@ -2,6 +2,10 @@
 #include "../common/common.h"
 #include "../sound/sound_driver.h"
 
+//Position du curseur
+uint16 cursor_x, cursor_y;
+// Le buffer chargé des caracteres
+uint16* vga_buffer;
 // Index pour le buffer video
 uint32 vga_index;
 // compteur pour la prochaine ligne
@@ -53,8 +57,9 @@ void init_vga(uint8 fore_color, uint8 back_color){
 void print_new_line(){
 	if(next_line_index >= TEXT_HEIGHT){
 		// On revient au début de l'écran et on clear tout
-		next_line_index = 0;
-		clear_vga_buffer(&vga_buffer, g_fore_color, g_back_color);
+		//next_line_index = 0;
+		scroll(); // On scrolle
+		//clear_vga_buffer(&vga_buffer, g_fore_color, g_back_color);
 	}
 	vga_index = TEXT_WIDTH * next_line_index;
 	next_line_index++;
@@ -63,8 +68,10 @@ void print_new_line(){
 void print_char(char ch){
 	if(ch == '\n')
 		print_new_line();
-	else
+	else{
 		vga_buffer[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
+		
+	}
 }
 
 void print_string(char *str){
@@ -83,6 +90,8 @@ void print_int(int num){
 
 void write_char(int x, int y, char c){
 	vga_buffer[TEXT_WIDTH*y + x] = vga_entry(c, g_fore_color, g_back_color);
+	cursor_x = x;
+	cursor_y = y;
 
 }
 // Color manager 
@@ -92,24 +101,45 @@ void change_color(uint8 fore_color, uint8 back_color){
 	g_back_color = back_color;
 }
 
+
+// Scrolling 
+
+void scroll(){
+	for(int i = 0; i < (TEXT_HEIGHT - 1) * TEXT_WIDTH ; i++){
+		vga_buffer[i] = vga_buffer[i+80];
+	}
+	for(int i = (TEXT_HEIGHT-1) * TEXT_WIDTH; i < TEXT_HEIGHT*TEXT_WIDTH;i++){
+		vga_buffer[i] = vga_entry(' ', g_fore_color, g_back_color);
+	}
+}
+
+// Deplacement du curseur
+
+void move_cursor(){
+	uint16 cursor_location = cursor_y * TEXT_WIDTH + cursor_x;
+	outb(14, 0x3d4);
+	outb(cursor_location >> 8, 0x3d5);
+	outb(15, 0x3d4);
+	outb(cursor_location, 0x3d5);
+}
+
+void move_to_text(){
+	uint16 cursor_location = vga_index;
+	outb(14, 0x3d4);
+	outb(cursor_location >> 8, 0x3d5);
+	outb(15, 0x3d4);
+	outb(cursor_location, 0x3d5);
+}
+
 // test entry - TO BE DELETED LATER ON -
 void test_entry()
 {
-	init_vga(RED,BLUE);
-	print_new_line();
-	print_string("Bienvenue sur le Vix-OS");
-	print_new_line();
-	print_string("Test");
-	print_new_line();
-	print_int(12345);
-	print_char(0x3d);
-	print_new_line();
-	print_string("Vim est le meilleur logiciel de tout les temps\n");
-	change_color(RED,WHITE);
-	print_string("EMACS est un éditeur pour hérétique\n");
-	print_string("    ");
-	beep();
-	print_string("J'ai beepé");
+	init_vga(BLACK, WHITE);
+	print_string("On écrit sur les murs à l'aide de nos mains");
+	write_char(10, 10, 'a');
+	move_to_text();
+	
+	//scroll();
 	/*
 	change_mode(GRAPHIC);
 	int d = 0;

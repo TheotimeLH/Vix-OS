@@ -1,17 +1,13 @@
 #ifndef VGA_H
 #define VGA_H
-
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned int uint32;
+#include "../common/common.h"
 
 #define VGA_ADDRESS_TEXT 0xB8000
 #define BUFSIZE 2200
 
 #define TEXT_WIDTH 80
-#define TEXT_HEIGHT 55
+#define TEXT_HEIGHT 55 
 
-uint16* vga_buffer; // Le buffer chargé des caracteres
 
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color);
 void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color);
@@ -22,6 +18,7 @@ void print_string(char *str);
 void print_int(int num);
 void write_char(int x, int y, char c);
 void change_color(uint8 fore_color, uint8 back_color);
+void scroll();
 
 #define NULL 0
 
