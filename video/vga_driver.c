@@ -1,4 +1,6 @@
 #include "vga_driver.h"
+#include "../common/common.h"
+#include "../sound/sound_driver.h"
 
 // Index pour le buffer video
 uint32 vga_index;
@@ -106,6 +108,8 @@ void test_entry()
 	change_color(RED,WHITE);
 	print_string("EMACS est un éditeur pour hérétique\n");
 	print_string("    ");
+	beep();
+	print_string("J'ai beepé");
 	/*
 	change_mode(GRAPHIC);
 	int d = 0;
