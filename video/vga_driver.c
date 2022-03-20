@@ -45,42 +45,6 @@ void init_vga(uint8 fore_color, uint8 back_color){
 	g_back_color = back_color;
 }
 
-// Misc 
-uint32 digit_count(int num){
-	uint32 count = 0;
-	if(num == 0)
-		return 1;
-	else{
-		while(num){
-			count ++;
-			num /= 10;
-		}
-		return count;
-	}
-}
-
-uint32 strlen(const char* str){
-	uint32 length = 0;
-	while(str[length++]);
-	return length;
-}
-
-void itoa(int num, char* number){
-	int dg = digit_count(num);
-	int i = dg -1;
-	if(num == 0 && dg == 1){
-		number[0] = '0';
-		number[1] = '\0';
-	}
-	else{
-		while(num){
-			char x = num%10;
-			number[i--] = x + '0';
-			num /= 10;
-		}
-		number[dg] = '\0';
-	}
-}
 
 // Printing 
 

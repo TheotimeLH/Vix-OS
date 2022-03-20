@@ -13,6 +13,15 @@ typedef unsigned int uint32;
 
 uint16* vga_buffer; // Le buffer chargé des caracteres
 
+uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color);
+void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color);
+void init_vga(uint8 fore_color, uint8 back_color);
+void print_new_line();
+void print_char(char ch);
+void print_string(char *str);
+void print_int(int num);
+void write_char(int x, int y, char c);
+void change_color(uint8 fore_color, uint8 back_color);
 
 #define NULL 0
 
