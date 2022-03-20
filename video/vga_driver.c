@@ -1,4 +1,4 @@
-#include "vga.h"
+#include "vga_driver.h"
 
 // Index pour le buffer video
 uint32 vga_index;
