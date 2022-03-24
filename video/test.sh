@@ -1,11 +1,11 @@
 #assemble boot.s file
 as --32 boot.s -o boot.o
 
-#compile vga.c file
-gcc -m32 -c vga.c -o vga.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+#compile vga_driver.c file
+gcc -m32 -c vga_driver.c -o vga_driver.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-#linking the vga with vga.o and boot.o files
-ld -m elf_i386 -T linker.ld vga.o boot.o -o VixOS.bin -nostdlib
+#linking the vga_driver with vga_driver.o and boot.o files
+ld -m elf_i386 -T linker.ld vga_driver.o boot.o -o VixOS.bin -nostdlib
 
 #check VixOS.bin file is x86 multiboot file or not
 grub-file --is-x86-multiboot VixOS.bin
