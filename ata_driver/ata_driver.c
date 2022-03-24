@@ -128,6 +128,7 @@ bool ata_read(Drive d,uint8_t count,uint32_t lba,uint16_t* buffer)
 	for(int i=0;i<count_16;i++)
 	{
 		uint8_t status=inb(io_base|0x7);
+
 		while((status&(1<<7))&&(!(status&(1<<3))))
 		{
 			status=inb(io_base|0x7);
