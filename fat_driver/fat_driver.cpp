@@ -1,7 +1,39 @@
 #include "fat_driver.h"
 #include <iostream>
+#include "../video/vga_driver.h"
 
 using namespace std;
+
+Ata_fat_system::Ata_fat_system(Drive d)
+:m_drive(d)
+{
+    m_id=ata_identify(d);
+    if(!is_ready())
+    {
+        err("erreur lors de l'initialisation du disque\n");
+    }
+}
+
+bool Ata_fat_system::read(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size)
+{
+    if(sector_size%m_id.taille_secteur!=0||sector_size==0)
+        err("taille de secteur non compatible\n");
+    uint8_t logical_per_ph=sector_size/m_id.taille_secteur;
+    return ata_read(m_drive,count*logical_per_ph,addr*logical_per_ph,(uint16_t*)buffer);
+}
+
+bool Ata_fat_system::write(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size)
+{
+    if(sector_size%m_id.taille_secteur!=0||sector_size==0)
+        err("taille de secteur non compatible\n");
+    uint8_t logical_per_ph=sector_size/m_id.taille_secteur;
+    return ata_write(m_drive,count*logical_per_ph,addr*logical_per_ph,(uint16_t*)buffer);
+}
+
+void err(char* msg)
+{
+    print_string(msg);
+}
 
 uint32_t inline max(uint32_t a,uint32_t b)
 {

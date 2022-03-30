@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "../ata_driver/ata_driver.h"
 
 typedef struct Fat_infos Fat_infos;
 
@@ -13,6 +14,19 @@ public:
     virtual bool read(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size=512)=0;
     virtual bool write(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size=512)=0;
     virtual void err(char* msg)=0;
+};
+
+class Ata_fat_system
+{
+public:
+    Ata_fat_system(Drive d);
+    virtual bool read(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size=512);
+    virtual bool write(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size=512);
+    virtual void err(char* msg);
+    bool is_ready(){return m_id.exists&&!m_id.erreur;};
+private:
+    Drive_id m_id;
+    Drive m_drive;
 };
 
 class Fat_entry
