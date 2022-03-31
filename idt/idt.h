@@ -1,25 +1,21 @@
 
 struct idt_gate_s
 {
-		u32int adrs ; // Adresse
-		u16int slct ; // Segment selector
-		u8int zeros ; // Reserved
-		u8int flags ; // Gate Type (4) : 0 : DPrivilegeLevels (3) : Present
+		uint32_t adrs ; // Adresse
+		uint16_t slct ; // Segment selector
+		uint8_t zeros ; // Reserved
+		uint8_t flags ; // Gate Type (4) : 0 : DPrivilegeLevels (3) : Present
 } __attribute__((packed)) ;
 
 typedef struct idt_gate_s idt_gate_t ;
 
 struct idtr_s
 {
-	u16int limit ; // Dernier offset valide dans la table
-	u32int base ; // Adresse de la première entrée
+	uint16_t limit ; // Dernier offset valide dans la table
+	uint32_t base ; // Adresse de la première entrée
 } __attribute__((packed)) ;
 
-typedef idtr_s idtr_t ;
-
-static void idt_init() ;
-
-static void gate_set(u8int index, u32int base, u16int slct, u8int gt_dpl_p) ;
+typedef struct idtr_s idtr_t ;
 
 extern void isr0() ;
 extern void isr1() ;
