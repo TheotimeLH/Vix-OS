@@ -1,6 +1,4 @@
 
-#include <stdint.h>
-#include <string.h>
 #include "idt.h"
 
 idt_gate_t idt_gates[256] ;
@@ -18,7 +16,7 @@ static void idt_init()
 {
 	idtr.limit = sizeof(idt_gate_t)*256-1 ;
 	idtr.base = (uint32_t) &idt_gates ;
-	memset(&idt_gates, 0, idtr.limit+1) ;
+	for (int i=0 ; i<256 ; i++) set_gate(i, 0, 0, 0) ;
 	uint32_t idtr_adrs = (uint32_t) &idtr ;
 	asm("lidt %0" : "=g" (idtr_adrs)) ; 
 
