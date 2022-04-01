@@ -3,10 +3,11 @@
 
 struct idt_gate_s
 {
-		uint32_t adrs ; // Adresse
+		uint16_t ofs1 ; // Première moitié de l'adresse
 		uint16_t slct ; // Segment selector
 		uint8_t zeros ; // Reserved
-		uint8_t flags ; // Gate Type (4) : 0 : DPrivilegeLevels (3) : Present
+		uint8_t flags ; // Gate Type (4) / 0 / Privilege Level (2) / Present (1)
+		uint16_t ofs2 ; // Seconde moitié de l'adresse
 } __attribute__((packed)) ;
 
 typedef struct idt_gate_s idt_gate_t ;
