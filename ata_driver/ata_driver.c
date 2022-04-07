@@ -1,39 +1,5 @@
 #include "ata_driver.h"
 
-__asm__(".globl outb\n\
-	.type outb, @function\n\
-	outb:\n\
-	mov 4(%esp),%dx\n\
-	mov 8(%esp),%al\n\
-	out %al,%dx\n\
-	ret\n");
-
-__asm__(".globl outw\n\
-	.type outw, @function\n\
-	outw:\n\
-	mov 4(%esp),%dx\n\
-	mov 8(%esp),%ax\n\
-	out %ax,%dx\n\
-	ret\n");
-
-
-__asm__(".globl inb\n\
-	.type inb,@function\n\
-	inb:\n\
-	mov 4(%esp),%dx\n\
-	in %dx,%al\n\
-	ret\n\
-");
-
-
-__asm__(".globl inw\n\
-	.type inw,@function\n\
-	inw:\n\
-	mov 4(%esp),%dx\n\
-	in %dx,%ax\n\
-	ret\n\
-");
-
 Drive_id ata_identify(Drive d)
 {
     bool primary=((d&0b10)==0);

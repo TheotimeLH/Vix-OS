@@ -1,7 +1,7 @@
 all:myos.bin
 
 myos.bin:linker.ld kernel.o boot.o ata_driver.o
-	i686-elf-gcc -T linker.ld -o myos.bin boot.o kernel.o ata_driver.o -ffreestanding -nostdlib
+	i686-elf-gcc -T linker.ld -o myos.bin boot.o kernel.o ata_driver.o ../common.o -ffreestanding -nostdlib
 
 boot.o:boot.s
 	i686-elf-as -o boot.o boot.s
