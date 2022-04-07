@@ -16,7 +16,7 @@ static void gate_set(uint8_t n, // Index dans la table
 	idt_gates[n].flags = flags ;
 }
 
-static void idt_init()
+void idt_init()
 {
 	idtr.limit = sizeof(idt_gate_t)*256-1 ;
 	idtr.base = (uint32_t) &idt_gates ;

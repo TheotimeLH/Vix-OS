@@ -20,6 +20,8 @@ struct idtr_s
 
 typedef struct idtr_s idtr_t ;
 
+void idt_init();
+
 extern void isr0() ;
 extern void isr1() ;
 extern void isr2() ;
