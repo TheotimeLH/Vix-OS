@@ -1,4 +1,6 @@
 #include "fat_driver.h"
+
+/*
 #include <iostream>
 #include <fstream>
 
@@ -46,26 +48,16 @@ public:
 private:
     string m_filename;
 };
+*/
 
-int main()
+extern "C" void fat_main()
 {
-    File_Fat_system ffs("test");
-    Fat_infos infos=fat_init(&ffs);
-    printf(
-"type : %d\nsector_size : %d\ncluster_size : %d\nfat : %d\nfat_size : %d\nroot : %d\nroot_size : %d\ndata : %d\ndata_size :%d\n",
-    infos.fat_type,infos.sector_size,infos.cluster_size,infos.fat,infos.fat_size,infos.root,infos.root_size,
-    infos.data,infos.data_size);
+    init_vga(0x07,0x0);
+    Ata_fat_system afs(hda);
+    fat_init(&afs);
+    while(1);
+    print_string("fat_type : ");
+    //print_int(fi.fat_type);
 
-    Fat_entry buff[infos.sector_size/32];
-    uint32_t written=infos.root_fat_entry.read_entries(buff,infos.sector_size/32,&infos,&ffs);
-//    cout<<buff[0].m_first_cluster<<endl<<buff[0].is_directory()<<endl<<buff[0].m_size<<endl;
-
-    uint8_t data_buff[infos.byte_per_cluster];
-    uint32_t read=buff[0].read_data(data_buff,1,&infos,&ffs);
-    cout<<read<<endl;
-    data_buff[read]=0;
-    cout<<string((char*)data_buff)<<endl;
-
-
-    return 0;
+	while(1);
 }

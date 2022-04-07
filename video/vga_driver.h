@@ -8,6 +8,9 @@
 #define TEXT_WIDTH 80
 #define TEXT_HEIGHT 25 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color);
 void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color);
@@ -19,6 +22,10 @@ void print_int(int num);
 void write_char(int x, int y, char c);
 void change_color(uint8 fore_color, uint8 back_color);
 void scroll();
+
+#ifdef __cplusplus
+}
+#endif
 
 #define NULL 0
 

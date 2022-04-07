@@ -57,6 +57,8 @@ void kernel_main()
 {
 	terminal_initialize();
 
-	print_int(0x42694269);
+	Drive_id id=ata_identify(hda);
+	if(!id.exists) print_int(0x69);
+	else print_int(0x42);
 	while(1);
 }

@@ -1,7 +1,7 @@
 all:myos.bin
 
-myos.bin:linker.ld kernel.o boot.o ata_driver.o
-	i686-elf-gcc -T linker.ld -o myos.bin boot.o kernel.o ata_driver.o ../common.o -ffreestanding -nostdlib
+myos.bin:linker.ld kernel.o boot.o ata_driver.o ../common/common.o
+	i686-elf-gcc -T linker.ld -o myos.bin boot.o kernel.o ata_driver.o ../common/common.o -ffreestanding -nostdlib
 
 boot.o:boot.s
 	i686-elf-as -o boot.o boot.s
@@ -12,8 +12,11 @@ kernel.o:kernel.c
 ata_driver.o:ata_driver.c
 	i686-elf-gcc -c ata_driver.c -o ata_driver.o -ffreestanding
 
+../common/common.o:../common/common.c
+	make --directory=../common
+
 run:all
-	qemu-system-i386 -kernel myos.bin
+	qemu-system-i386 -kernel myos.bin -drive file=test,index=0,media=disk,format=raw
 
 clean:
 	rm -f myos.bin boot.o kernel.o ata_driver.o

@@ -4,9 +4,9 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "../ata_driver/ata_driver.h"
+#include "../video/vga_driver.h"
 
 typedef struct Fat_infos Fat_infos;
-
 
 class Fat_system
 {
@@ -16,7 +16,7 @@ public:
     virtual void err(char* msg)=0;
 };
 
-class Ata_fat_system
+class Ata_fat_system:public Fat_system
 {
 public:
     Ata_fat_system(Drive d);
