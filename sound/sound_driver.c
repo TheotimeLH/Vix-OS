@@ -1,6 +1,8 @@
 #include "sound_driver.h"
 #include "../common/common.h"
 #include "../common/idt.h"
+#include "../common/isr.h"
+#include "../video/vga_driver.h"
 
 void play_sound(uint32 freq)
 {
@@ -28,9 +30,9 @@ void sound_blaster(){
 	idt_init(); // initialisation de la table, mais il faudrait le faire plus tôt, je sais pas trop comment ça marche
 	// On reset le port
 	outb(1, 0x226);
-	asm("mov 0x86, ah");
-	asm("mov 0x0000, cx");
-	asm("mov 0xFFFF, dx");
+	asm("mov 0x86, %ah");
+	asm("mov 0x0000, %cx");
+	asm("mov 0xFFFF, %dx");
 	isr21();
 	outb(0, 0x226);
 	// On allume les hauts-parleurs
@@ -63,13 +65,19 @@ void beep()
 	//no_sound();
 }
 
+void isr_handler(registers_t regs){
+	print_string("received interrupt :");
+	print_int(regs.int_no);
+	print_new_line();
+}
+
 void test_driver(){
-	#include "../video/vga_driver.h"
 	init_vga(RED, BLUE);
 	print_new_line();
 	print_string("TEST DU SON");
 	beep();
 	sound_blaster();
-	
+	asm volatile ("int $0x3");
+	asm volatile ("int $0x4");
 }
 
