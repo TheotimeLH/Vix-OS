@@ -6,7 +6,7 @@ boot.o: boot.s
 sound_driver.o : sound_driver.c
 	i686-elf-gcc -m32 -c sound_driver.c -o sound_driver.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-VixOS.bin : linker.ld sound_driver.o boot.o ../common/common.o ../video/vga_driver.o
+VixOS.bin : linker.ld sound_driver.o boot.o ../common/common.o ../video/vga_driver.o ../common/idt.o ../common/isr.o ../common/interrupt.o
 	i686-elf-ld -T $^ -o VixOS.bin -nostdlib
 
 check-multiboot : VixOS.bin
