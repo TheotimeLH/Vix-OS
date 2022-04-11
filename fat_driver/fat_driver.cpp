@@ -16,7 +16,12 @@ bool Ata_fat_system::read(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t s
     if(sector_size%m_id.taille_secteur!=0||sector_size==0)
         err("taille de secteur non compatible\n");
     uint8_t logical_per_ph=sector_size/m_id.taille_secteur;
-    return ata_read(m_drive,count*logical_per_ph,addr*logical_per_ph,(uint16_t*)buffer);
+    for(int i=0;i<10;i++)
+    {
+        if(ata_read(m_drive,count*logical_per_ph,addr*logical_per_ph,(uint16_t*)buffer))
+            return true;
+    }
+    return false;
 }
 
 bool Ata_fat_system::write(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t sector_size)
@@ -59,13 +64,12 @@ Fat_infos fat_init(Fat_system* intf)
     ret.fat_type=0;
 
     uint8_t BPB[512];
-    if(!intf->read(1,0,BPB))
+    if(!intf->read(1,0,BPB,intf->get_sectorsize()))
     {
         intf->err("erreur de lecture");
         return Fat_infos();
     }
 
-    
     ret.sector_size=buff_8_16(BPB,0x0B);//sector_size
     ret.cluster_size=BPB[0x0D];
 
@@ -86,6 +90,7 @@ Fat_infos fat_init(Fat_system* intf)
     }
 
     ret.root=ret.fat+ret.fat_size*(uint32_t)(BPB[0x10]);//root
+
     ret.root_size=32*(uint32_t)buff_8_16(BPB,0x11)/(uint32_t)ret.sector_size;//root_size
     ret.data=ret.root+ret.root_size;//data
 
@@ -119,13 +124,13 @@ Fat_infos fat_init(Fat_system* intf)
 }
 
 
+
 uint32_t fat_next_cluster(uint32_t current_cluster,Fat_system* intf,Fat_infos* infos)
 {
-    current_cluster-=2;
-    uint8_t byte_per_entry=(infos->fat_size==12)?3:(infos->fat_size/8);
-    uint32_t entry_no=(infos->fat_size==12)?current_cluster/2:current_cluster;
+    uint8_t byte_per_entry=(infos->fat_type==12)?3:(infos->fat_type/8);
+    uint32_t entry_no=(infos->fat_type==12)?current_cluster/2:current_cluster;
     uint32_t sector_offset=(entry_no*byte_per_entry)/(uint32_t)infos->sector_size;
-    uint16_t entry_offset=entry_no%infos->sector_size;
+    uint16_t entry_offset=entry_no%(infos->sector_size/(uint16_t)byte_per_entry);
     
     uint8_t buffer[infos->sector_size*2];
     intf->read(2,sector_offset+infos->fat,buffer,infos->sector_size);
@@ -214,6 +219,19 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
     bool buff_empty(true);
 
     
+    uint32_t last_cluster;
+    switch (infos->fat_type)
+    {
+    case 32:
+        last_cluster=0xFFFFFF8;
+        break;
+    case 16:
+        last_cluster=0xFFF8;
+        break;
+    default:
+        last_cluster=0xFF8;
+        break;
+    }
 
     while(read<size)
     {
@@ -233,19 +251,6 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
             }
             else
             {
-                uint32_t last_cluster;
-                switch (infos->fat_type)
-                {
-                case 32:
-                    last_cluster=0xFFFFFF8;
-                    break;
-                case 16:
-                    last_cluster=0xFFF8;
-                    break;
-                default:
-                    last_cluster=0xFF8;
-                    break;
-                }
                 uint32_t next_cluster=fat_next_cluster(m_current_cluster,intf,infos);
                 if(next_cluster>=last_cluster)
                 {

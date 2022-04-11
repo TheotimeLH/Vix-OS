@@ -9,56 +9,28 @@ static const size_t VGA_HEIGHT = 25;
 size_t terminal_row;
 size_t terminal_column;
 uint16_t* terminal_buffer;
- 
-void terminal_initialize() 
-{
-	terminal_row = 0;
-	terminal_column = 0;
-	terminal_buffer = (uint16_t*) 0xB8000;
-	for (size_t y = 0; y < VGA_HEIGHT; y++) {
-		for (size_t x = 0; x < VGA_WIDTH; x++) {
-			const size_t index = y * VGA_WIDTH + x;
-			terminal_buffer[index] = 0x0720;
-		}
-	}
-}
- 
-void terminal_putchar(char c) 
-{
-	terminal_buffer[terminal_row*VGA_WIDTH+terminal_column] = (uint16_t) c | 0x0700; 
-	if (++terminal_column == VGA_WIDTH)
-	{
-		terminal_column = 0;
-		if (++terminal_row == VGA_HEIGHT)
-			terminal_row = 0;
-	}
-}
 
-void terminal_newline()
-{
-	terminal_column=0;
-	if(++terminal_row==VGA_HEIGHT)
-		terminal_row=0;
-}
-
-void print_int(uint32_t x)
-{
-	for(int i=7;i>=0;i--)
-	{
-		uint32_t c=(x&(0xF<<(i*4)))>>(i*4);
-		if(c>9)
-			terminal_putchar(c+0x41-10);
-		else
-			terminal_putchar(c+0x30);
-	}
-}
 
 void kernel_main() 
 {
-	terminal_initialize();
+//	terminal_initialize();
+	init_vga(0x07,0x00);
 
-	Drive_id id=ata_identify(hda);
-	if(!id.exists) print_int(0x69);
-	else print_int(0x42);
+  	Drive_id id=ata_identify(hda);
+  	print_int(id.taille_secteur);
+	print_new_line();
+  	print_int(id.nb_secteur);
+	print_new_line();
+
+	uint16_t buff[512];
+	buff[0]=0x4242;
+
+	while(!ata_read(hda,2,0,buff));
+	print_hexa(buff[0]);
+	print_new_line();
+
+	print_hexa(buff[0x3F0/2]);
+	print_new_line();
+
 	while(1);
 }

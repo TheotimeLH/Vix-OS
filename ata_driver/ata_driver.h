@@ -2,6 +2,7 @@
 //#include <stddef.h>
 #include <stdint.h>
 #include "../common/common.h"
+#include "../video/vga_driver.h"
 
 #ifdef __cplusplus
 extern "C" {

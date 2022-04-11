@@ -57,3 +57,28 @@ void itoa(int num, char* number){
 		number[dg] = '\0';
 	}
 }
+
+void print_hexa(uint32 x)
+{
+	for(int i=7;i>=0;i--)
+	{
+		uint32 c=(x&(0xF<<(i*4)))>>(i*4);
+		if(c>9)
+			print_char(c+0x41-10);
+		else
+			print_char(c+0x30);
+	}
+}
+
+
+bool strcmp(const char* a,const char* b)
+{
+    for(int i=0;;i++)
+    {
+        if(a[i]!=b[i])
+            return false;
+        if(a[i]==0)
+            break;
+    }
+    return true;
+}
