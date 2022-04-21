@@ -74,6 +74,18 @@ void print_char(char ch){
 	}
 }
 
+void print_hexa(uint32 x)
+{
+	for(int i=7;i>=0;i--)
+	{
+		uint32 c=(x&(0xF<<(i*4)))>>(i*4);
+		if(c>9)
+			print_char(c+0x41-10);
+		else
+			print_char(c+0x30);
+	}
+}
+
 void print_string(char *str){
 	int i = 0;
 	while(str[i]){

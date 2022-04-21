@@ -1,5 +1,6 @@
 #include "common.h"
 
+
 // Gestion des ports
 void outb(uint8 value, uint16 port){
 	asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
@@ -58,17 +59,6 @@ void itoa(int num, char* number){
 	}
 }
 
-void print_hexa(uint32 x)
-{
-	for(int i=7;i>=0;i--)
-	{
-		uint32 c=(x&(0xF<<(i*4)))>>(i*4);
-		if(c>9)
-			print_char(c+0x41-10);
-		else
-			print_char(c+0x30);
-	}
-}
 
 
 bool strcmp(const char* a,const char* b)
