@@ -65,11 +65,6 @@ void beep()
 	//no_sound();
 }
 
-void isr_handler(registers_t regs){
-	print_string("received interrupt :");
-	print_int(regs.int_no);
-	print_new_line();
-}
 
 void test_driver(){
 	init_vga(RED, BLUE);

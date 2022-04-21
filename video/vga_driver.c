@@ -2,6 +2,7 @@
 #include "../common/common.h"
 #include "../sound/sound_driver.h"
 #include "../common/descriptor_tables.h"
+#include "../common/isr.h"
 
 //Position du curseur
 uint16 cursor_x, cursor_y;
@@ -152,10 +153,15 @@ void move_to_text(){
 // test entry - TO BE DELETED LATER ON -
 //
 
+void isr_handler(registers_t regs){
+	print_string("received interrupt :");
+	print_int(regs.int_no);
+	print_new_line();
+}
 void test_entry()
 {
-	init_descriptor_tables();
 	init_vga(BLACK, WHITE);
+	init_descriptor_tables();
 	print_string("On écrit sur les murs à l'aide de nos mains");
 	print_new_line();
 	print_string("OK dok");
@@ -163,7 +169,8 @@ void test_entry()
 	scroll();
 	scroll();
 	move_to_text();
-	asm("int $9");
+	asm volatile("int $0x3");
+	asm volatile("int $0x4");
 	//scroll();
 	/*
 	change_mode(GRAPHIC);

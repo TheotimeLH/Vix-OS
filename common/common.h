@@ -6,7 +6,6 @@ typedef unsigned short uint16;
 typedef unsigned char uint8;
 
 #include <stddef.h>
-#include <stdint.h>
 //#include <stdbool.h> probleme de compatibilité car inclus string.h
 #ifndef __cplusplus
 #define bool _Bool
