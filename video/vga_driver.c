@@ -158,6 +158,7 @@ void isr_handler(registers_t regs){
 	print_int(regs.int_no);
 	print_new_line();
 }
+
 void test_entry()
 {
 	init_vga(BLACK, WHITE);
@@ -170,7 +171,7 @@ void test_entry()
 	scroll();
 	move_to_text();
 	asm volatile("int $0x3");
-	asm volatile("int $0x4");
+	//asm volatile("int $0x4");
 	//scroll();
 	/*
 	change_mode(GRAPHIC);
