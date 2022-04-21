@@ -7,12 +7,20 @@ typedef unsigned char uint8;
 
 #include <stddef.h>
 #include <stdint.h>
-#include <stdbool.h>
+//#include <stdbool.h> probleme de compatibilité car inclus string.h
+
+#ifndef __cplusplus
+#define bool _Bool
+#define true 1
+#define false 0
+
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+void *memset(void *__s, int __c, size_t __n); //__THROW __nonnull((1));
 void outb(uint8 value, uint16 port);
 void outw(uint16 value, uint16 port);
 uint8 inb(uint16 port);
