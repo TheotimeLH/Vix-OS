@@ -1,6 +1,6 @@
 #include "sound_driver.h"
 #include "../common/common.h"
-#include "../common/idt.h"
+#include "../common/descriptor_tables.h"
 #include "../common/isr.h"
 #include "../video/vga_driver.h"
 
@@ -27,7 +27,7 @@ void no_sound()
 }
 
 void sound_blaster(){
-	idt_init(); // initialisation de la table, mais il faudrait le faire plus tôt, je sais pas trop comment ça marche
+	init_descriptor_tables();
 	// On reset le port
 	outb(1, 0x226);
 	asm("mov 0x86, %ah");

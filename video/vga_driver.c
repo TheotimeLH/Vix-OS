@@ -1,6 +1,7 @@
 #include "vga_driver.h"
 #include "../common/common.h"
 #include "../sound/sound_driver.h"
+#include "../common/descriptor_tables.h"
 
 //Position du curseur
 uint16 cursor_x, cursor_y;
@@ -37,7 +38,7 @@ uint16 vga_entry(unsigned char ch, uint8 fore_color, uint8 back_color){
 void clear_vga_buffer(uint16 **buffer, uint8 fore_color, uint8 back_color){
 	uint32 i;
 	for(i = 0; i < BUFSIZE; i++)
-		(*buffer)[i] = vga_entry(NULL,fore_color, back_color);
+		(*buffer)[i] = vga_entry(0,fore_color, back_color);
 }
 
 //initialize vga buffer 
@@ -149,8 +150,11 @@ void move_to_text(){
 }
 
 // test entry - TO BE DELETED LATER ON -
+//
+
 void test_entry()
 {
+	init_descriptor_tables();
 	init_vga(BLACK, WHITE);
 	print_string("On écrit sur les murs à l'aide de nos mains");
 	print_new_line();
@@ -159,6 +163,7 @@ void test_entry()
 	scroll();
 	scroll();
 	move_to_text();
+	asm("int $9");
 	//scroll();
 	/*
 	change_mode(GRAPHIC);

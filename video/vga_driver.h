@@ -28,7 +28,6 @@ void scroll();
 }
 #endif
 
-//#define NULL 0
 
 enum vga_mode {
 	TEXT,
