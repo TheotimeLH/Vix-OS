@@ -161,6 +161,10 @@ void isr_handler(registers_t regs){
 	//print_int(regs.err_code);
 }
 
+void irq_handler(){
+
+}
+
 void test_entry()
 {
 	init_vga(BLACK, WHITE);
