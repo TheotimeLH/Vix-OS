@@ -14,6 +14,7 @@ void isr_handler(registers_t regs){
 
 
 void irq_handler(registers_t regs){
+	print_string("Handling IRQ\n");
 	if(regs.int_no >= 40){
 		outb(0x20, 0xA0);
 	}

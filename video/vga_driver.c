@@ -3,6 +3,8 @@
 #include "../sound/sound_driver.h"
 #include "../common/descriptor_tables.h"
 #include "../common/isr.h"
+#include "../common/timer.h"
+
 
 //Position du curseur
 uint16 cursor_x, cursor_y;
@@ -62,6 +64,7 @@ void print_new_line(){
 		//next_line_index = 0;
 		scroll(); // On scrolle
 		//clear_vga_buffer(&vga_buffer, g_fore_color, g_back_color);
+		next_line_index--;
 	}
 	vga_index = TEXT_WIDTH * next_line_index;
 	next_line_index++;
@@ -159,11 +162,10 @@ void test_entry()
 {
 	init_vga(BLACK, WHITE);
 	init_descriptor_tables();
-	asm volatile("int $0x3");
-	asm volatile("int $0x13");
-	asm volatile("int $0x17");
-	asm volatile("int $0x2");
-	asm volatile("int $0x1");
+	print_string("DEBUT\n"); 
+	asm volatile ("int $0x3");
+	init_timer(20);
+	print_string("TEST");
 	//print_string("On écrit sur les murs à l'aide de nos mains");
 	//print_new_line();
 	//print_string("OK dok");
