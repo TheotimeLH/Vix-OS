@@ -14,7 +14,6 @@ void isr_handler(registers_t regs){
 
 
 void irq_handler(registers_t regs){
-	print_string("Handling IRQ\n");
 	if(regs.int_no >= 40){
 		outb(0x20, 0xA0);
 	}
@@ -22,6 +21,11 @@ void irq_handler(registers_t regs){
 	if(interrupt_handlers[regs.int_no] != 0){
 		isr_t handler = interrupt_handlers[regs.int_no];
 		handler(regs);
+	}
+	else{
+		print_string("Unhandled IRQ number : ");
+		print_int(regs.int_no);
+		print_new_line();
 	}
 }
 
