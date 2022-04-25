@@ -157,6 +157,8 @@ void isr_handler(registers_t regs){
 	print_string("received interrupt :");
 	print_int(regs.int_no);
 	print_new_line();
+	//print_string("error code :");
+	//print_int(regs.err_code);
 }
 
 void test_entry()
@@ -164,6 +166,10 @@ void test_entry()
 	init_vga(BLACK, WHITE);
 	init_descriptor_tables();
 	asm volatile("int $0x3");
+	asm volatile("int $0x13");
+	asm volatile("int $0x17");
+	asm volatile("int $0x2");
+	asm volatile("int $0x1");
 	//print_string("On écrit sur les murs à l'aide de nos mains");
 	//print_new_line();
 	//print_string("OK dok");

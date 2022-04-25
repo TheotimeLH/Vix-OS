@@ -20,194 +20,194 @@
 
 isr0:
 	cli
-	pushl 0
-	pushl 0
+	push $0
+	push $0
 	jmp isr_common_stub
 
 isr1:
 	cli
-	pushl 0
-	pushl 1
+	push $0
+	push $1
 	jmp isr_common_stub
 
 isr2:
 	cli
-	pushl 0
-	pushl 2
+	push $0
+	push $2
 	jmp isr_common_stub
 
 isr3:
 	cli
-	pushl 0
-	pushl 3
+	push $0
+	push $3
 	jmp isr_common_stub
 
 isr4:
 	cli
-	pushl 0
-	pushl 4
+	push $0
+	push $4
 	jmp isr_common_stub
 
 isr5:
 	cli
-	pushl 0
-	pushl 5
+	push $0
+	push $5
 	jmp isr_common_stub
 
 isr6:
 	cli
-	pushl 0
-	pushl 6
+	push $0
+	push $6
 	jmp isr_common_stub
 
 isr7:
 	cli
-	pushl 0
-	pushl 7
+	push $0
+	push $7
 	jmp isr_common_stub
 
 isr8:
 	cli
-	#pushl 0
-	pushl 8
+	#push 0
+	push $8
 	jmp isr_common_stub
 
 isr9:
 	cli
-	pushl 0
-	pushl 9
+	push $0
+	push $9
 	jmp isr_common_stub
 
 isr10:
 	cli
-	#pushl 0
-	pushl 10
+	#push 0
+	push $10
 	jmp isr_common_stub
 
 isr11:
 	cli
-	#pushl 0
-	pushl 11
+	#push 0
+	push $11
 	jmp isr_common_stub
 
 isr12:
 	cli
-	#pushl 0
-	pushl 12
+	#push 0
+	push $12
 	jmp isr_common_stub
 
 isr13:
 	cli
-	#pushl 0
-	pushl 13
+	#push 0
+	push $13
 	jmp isr_common_stub
 
 isr14:
 	cli
-	#pushl 0
-	pushl 14
+	#push 0
+	push $14
 	jmp isr_common_stub
 
 isr15:
 	cli
-	pushl 0
-	pushl 15
+	push $0
+	push $15
 	jmp isr_common_stub
 
 isr16:
 	cli
-	pushl 0
-	pushl 16
+	push $0
+	push $16
 	jmp isr_common_stub
 
 isr17:
 	cli
-	pushl 0
-	pushl 17
+	push $0
+	push $17
 	jmp isr_common_stub
 
 isr18:
 	cli
-	pushl 0
-	pushl 18
+	push $0
+	push $18
 	jmp isr_common_stub
 
 isr19:
 	cli
-	pushl 0
-	pushl 19
+	push $0
+	push $19
 	jmp isr_common_stub
 
 isr20:
 	cli
-	pushl 0
-	pushl 20
+	push $0
+	push $20
 	jmp isr_common_stub
 
 isr21:
 	cli
-	pushl 0
-	pushl 21
+	push $0
+	push $21
 	jmp isr_common_stub
 
 isr22:
 	cli
-	pushl 0
-	pushl 22
+	push $0
+	push $22
 	jmp isr_common_stub
 
 isr23:
 	cli
-	pushl 0
-	pushl 23
+	push $0
+	push $23
 	jmp isr_common_stub
 
 isr24:
 	cli
-	pushl 0
-	pushl 24
+	push $0
+	push $24
 	jmp isr_common_stub
 
 isr25:
 	cli
-	pushl 0
-	pushl 25
+	push $0
+	push $25
 	jmp isr_common_stub
 
 isr26:
 	cli
-	pushl 0
-	pushl 26
+	push $0
+	push $26
 	jmp isr_common_stub
 
 isr27:
 	cli
-	pushl 0
-	pushl 27
+	push $0
+	push $27
 	jmp isr_common_stub
 
 isr28:
 	cli
-	pushl 0
-	pushl 28
+	push $0
+	push $28
 	jmp isr_common_stub
 
 isr29:
 	cli
-	pushl 0
-	pushl 29
+	push $0
+	push $29
 	jmp isr_common_stub
 
 isr30:
 	cli
-	pushl 0
-	pushl 30
+	push $0
+	push $30
 	jmp isr_common_stub
 
 isr31:
 	cli
-	pushl 0
-	pushl 31
+	push $0
+	push $31
 	jmp isr_common_stub
 
 isr_common_stub:
@@ -216,21 +216,21 @@ isr_common_stub:
 	push %eax
 
 	mov $0x10, %ax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
+	mov %eax, %ds
+	mov %eax, %es
+	mov %eax, %fs
+	mov %eax, %gs
 
 	call isr_handler
 	
 	pop %eax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
+	mov %eax, %ds
+	mov %eax, %es
+	mov %eax, %fs
+	mov %eax, %gs
 
 	popa
-	add $8, %esp
+	add $0x8, %esp
 	sti
 	iret
 
