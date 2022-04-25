@@ -153,17 +153,7 @@ void move_to_text(){
 // test entry - TO BE DELETED LATER ON -
 //
 
-void isr_handler(registers_t regs){
-	print_string("received interrupt :");
-	print_int(regs.int_no);
-	print_new_line();
-	//print_string("error code :");
-	//print_int(regs.err_code);
-}
 
-void irq_handler(){
-
-}
 
 void test_entry()
 {
