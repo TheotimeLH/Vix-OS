@@ -18,6 +18,9 @@ VixOS.iso : VixOS.bin grub.cfg
 	grub-mkrescue -o VixOS.iso isodir
 
 run : VixOS.iso
+	qemu-system-i386 -soundhw all -cdrom VixOS.iso
+
+debug : VixOS.iso
 	qemu-system-i386 -s -S -soundhw all -cdrom VixOS.iso
 
 clean : 

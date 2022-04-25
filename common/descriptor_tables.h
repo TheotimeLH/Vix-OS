@@ -1,6 +1,7 @@
 
 #ifndef DESCRI_TABLES_H
 #define DESCRI_TABLES_H
+
 struct gdt_entry_struct
 {
 	uint16 limit_low;
@@ -10,7 +11,6 @@ struct gdt_entry_struct
 	uint8 granularity;
 	uint8 base_high;
 } __attribute__((packed));
-
 typedef struct gdt_entry_struct gdt_entry_t;
 
 

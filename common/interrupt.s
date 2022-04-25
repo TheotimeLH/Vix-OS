@@ -68,7 +68,7 @@ isr7:
 
 isr8:
 	cli
-	pushl 0
+	#pushl 0
 	pushl 8
 	jmp isr_common_stub
 
@@ -80,31 +80,31 @@ isr9:
 
 isr10:
 	cli
-	pushl 0
+	#pushl 0
 	pushl 10
 	jmp isr_common_stub
 
 isr11:
 	cli
-	pushl 0
+	#pushl 0
 	pushl 11
 	jmp isr_common_stub
 
 isr12:
 	cli
-	pushl 0
+	#pushl 0
 	pushl 12
 	jmp isr_common_stub
 
 isr13:
 	cli
-	pushl 0
+	#pushl 0
 	pushl 13
 	jmp isr_common_stub
 
 isr14:
 	cli
-	pushl 0
+	#pushl 0
 	pushl 14
 	jmp isr_common_stub
 
@@ -212,33 +212,24 @@ isr31:
 
 isr_common_stub:
 	pusha
-	#push %rdi
-	#push %rsi
-	#push %rbp
-	#push %rsp
-	#push %rbx
-	#push %rdx
-	#push %rcx
-	#push %rax
 	mov %ds, %ax
 	push %eax
 
-	mov 0x10, %ax
+	mov $0x10, %ax
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %fs
+	mov %ax, %gs
+
+	call isr_handler
+	
+	pop %eax
 	mov %ax, %ds
 	mov %ax, %es
 	mov %ax, %fs
 	mov %ax, %gs
 
 	popa
-	#pop %rax
-	#pop %rcx
-	#pop %rdx
-	#pop %rbx
-	#pop %rsp
-	#pop %rbp
-	#pop %rsi
-	#pop %rdi
-
 	add $8, %esp
 	sti
 	iret

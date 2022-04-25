@@ -163,14 +163,14 @@ void test_entry()
 {
 	init_vga(BLACK, WHITE);
 	init_descriptor_tables();
-	print_string("On écrit sur les murs à l'aide de nos mains");
-	print_new_line();
-	print_string("OK dok");
-	write_char(10, 10, 'a');
-	scroll();
-	scroll();
-	move_to_text();
 	asm volatile("int $0x3");
+	//print_string("On écrit sur les murs à l'aide de nos mains");
+	//print_new_line();
+	//print_string("OK dok");
+	//write_char(10, 10, 'a');
+	//scroll();
+	//scroll();
+	//move_to_text();
 	//asm volatile("int $0x4");
 	//scroll();
 	/*
