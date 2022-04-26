@@ -1,214 +1,79 @@
-.global isr0, isr1, isr2, isr3, isr4, isr5, isr6, isr7, isr8, isr9, isr10, isr11, isr12, isr13, isr14, isr15, isr16, isr17, isr18, isr19, isr20, isr21, isr22, isr23, isr24, isr25, isr26, isr27, isr28, isr29, isr30, isr31 
+.macro ISR_NOERRCODE n
+	.global isr\n
+	isr\n:
+		cli
+		push $0
+		push $\n
+		jmp isr_common_stub
+.endm
 
+.macro ISR_ERRCODE n
+	.global isr\n
+	isr\n:
+		cli
+		push $\n
+		jmp isr_common_stub
+.endm
 
+ISR_NOERRCODE 0
+ISR_NOERRCODE 1
+ISR_NOERRCODE 2
+ISR_NOERRCODE 3
+ISR_NOERRCODE 4
+ISR_NOERRCODE 5
+ISR_NOERRCODE 6
+ISR_NOERRCODE 7
+ISR_ERRCODE 8
+ISR_NOERRCODE 9
+ISR_ERRCODE 10
+ISR_ERRCODE 11
+ISR_ERRCODE 12
+ISR_ERRCODE 13
+ISR_ERRCODE 14
+ISR_NOERRCODE 15
+ISR_NOERRCODE 16
+ISR_NOERRCODE 17
+ISR_NOERRCODE 18
+ISR_NOERRCODE 19
+ISR_NOERRCODE 20
+ISR_NOERRCODE 21
+ISR_NOERRCODE 22
+ISR_NOERRCODE 23
+ISR_NOERRCODE 24
+ISR_NOERRCODE 25
+ISR_NOERRCODE 26
+ISR_NOERRCODE 27
+ISR_NOERRCODE 28
+ISR_NOERRCODE 29
+ISR_NOERRCODE 30
+ISR_NOERRCODE 31
 
-#.macro ISR_NOERRCODE n
-#	isr\n:
-#		cli
-#		push 0
-#		push \n
-#		jmp isr_common_stub
-#.endm
+.macro IRQ n m # On fait un macro pour tout les irq ( ce qu'on aurait du faire pour les isr )
+	.global irq\n
+	irq\n:
+		cli
+		push $0
+		push $\m
+		jmp irq_common_stub
+.endm
 
-#.macro ISR_ERRCODE n
-#	isr\n:
-#		cli
-#		push \n
-#		jmp isr_common_stub
-#.endm
+IRQ 0, 32
+IRQ 1, 33
+IRQ 2, 34
+IRQ 3, 35
+IRQ 4, 36
+IRQ 5, 37
+IRQ 6, 38
+IRQ 7, 39
+IRQ 8, 40
+IRQ 9, 41
+IRQ 10, 42
+IRQ 11, 43
+IRQ 12, 44
+IRQ 13, 45
+IRQ 14, 46
+IRQ 15, 47
 
-
-isr0:
-	cli
-	pushl 0
-	pushl 0
-	jmp isr_common_stub
-
-isr1:
-	cli
-	pushl 0
-	pushl 1
-	jmp isr_common_stub
-
-isr2:
-	cli
-	pushl 0
-	pushl 2
-	jmp isr_common_stub
-
-isr3:
-	cli
-	pushl 0
-	pushl 3
-	jmp isr_common_stub
-
-isr4:
-	cli
-	pushl 0
-	pushl 4
-	jmp isr_common_stub
-
-isr5:
-	cli
-	pushl 0
-	pushl 5
-	jmp isr_common_stub
-
-isr6:
-	cli
-	pushl 0
-	pushl 6
-	jmp isr_common_stub
-
-isr7:
-	cli
-	pushl 0
-	pushl 7
-	jmp isr_common_stub
-
-isr8:
-	cli
-	#pushl 0
-	pushl 8
-	jmp isr_common_stub
-
-isr9:
-	cli
-	pushl 0
-	pushl 9
-	jmp isr_common_stub
-
-isr10:
-	cli
-	#pushl 0
-	pushl 10
-	jmp isr_common_stub
-
-isr11:
-	cli
-	#pushl 0
-	pushl 11
-	jmp isr_common_stub
-
-isr12:
-	cli
-	#pushl 0
-	pushl 12
-	jmp isr_common_stub
-
-isr13:
-	cli
-	#pushl 0
-	pushl 13
-	jmp isr_common_stub
-
-isr14:
-	cli
-	#pushl 0
-	pushl 14
-	jmp isr_common_stub
-
-isr15:
-	cli
-	pushl 0
-	pushl 15
-	jmp isr_common_stub
-
-isr16:
-	cli
-	pushl 0
-	pushl 16
-	jmp isr_common_stub
-
-isr17:
-	cli
-	pushl 0
-	pushl 17
-	jmp isr_common_stub
-
-isr18:
-	cli
-	pushl 0
-	pushl 18
-	jmp isr_common_stub
-
-isr19:
-	cli
-	pushl 0
-	pushl 19
-	jmp isr_common_stub
-
-isr20:
-	cli
-	pushl 0
-	pushl 20
-	jmp isr_common_stub
-
-isr21:
-	cli
-	pushl 0
-	pushl 21
-	jmp isr_common_stub
-
-isr22:
-	cli
-	pushl 0
-	pushl 22
-	jmp isr_common_stub
-
-isr23:
-	cli
-	pushl 0
-	pushl 23
-	jmp isr_common_stub
-
-isr24:
-	cli
-	pushl 0
-	pushl 24
-	jmp isr_common_stub
-
-isr25:
-	cli
-	pushl 0
-	pushl 25
-	jmp isr_common_stub
-
-isr26:
-	cli
-	pushl 0
-	pushl 26
-	jmp isr_common_stub
-
-isr27:
-	cli
-	pushl 0
-	pushl 27
-	jmp isr_common_stub
-
-isr28:
-	cli
-	pushl 0
-	pushl 28
-	jmp isr_common_stub
-
-isr29:
-	cli
-	pushl 0
-	pushl 29
-	jmp isr_common_stub
-
-isr30:
-	cli
-	pushl 0
-	pushl 30
-	jmp isr_common_stub
-
-isr31:
-	cli
-	pushl 0
-	pushl 31
-	jmp isr_common_stub
 
 isr_common_stub:
 	pusha
@@ -216,21 +81,46 @@ isr_common_stub:
 	push %eax
 
 	mov $0x10, %ax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
+	mov %eax, %ds
+	mov %eax, %es
+	mov %eax, %fs
+	mov %eax, %gs
 
 	call isr_handler
 	
 	pop %eax
-	mov %ax, %ds
-	mov %ax, %es
-	mov %ax, %fs
-	mov %ax, %gs
+	mov %eax, %ds
+	mov %eax, %es
+	mov %eax, %fs
+	mov %eax, %gs
 
 	popa
-	add $8, %esp
+	add $0x8, %esp
+	sti
+	iret
+
+irq_common_stub: # Pour gerer les irq
+	pusha
+
+	mov %ds, %ax
+	push %eax
+
+	mov $0x10, %ax
+	mov %eax, %ds
+	mov %eax, %es
+	mov %eax, %fs
+	mov %eax, %gs
+
+	call irq_handler
+
+	pop %ebx
+	mov %ebx, %ds
+	mov %ebx, %es
+	mov %ebx, %fs
+	mov %ebx, %gs
+
+	popa
+	add $0x8, %esp
 	sti
 	iret
 

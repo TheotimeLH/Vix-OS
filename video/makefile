@@ -7,7 +7,7 @@ vga_driver.o : vga_driver.c
 	i686-elf-gcc -ggdb -m32 -c vga_driver.c -o vga_driver.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	objcopy --only-keep-debug vga_driver.o vga.debug
 
-VixOS.bin : linker.ld vga_driver.o boot.o ../common/common.o ../sound/sound_driver.o ../common/descriptor_tables.o ../common/interrupt.o ../common/isr.o ../common/gdt_flush.o
+VixOS.bin : linker.ld vga_driver.o boot.o ../common/common.o ../sound/sound_driver.o ../common/descriptor_tables.o ../common/interrupt.o ../common/isr.o ../common/gdt_flush.o ../common/timer.o
 	i686-elf-gcc -ggdb -T $^ -o VixOS.bin -nostdlib
 	grub-file --is-x86-multiboot VixOS.bin
 
