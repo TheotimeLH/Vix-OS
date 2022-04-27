@@ -4,10 +4,10 @@
  * ________________________________
  *
  * Bloc alloué :
- * 	entête
+ * 	entête (0*8)
  * 	taille (uint32)
  * 	espace mémoire
- * 	entête
+ * 	entête (0*8)
  *
  * Bloc libre :
  * 	entête
@@ -141,8 +141,12 @@ void free(void* base[30], uint8* bloc)
 void* malloc(void* base[30], uint32 n)
 {
 	uint8* bloc = find(base, n+5) ;
-	if (bloc == NULL) bloc = sbrk(n+6) ;
-	else unlink(base, bloc) ;
+	if (bloc != NULL) {
+		uint32 n_old = size(bloc) ;
+		unlink(base, bloc) ;
+		if (n_old>n+5) init_bloc(bloc+n+1, bloc+n_old) ; 
+	}
+	else bloc = sbrk(n+6) ;
 	*(bloc+n+5) = *bloc = 0	;
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
