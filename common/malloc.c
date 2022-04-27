@@ -142,18 +142,12 @@ void* malloc(void* base[30], uint32 n)
 {
 	uint8* bloc = find(base, n+5) ;
 	if (bloc != NULL) {
-		uint32 n_old = size(bloc) ;
 		unlink(base, bloc) ;
-		if (n_old>n+5) init_bloc(bloc+n+1, bloc+n_old) ; 
-	}
+		uint32 n_old = size(bloc) ;
+		if (n_old>n+5) init_bloc(bloc+n+6, bloc+n_old) ; }
 	else bloc = sbrk(n+6) ;
 	*(bloc+n+5) = *bloc = 0	;
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
-}
-
-int main()
-{
-	return 0 ;
 }
 
