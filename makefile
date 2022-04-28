@@ -14,6 +14,9 @@ common :  # On appeler le makefile de common
 video :
 	cd common && make
 
+kernel : 
+	cd kernel && make
+
 %.o : %.c
 	i686-elf-gcc -ggdb -m32 -c $< -o $@ -std=gnu99 -ffreestanding -O2
 
@@ -26,11 +29,11 @@ run : VixOS.iso
 debug : VixOS.iso
 	qemu-system-i386 -s -S -soundhw all -cdrom VixOS.iso
 
-VixOS.bin : linker.ld main.o $(COMMON_INCLUDE) $(COMMON_INCLUDE_) video/vga_driver.o boot.o 
+VixOS.bin : linker.ld  $(COMMON_INCLUDE) $(COMMON_INCLUDE_) video/vga_driver.o boot.o kernel/main.o
 	i686-elf-gcc -ggdb -T $^ -o VixOS.bin -nostdlib
 	grub-file --is-x86-multiboot VixOS.bin
 
-VixOS.iso : VixOS.bin grub.cfg 
+VixOS.iso : common video kernel VixOS.bin grub.cfg 
 	mkdir -p isodir/boot/grub
 	cp VixOS.bin isodir/boot/VixOS.bin
 	cp grub.cfg isodir/boot/grub/grub.cfg
