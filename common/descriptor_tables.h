@@ -22,7 +22,13 @@ struct gdt_ptr_struct
 
 typedef struct gdt_ptr_struct gdt_ptr_t;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void init_descriptor_tables();
+#ifdef __cplusplus
+}
+#endif
 
 
 #include <stdint.h>

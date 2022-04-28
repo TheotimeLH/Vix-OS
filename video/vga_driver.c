@@ -157,7 +157,7 @@ void move_to_text(){
 //
 
 
-
+/*
 void test_entry()
 {
 	init_vga(BLACK, WHITE);
@@ -187,4 +187,4 @@ void test_entry()
 //	draw_rectangle_color(20,20,10,10, '@', BLACK,WHITE);
 //	init_vga_graphic(WHITE,BLACK);
 
-}
+//}

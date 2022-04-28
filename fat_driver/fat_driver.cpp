@@ -123,8 +123,6 @@ Fat_infos fat_init(Fat_system* intf)
     return ret;
 }
 
-
-
 uint32_t fat_next_cluster(uint32_t current_cluster,Fat_system* intf,Fat_infos* infos)
 {
     uint8_t byte_per_entry=(infos->fat_type==12)?3:(infos->fat_type/8);

@@ -35,6 +35,7 @@ class Fat_entry
 {
 public:
     Fat_entry(){};
+    Fat_entry(bool is_directory,char* name):Fat_entry(0,is_directory,name,0){};
     Fat_entry(uint32_t cluster,bool is_directory,char* name,uint32_t size)
     :m_is_directory(is_directory),m_first_cluster(cluster),m_current_cluster(cluster),
     m_current_entry_offset(0),m_last_entry(0),m_size(size)
@@ -72,7 +73,6 @@ public:
     //  - pour la racine en fat12/16 : infos.sector_size/32
     //  - sinon, infos.byte_per_cluster/32
     uint32_t read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf);
-
 private:
     uint32_t m_first_cluster;//0 for root (FAT12/16)
     char m_name[9];
@@ -80,6 +80,7 @@ private:
     uint32_t m_current_cluster;//sector offset for fat12/16 root
     uint32_t m_size;//en octets
     uint32_t m_current_entry_offset;//for directory
+    uint32_t m_next_free_entry;//for directory
     bool m_last_entry;//..
 };
 
