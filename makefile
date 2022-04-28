@@ -26,7 +26,7 @@ run : VixOS.iso
 debug : VixOS.iso
 	qemu-system-i386 -s -S -soundhw all -cdrom VixOS.iso
 
-VixOS.bin : linker.ld $(COMMON_INCLUDE) $(COMMON_INCLUDE_) video/vga_driver.o boot.o 
+VixOS.bin : linker.ld main.o $(COMMON_INCLUDE) $(COMMON_INCLUDE_) video/vga_driver.o boot.o 
 	i686-elf-gcc -ggdb -T $^ -o VixOS.bin -nostdlib
 	grub-file --is-x86-multiboot VixOS.bin
 
