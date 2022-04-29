@@ -22,6 +22,23 @@ uint16 inw(uint16 port){
 	return ret;
 }
 
+inline void cli()
+{
+	asm volatile("cli");
+}
+
+inline void sti()
+{
+	asm volatile("sti");
+}
+
+uint32 get_esp()
+{
+	uint32 ret;
+	asm volatile("mov %%esp,%0":"=a" (ret));
+	return ret;
+}
+
 // Misc 
 uint32 digit_count(int num){
 	uint32 count = 0;

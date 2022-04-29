@@ -4,12 +4,23 @@
 #include "../video/vga_driver.h"
 
 uint32 tick = 0;
+bool seconde=false;
+
+bool get_seconde()
+{
+	return seconde;
+}
+
+void set_seconde()
+{
+	seconde=false;
+}
 
 static void timer_callback(registers_t regs){
 	tick++;
 	if(tick%20==0)
 	{
-		print_string("Tick: ");
+		print_string("Tick : ");
 		print_int(tick);
 		print_new_line();
 	}

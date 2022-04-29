@@ -29,6 +29,10 @@ uint32 digit_count(int num);
 void print_hexa(uint32 x);
 bool strcmp(const char* a,const char* b);
 
+void cli();
+void sti();
+uint32 get_esp();
+
 #ifdef __cplusplus
 }
 #endif

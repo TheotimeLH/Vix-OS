@@ -51,10 +51,10 @@ public:
             }
         }
     };
-    const char* get_name(){return m_name;};
-    const bool is_directory(){return m_is_directory;};
+    char* get_name(){return m_name;};
+    bool is_directory(){return m_is_directory;};
     void init_offset(){m_current_cluster=m_first_cluster;m_current_entry_offset=0;m_last_entry=false;};
-    const uint32_t get_size(){return m_size;};
+    uint32_t get_size(){return m_size;};
 
     //uniquement pour les fichiers
     //renvoit la taille lue en octet
@@ -74,14 +74,13 @@ public:
     //  - sinon, infos.byte_per_cluster/32
     uint32_t read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf);
 private:
-    uint32_t m_first_cluster;//0 for root (FAT12/16)
-    char m_name[9];
     bool m_is_directory;
+    uint32_t m_first_cluster;//0 for root (FAT12/16)
     uint32_t m_current_cluster;//sector offset for fat12/16 root
-    uint32_t m_size;//en octets
     uint32_t m_current_entry_offset;//for directory
-    uint32_t m_next_free_entry;//for directory
     bool m_last_entry;//..
+    uint32_t m_size;//en octets
+    char m_name[9];
 };
 
 Fat_infos fat_init(Fat_system* intf);
