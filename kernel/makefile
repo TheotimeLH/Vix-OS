@@ -1,6 +1,6 @@
 common = ../common/common.o ../common/descriptor_tables.o ../common/interrupt.o ../common/gdt_flush.o ../common/isr.o ../common/timer.o
 other = ../fat_driver/fat_driver.o ../ata_driver/ata_driver.o ../video/vga_driver.o
-kernel=process.o main.o boot.o
+kernel=process.o main.o boot.o syscall.o
 
 a.out:linker.ld makefile $(kernel)  $(common) $(other)
 	i686-elf-g++ -T linker.ld $(kernel) $(common) $(other) -nostdlib -ffreestanding
@@ -36,9 +36,8 @@ run:a.out
 %.o:%.cpp
 	i686-elf-g++ -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti
 
-prog:prog_test/prog.s
-	i686-elf-as -o prog_test/prog.o prog_test/prog.s
-	i686-elf-gcc -o prog_test/prog prog_test/prog.o -nostdlib
+prog:
+	make --directory=prog_test
 	sudo mount test /mnt/test
 	sudo cp prog_test/prog /mnt/test
 	sudo umount test

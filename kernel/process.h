@@ -5,6 +5,9 @@
 #include "../common/isr.h"
 #include "../fat_driver/fat_driver.h"
 
+#define get_uint32(buff,addr) *(uint32*)(&buff[addr])
+#define get_uint16(buff,addr) *(uint16*)(&buff[addr])
+
 typedef enum proc_state
 {
     WAITING,RUNNABLE,ZOMBIE,FREE

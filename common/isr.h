@@ -30,7 +30,14 @@ typedef struct registers
 
 typedef void (*isr_t)(registers_t);
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 void register_interrupt_handler(uint8 n, isr_t handler);
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif

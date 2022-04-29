@@ -1,19 +1,19 @@
-//.section .bss
-//.align 16
-//stack_bottom:
-//.skip 0x10000
-//stack_top:
+.section .bss
+.align 16
+stack_bottom:
+.skip 0x10000
+stack_top:
  
 .section .text
 .global _start
 _start:
-//	mov $stack_top, %esp
+	mov $stack_top, %esp
 
-	mov $0xB8000,%edi
-	movw $0x4270,(%edi)
+	movw $0x0742,(0xB8000)
+	mov $0x42694269,%eax
 
-	int $0x3
-	movw $0x4270,2(%edi)
+	int $0x42
+	int $0x42
  
 
 1:

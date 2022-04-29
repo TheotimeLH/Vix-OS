@@ -47,6 +47,7 @@ ISR_NOERRCODE 28
 ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
+ISR_NOERRCODE 66
 
 .macro IRQ n m # On fait un macro pour tout les irq ( ce qu'on aurait du faire pour les isr )
 	.global irq\n

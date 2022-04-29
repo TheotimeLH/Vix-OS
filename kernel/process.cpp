@@ -3,8 +3,6 @@
 const uint32 n_process=10;
 process tab_process[n_process];
 
-#define get_uint32(buff,addr) *(uint32*)(&buff[addr])
-#define get_uint16(buff,addr) *(uint16*)(&buff[addr])
 
 void init_process_tab()
 {
@@ -83,6 +81,5 @@ void run_process(uint32 pid)
     process *proc=&tab_process[pid];
     if(proc->state!=RUNNABLE)
         return;
-    print_string("coucou");
-    asm volatile("jmp 0x08048054");//*%0"::"a"(proc->pg_entry));
+    asm volatile("jmp *%0"::"a"(proc->saved_context.eip));
 }
