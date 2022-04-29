@@ -24,7 +24,7 @@
  * 	is_small (<16)
  * 	size:4 (if is_small)
  */
-
+/*
 #include "common.h"
 
 extern void* sbrk(uint32) ;
@@ -150,4 +150,4 @@ void* malloc(void* base[30], uint32 n)
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
 }
-
+*/
