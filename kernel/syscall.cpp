@@ -5,7 +5,18 @@
 static void syscall(registers_t regs)
 {
     //rétablir le contexte du noyau ??
-    print_hexa(*(uint32*)(regs.esp-4));
+    uint32* eax=(uint32*)(regs.esp-4);
+    switch (*eax)
+    {
+    case 0:
+        *eax=get_ticks();
+        break;
+    case 1:
+    default:
+        break;
+    }
+    print_new_line();
+    *(uint32*)(regs.esp-4)=0x666;
 }
 
 void init_syscalls()
