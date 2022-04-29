@@ -78,7 +78,7 @@ void itoa(int num, char* number){
 
 
 
-bool strcmp(const char* a,const char* b)
+int strcmp(const char* a,const char* b)
 {
     for(int i=0;;i++)
     {

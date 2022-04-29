@@ -1,9 +1,14 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+
 typedef unsigned int uint32;
 typedef unsigned short uint16;
 typedef unsigned char uint8;
+
+typedef uint32 uint32_t;
+typedef uint16 uint16_t;
+typedef uint8 uint8_t;
 
 #include <stddef.h>
 //#include <stdbool.h> probleme de compatibilité car inclus string.h
@@ -27,7 +32,7 @@ void itoa(int num, char *number);
 uint32 strlen(const char* str);
 uint32 digit_count(int num);
 void print_hexa(uint32 x);
-bool strcmp(const char* a,const char* b);
+int strcmp(const char* a,const char* b);
 
 void cli();
 void sti();

@@ -31,7 +31,7 @@ void init_descriptor_tables();
 #endif
 
 
-#include <stdint.h>
+//#include <stdint.h>
 
 
 // A struct describing an interrupt gate.

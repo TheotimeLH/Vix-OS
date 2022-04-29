@@ -2,7 +2,7 @@
 #define _FAT_DRIVER_H_
 
 #include <stddef.h>
-#include <stdint.h>
+#include "../common/common.h"
 #include "../ata_driver/ata_driver.h"
 #include "../video/vga_driver.h"
 

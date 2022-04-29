@@ -1,6 +1,6 @@
-#include <stdbool.h>
+//#include <stdbool.h>
 //#include <stddef.h>
-#include <stdint.h>
+//#include <stdint.h>
 #include "../common/common.h"
 #include "../video/vga_driver.h"
 
