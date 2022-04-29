@@ -1,4 +1,8 @@
 #include "common.h"
+#include "kheap.h"
+
+extern uint32 end;
+uint32 placement_adress = (uint32)&end;
 
 uint32 kmalloc_int(uint32 sz, int align, uint32 *phys){
 	if(align == 1 && (placement_adress & 0xFFFFF000)){ // Si l'adresse est pas alignée
