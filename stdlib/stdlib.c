@@ -3,22 +3,34 @@
 uint32 get_ticks()
 {
     uint32 tick;
+
     asm volatile("mov $0,%eax");
     asm volatile("int $0x42");
     asm volatile("mov %%eax,%0"::"m"(tick));
+
     return tick;
 }
 
 void write(uint32 file_desc,char *str)
 {
+    asm volatile("push %esi");
+    asm volatile("push %eax");
+    asm volatile("push %edi");
+
     asm volatile("mov %0,%%esi":"=m"(str));
     asm volatile("mov $1,%eax");
     asm volatile("mov %0,%%edi":"=m"(file_desc));
     asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+    asm volatile("pop %eax");
+    asm volatile("pop %esi");
 }
 
 void print_screen(uint32 x,uint32 y,char car,uint8 fg_color,uint8 bg_color)
 {
+    asm volatile("push %edi");
+    asm volatile("push %eax");
     if(x>80)
         x=80;
     if(y>25)
@@ -27,4 +39,7 @@ void print_screen(uint32 x,uint32 y,char car,uint8 fg_color,uint8 bg_color)
     asm volatile("mov %0,%%edi":"=m"(edi));
     asm volatile("mov $3,%eax");
     asm volatile("int $0x42");
+
+    asm volatile("pop %eax");
+    asm volatile("pop %edi");
 }

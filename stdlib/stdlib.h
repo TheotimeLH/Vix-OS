@@ -5,7 +5,7 @@ typedef unsigned int uint32;
 typedef unsigned short uint16;
 typedef unsigned char uint8;
 
-enum vga_color {
+typedef enum vga_color {
 	BLACK,
 	BLUE,
 	GREEN,
@@ -22,7 +22,7 @@ enum vga_color {
 	BRIGHT_MAGENTA,
 	YELLOW,
 	WHITE,
-};
+} vga_color;
 
 uint32 get_ticks();
 void write(uint32 file_desc,char *str);

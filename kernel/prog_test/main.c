@@ -4,18 +4,12 @@ char* msg="coucou depuis le programme\n";
 
 int main()
 {
-    int tick=0;
-    int old_tick=0;
-    int changement=0;
-    while(1)
-    {
-        old_tick=tick;
-        tick=get_ticks();
-        changement=tick!=old_tick;
-        if(tick%1000==0&&changement)
-        {
-            write(0,msg);
-        }
-    }
+    print_screen(10,10,'B',RED,GREEN);
+    print_screen(11,10,'O',GREEN,WHITE);
+    print_screen(12,10,'N',WHITE,MAGENTA);
+    print_screen(13,10,'J',MAGENTA,YELLOW);
+    print_screen(14,10,'O',YELLOW,CYAN);
+    print_screen(15,10,'U',CYAN,BROWN);
+    print_screen(16,10,'R',BROWN,RED);
     return 0;	
 }
