@@ -43,19 +43,16 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
     //init_paging();
-    init_process_tab();
+    //init_process_tab();
     init_vga(0x07,0x0);
-    // if(magic!=MULTIBOOT_BOOTLOADER_MAGIC||(mbd->flags))
-    // {
-        // PANIC("memory map mal chargée par grub");
-    // }
 
 
+
+    while(1);
     init_timer(1000);
     init_syscalls();
 		init_keyboard();
     charger_prog();
-    while(1);
 
 
      while(1){
@@ -70,3 +67,30 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 			 }
 		 }
 }
+
+    // if(magic!=MULTIBOOT_BOOTLOADER_MAGIC||!(mbd->flags>>6&0x1))
+    // {
+        // PANIC("memory map mal chargee par grub");
+    // }
+    // int i;
+    // for(i = 0; i < mbd->mmap_length; 
+        // i += sizeof(multiboot_memory_map_t)) 
+    // {
+        // multiboot_memory_map_t* mmmt = 
+            // (multiboot_memory_map_t*) (mbd->mmap_addr + i);
+//  
+//  
+        // if(mmmt->type == MULTIBOOT_MEMORY_AVAILABLE)
+        // {
+            // print_string("Start Addr: ");
+            // print_hexa(mmmt->addr);
+            // print_string("\nLength: ");
+            // print_hexa(mmmt->len);
+            // print_string("\nSize: ");
+            // print_hexa(mmmt->size);
+            // print_string("\nType:");
+            // print_hexa(mmmt->type);
+            // print_new_line();
+            // print_new_line();
+        // }
+    // }
