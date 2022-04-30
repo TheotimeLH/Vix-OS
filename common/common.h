@@ -23,7 +23,7 @@ typedef uint8 uint8_t;
 extern "C" {
 #endif
 
-void *memset(void *__s, int __c, size_t __n); //__THROW __nonnull((1));
+void *memset(void *pointer, int value, size_t count); //__THROW __nonnull((1));
 void outb(uint8 value, uint16 port);
 void outw(uint16 value, uint16 port);
 uint8 inb(uint16 port);

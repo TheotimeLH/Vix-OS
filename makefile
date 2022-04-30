@@ -14,7 +14,6 @@ INCLUDE_CPP = $(foreach dir, $(dirs), $(find_cpp_src))
 INCLUDE_S = $(foreach dir, $(dirs), $(find_s_src))
 
 INCLUDES = $(INCLUDE_C:.c=.o) $(INCLUDE_CPP:.cpp=.o) $(INCLUDE_S:.s=.o)#$(COMMON_INCLUDE) $(KERNEL_INCLUDE) ata_driver/ata_driver.o fat_driver/fat_driver.o video/vga_driver.o
-
 all : run
 
 get_includes :
@@ -53,8 +52,13 @@ VixOS.iso : common video kernel ata_driver fat_driver VixOS.bin grub.cfg
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o VixOS.iso isodir
 
+clean_all :
+	rm -f *.o *.iso
+	rm -fr isodir
+	$(foreach dir,$(dirs), cd $(dir) && make clean; ) 
+
 clean :
-	rm *.o *.iso
+	rm -f *.o *.iso
 	rm -fr isodir
 
 .PHONY : all run clean common ata_driver fat_driver video kernel

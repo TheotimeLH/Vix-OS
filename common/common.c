@@ -89,3 +89,11 @@ int strcmp(const char* a,const char* b)
     }
     return true;
 }
+
+
+void* memset (void* pointer, int value, size_t count){
+	uint8 *p = pointer;
+	while(count--)
+		*p++ = (uint8) value;
+	return pointer;
+}
