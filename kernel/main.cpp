@@ -41,7 +41,7 @@ void charger_prog()
 extern "C" void kernel_main()
 {
     init_descriptor_tables();
-    init_paging();
+    //init_paging();
     init_process_tab();
     init_vga(0x07,0x0);
     init_timer(1000);
@@ -49,16 +49,17 @@ extern "C" void kernel_main()
 		//init_keyboard();
     charger_prog();
 
+    while(1);
 
-    while(1){
-			union key k = keyboard_handler();
-			if (k.ch){
-				print_char(k.ch);
-			}
-			else if (k.sp){
-				if(k.sp == SPACE){
-					print_char(' ');
-				}
-			}
-		}
+    // while(1){
+			// union key k = keyboard_handler();
+			// if (k.ch){
+				// print_char(k.ch);
+			// }
+			// else if (k.sp){
+				// if(k.sp == SPACE){
+					// print_char(' ');
+				// }
+			// }
+		// }
 }

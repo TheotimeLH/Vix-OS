@@ -8,12 +8,6 @@ uint32 freq = 0;
 
 static void timer_callback(registers_t regs){
 	tick++;
-	/*
-	if(tick%1000==0)
-	{
-		//print_string("tick\n");
-	}
-	*/
 }
 
 void wait(uint32 milliseconds){

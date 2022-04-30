@@ -44,7 +44,7 @@ debug : VixOS.iso
 	qemu-system-i386 -s -S -cdrom VixOS.iso
 
 VixOS.bin : linker.ld  $(INCLUDES)
-	i686-elf-g++ -ggdb -T $^ -o $@ -nostdlib -ffreestanding
+	i686-elf-g++ -ggdb -T $^ -o $@ -ffreestanding -nostdlib
 	grub-file --is-x86-multiboot VixOS.bin
 
 VixOS.iso : common video kernel ata_driver fat_driver VixOS.bin grub.cfg 

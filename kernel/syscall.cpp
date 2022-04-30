@@ -17,6 +17,10 @@ static void syscall(registers_t regs)
             print_string((char*)regs.esi);
         }
         break;
+    case 3:
+        change_color(regs.edi>>7,regs.edi>>0);
+        write_char(regs.edi>>24,regs.edi>>16&0xff,regs.edi>>8&0xff);
+        break;
     default:
         break;
     }
