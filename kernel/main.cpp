@@ -5,7 +5,7 @@
 #include "../common/paging.h"
 #include "process.h"
 #include "syscall.h"
-#include "../keyboard/keyboard.h"
+#include "../common/keyboard.h"
 
 void charger_prog()
 {
