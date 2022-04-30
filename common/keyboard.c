@@ -2,6 +2,7 @@
 
 int available = 1;
 uint32 last_tick = 0;
+int shift_key = 0;
 
 uint8 get_scancode(){
 	uint8 code;
@@ -9,13 +10,25 @@ uint8 get_scancode(){
 	return code;
 }
 
-union key qwerty_config(uint8 code, int shift_key){
+
+static char shifter(char c){
+	// On traite le cas de si c est une lettre
+
+	if(0x61 <= c && c <= 0x7a){ // 
+		return c-0x20;
+	}
+	return c;
+}
+
+keyboard_t qwerty_config(uint8 code){
 	union key res;
+	uint8 type = 0;
 	res.ch = 0;
 	res.sp = 0;
 	switch (code){
 		case 0x01:
 			res.sp = ESCAPE;
+			type = 1;
 			break;
 		case 0x02:
 				res.ch = '1';
@@ -55,12 +68,14 @@ union key qwerty_config(uint8 code, int shift_key){
 			break;
 		case 0x0e:
 			res.sp = BACKSPACE;
+			type = 1;
 			break;
 		case 0x0f:
 			res.sp = TAB;
+			type = 1;
 			break;
 		case 0x10:
-				res.ch = 'q';
+			res.ch = 'q';
 			break;
 		case 0x11:
 			res.ch = 'w';
@@ -97,9 +112,11 @@ union key qwerty_config(uint8 code, int shift_key){
 			break;
 		case 0x1c:
 			res.sp = ENTER;
+			type = 1;
 			break;
 		case 0x1d:
 			res.sp = L_CTRL;
+			type = 1;
 			break;
 		case 0x1e:
 			res.ch = 'a';
@@ -139,6 +156,10 @@ union key qwerty_config(uint8 code, int shift_key){
 			break;
 		case 0x2a:
 			res.sp = L_SHIFT;
+			//if(!shift_key){
+				shift_key = !(shift_key);
+			//}
+			type = 1;
 			break;
 		case 0x2b:
 			res.ch = '\\';
@@ -175,18 +196,32 @@ union key qwerty_config(uint8 code, int shift_key){
 			break;
 		case 0x36:
 			res.sp = R_SHIFT;
+			type = 1;
 			break;
 		case 0x37:
 			res.ch = '*';
 			break;
 		case 0x38:
 			res.sp = L_ALT;
+			type = 1;
 			break;
 		case 0x39:
 			res.sp = SPACE;
+			type = 1;
+			break;
+		case 0xaa: // Si on relache le shift
+			res.sp = RELEASE;
+			shift_key = !(shift_key);
+			type = 1;
 			break;
 	}
-	return res;
+	keyboard_t fin;
+	if(shift_key && type == 0){
+		res.ch = shifter(res.ch);
+	}
+	fin.k = res;
+	fin.type = type;
+	return fin;
 }
 
 
@@ -198,9 +233,8 @@ void init_keyboard(){
 	register_interrupt_handler(33, make_available);
 }
 
-union key keyboard_handler(){
+keyboard_t keyboard_handler(){
 	uint8 code = 0;
-	int shift_key = 0;
 	if(available){
 		code = get_scancode();
 		available = 0;
@@ -216,5 +250,5 @@ union key keyboard_handler(){
 		shift_key = 1;
 	}
 	*/
-	return qwerty_config(code, shift_key);
+	return qwerty_config(code);
 }

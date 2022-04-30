@@ -1,7 +1,8 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "../common/common.h"
+#include "common.h"
+#include "isr.h"
 
 enum keyboard_disposition{
 	QWERTY,
@@ -9,6 +10,7 @@ enum keyboard_disposition{
 };
 
 enum special_key{
+	UNUSED = 0,
 	BACKSPACE,
 	ESCAPE,
 	SPACE,
@@ -19,8 +21,8 @@ enum special_key{
 	R_SHIFT,
 	TAB,
 	CAPS_LOCK,
+	RELEASE
 };
-
 
 union key
 {
@@ -28,12 +30,19 @@ union key
 	enum special_key sp;
 };
 
+typedef struct keyboard 
+{
+	uint8 type; // Si c'est 0 c'est un char sinon c'est un caractere spécial
+	union key k;
+} keyboard_t;
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 uint8 get_scancode();
-union key keyboard_handler();
+keyboard_t keyboard_handler();
 void init_keyboard();
 #ifdef __cplusplus
 }
