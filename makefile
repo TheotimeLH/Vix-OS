@@ -64,5 +64,6 @@ clean :
 	cd fat_driver && make clean
 	cd ata_driver && make clean
 	cd video && make clean
+	cd keyboard && make clean
 
 .PHONY : all run clean common ata_driver fat_driver video kernel

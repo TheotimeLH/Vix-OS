@@ -5,6 +5,7 @@
 #include "../common/paging.h"
 #include "process.h"
 #include "syscall.h"
+#include "../keyboard/keyboard.h"
 
 
 extern "C" void kernel_main()
@@ -46,8 +47,16 @@ extern "C" void kernel_main()
     print_new_line();
     run_process(load_process(buff,size));
 		*/
+		/*
 		uint32 *ptr = (uint32*)0xA0000000;
 		uint32 do_page_fault = *ptr;
 		return ;
-    while(1);
+		*/
+    while(1){
+			union key k = keyboard_handler();
+			if (k.ch){
+				print_char(k.ch);
+
+			}
+		}
 }
