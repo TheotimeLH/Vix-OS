@@ -9,7 +9,7 @@ static void timer_callback(registers_t regs){
 	tick++;
 	if(tick%1000==0)
 	{
-		print_string("coucou");
+		print_string("tick\n");
 	}
 }
 
@@ -31,11 +31,11 @@ void init_timer(uint32 frequency){
 	// print_string("Frequency : ");
 	// print_int(frequency);
 	// print_new_line();
-	outb(0x36, 0x43);
 	if(divisor==1)
 		divisor=2;
 	uint8 l = (uint8) (divisor & 0xFF);
 	uint8 h = (uint8) (divisor>>8 & 0xFF);
+	outb(0x36, 0x43);
 	outb(l, 0x40);
 	outb(h, 0x40);
 	asm volatile("sti");

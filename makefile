@@ -37,7 +37,8 @@ boot.o : boot.s
 	i686-elf-as -ggdb --32 $< -o $@
 
 run : VixOS.iso
-	qemu-system-i386 -kernel VixOS.bin #-cdrom VixOS.iso
+	qemu-system-i386 -kernel VixOS.bin -m 1G -drive file=kernel/disque,format=raw #-cdrom VixOS.iso
+
 
 debug : VixOS.iso
 	qemu-system-i386 -s -S -cdrom VixOS.iso

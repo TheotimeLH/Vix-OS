@@ -12,11 +12,14 @@ static void syscall(registers_t regs)
         *eax=get_ticks();
         break;
     case 1:
+        if(regs.edi==0)
+        {
+            print_string((char*)regs.esi);
+        }
+        break;
     default:
         break;
     }
-    print_new_line();
-    *(uint32*)(regs.esp-4)=0x666;
 }
 
 void init_syscalls()

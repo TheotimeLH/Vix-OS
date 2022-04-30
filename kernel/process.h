@@ -22,7 +22,7 @@ typedef struct process
 } process;
 
 void init_process_tab();
-uint32 load_process(uint8* elf,uint32 size,uint32 current_pid=0);
+uint32 load_process(uint8* elf,uint32 current_pid=0);
 void run_process(uint32 pid);
 
 #endif
