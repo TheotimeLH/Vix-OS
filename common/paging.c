@@ -16,7 +16,8 @@ void panic(char* msg, char* file, int line){
 	print_string(" in file : ");
 	print_string(file);
 	print_string(" at line : ");
-	print_new_line(line);
+	print_int(line);
+	print_new_line();
 	while(1);
 }
 
@@ -55,7 +56,7 @@ static uint32 first_frame(){ // On cherche la premiere frame libre
 		if(frames[i] != 0xFFFFFFFF){
 			for(j = 0; j < 32; j++){
 				uint32 to_test = 0x1 << j;
-				if(frames[i] & to_test){
+				if(!(frames[i] & to_test)){
 					return i*4*8 +j;
 				}
 			}
@@ -122,7 +123,7 @@ void switch_page_directory(page_directory_t *dir){
 	asm volatile("mov %0, %%cr3" :: "r"(&(dir->tablesPhysical)));
 	uint32 cr0;
 	asm volatile("mov %%cr0, %0": "=r"(cr0));
-	cr0 |= 0x80000000; // On active le paging
+	cr0 |= 0x80000001; // On active le paging
 	asm volatile("mov %0, %%cr0":: "r"(cr0));
 }
 
@@ -165,7 +166,7 @@ void page_fault(registers_t regs)
 	if(us) print_string("user-mode ");
 	if(reserved) print_string("reserved ");
 	print_string (") at "); // TODO mettre l'adresse en hexa
-	print_int(faulting_address);
+	print_hexa(faulting_address);
 	print_new_line();
 	PANIC("Page fault");
 
