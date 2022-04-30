@@ -1,6 +1,7 @@
 #include "keyboard.h"
 
 int available = 1;
+uint32 last_tick = 0;
 
 uint8 get_scancode(){
 	uint8 code;
@@ -204,6 +205,12 @@ union key keyboard_handler(){
 		code = get_scancode();
 		available = 0;
 	}
+	/*
+	if(!available && (get_ticks() > last_tick + 10*get_freq())){
+		available = 1;
+		last_tick = get_ticks();
+	}
+	*/
 	/*
 	if(code & 0x2A){
 		shift_key = 1;
