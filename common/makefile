@@ -7,7 +7,7 @@ all : $(OBJ_S) $(OBJ_C)
 
 
 %.o : %.c 
-	i686-elf-gcc -g -m32 -c $< -o $@ -ffreestanding -O2 -Wall -Wextra
+	i686-elf-gcc -g -m32 -c $< -o $@ -ffreestanding -Wall -Wextra -O2
 
 %.o : %.s
 	i686-elf-as -g --32 $< -o $@

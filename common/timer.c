@@ -7,6 +7,10 @@ uint32 tick = 0;
 
 static void timer_callback(registers_t regs){
 	tick++;
+	if(tick%1000==0)
+	{
+		print_string("coucou");
+	}
 }
 
 inline uint32 get_ticks()
