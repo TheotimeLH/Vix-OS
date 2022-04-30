@@ -1,7 +1,7 @@
 .section .bss
 .align 16
 stack_bottom:
-.skip 0x16384
+.skip 0x1000000
 stack_top:
  
 .section .text

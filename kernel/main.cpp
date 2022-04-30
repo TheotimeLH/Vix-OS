@@ -53,9 +53,9 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_timer(1000);
     init_syscalls();
 	init_keyboard();
-    memory_detection(mbd,magic);
+//    memory_detection(mbd,magic);
 
-//    charger_prog();
+    charger_prog();
     while (1);
     
 
