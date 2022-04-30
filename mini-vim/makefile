@@ -12,3 +12,7 @@ all:mvim ../kernel/disque
 mvim:main.c
 	i686-elf-gcc -c main.c -nostdlib -ffreestanding
 	i686-elf-gcc -o mvim main.o ../stdlib/stdlib.o ../stdlib/crt0.o -nostdlib -ffreestanding
+
+clean :
+	rm -f *.o
+	rm -f mvim
