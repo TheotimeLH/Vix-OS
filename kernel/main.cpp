@@ -35,23 +35,19 @@ void charger_prog()
     uint32 cluster_count=(size+infos.byte_per_cluster-1)/infos.byte_per_cluster;
     uint8 buff[cluster_count*infos.byte_per_cluster];
     entries[i].read_data(buff,cluster_count,&infos,&afs);
-    print_new_line();
-    print_hexa(get_esp());
-    print_new_line();
-    run_process(load_process(buff,size));
     run_process(load_process(buff));
 }
 
 extern "C" void kernel_main()
 {
     init_descriptor_tables();
-		//init_paging();
+    //init_paging();
     init_process_tab();
     init_vga(0x07,0x0);
     init_timer(1000);
     init_syscalls();
-		init_keyboard();
-    //charger_prog();
+		//init_keyboard();
+    charger_prog();
 
 
     while(1){

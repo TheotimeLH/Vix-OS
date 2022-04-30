@@ -304,3 +304,10 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
 
     return read;
 }
+
+// bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* buff)
+// {
+    // if(!m_is_directory)
+        // return false;
+    // *buff
+// }

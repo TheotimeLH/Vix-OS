@@ -63,6 +63,7 @@ public:
     //utiliser init_offset pour repartir du début
     //attention, le buffer doit être de taille cluster_count*infos.byte_per_cluster
     uint32_t read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* infos,Fat_system* intf);
+    bool add_entry(char* name,bool is_directory,Fat_entry* buff);
 
     //uniquement pour les répertoires
     //renvoit le nombre d'entrées lues, s'il est inférieur à size,
