@@ -39,19 +39,20 @@ void charger_prog()
     run_process(load_process(buff));
 }
 
+uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory end
+
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
     //init_paging();
     init_process_tab();
     init_vga(0x07,0x0);
-
-
-
     init_timer(1000);
     init_syscalls();
-		init_keyboard();
-    charger_prog();
+	init_keyboard();
+    memory_detection(mbd,magic);
+
+//    charger_prog();
     while (1);
     
 
@@ -69,29 +70,24 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 		 }
 }
 
-    // if(magic!=MULTIBOOT_BOOTLOADER_MAGIC||!(mbd->flags>>6&0x1))
-    // {
-        // PANIC("memory map mal chargee par grub");
-    // }
-    // int i;
-    // for(i = 0; i < mbd->mmap_length; 
-        // i += sizeof(multiboot_memory_map_t)) 
-    // {
-        // multiboot_memory_map_t* mmmt = 
-            // (multiboot_memory_map_t*) (mbd->mmap_addr + i);
-//  
-//  
-        // if(mmmt->type == MULTIBOOT_MEMORY_AVAILABLE)
-        // {
-            // print_string("Start Addr: ");
-            // print_hexa(mmmt->addr);
-            // print_string("\nLength: ");
-            // print_hexa(mmmt->len);
-            // print_string("\nSize: ");
-            // print_hexa(mmmt->size);
-            // print_string("\nType:");
-            // print_hexa(mmmt->type);
-            // print_new_line();
-            // print_new_line();
-        // }
-    // }
+
+uint32 memory_detection(multiboot_info_t *mbd,uint32 magic)
+{
+    if(magic!=MULTIBOOT_BOOTLOADER_MAGIC||!(mbd->flags>>6&0x1))
+    {
+        PANIC("memory map mal chargee par grub\n");
+    }
+
+    for(int i=0; i < mbd->mmap_length;i += sizeof(multiboot_memory_map_t)) 
+    {
+        multiboot_memory_map_t* mmmt = (multiboot_memory_map_t*) (mbd->mmap_addr + i);
+ 
+ 
+        if(mmmt->type == MULTIBOOT_MEMORY_AVAILABLE&&mmmt->addr==0x100000)
+        {
+            return mmmt->len;
+        }
+    }
+
+    PANIC("pas de memoire trouvee\n");
+}
