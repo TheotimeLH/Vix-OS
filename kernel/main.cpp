@@ -2,18 +2,20 @@
 #include "../common/descriptor_tables.h"
 #include "../common/timer.h"
 #include "../fat_driver/fat_driver.h"
+#include "../common/paging.h"
 #include "process.h"
 #include "syscall.h"
 
 
 extern "C" void kernel_main()
 {
-	init_descriptor_tables();
-    init_process_tab();
+		init_descriptor_tables();
+		initialise_paging();
+    //init_process_tab();
     init_vga(0x07,0x0);
-    init_timer(1000);
-    init_syscalls();
-
+    //init_timer(1000);
+    //init_syscalls();
+		/*
     Ata_fat_system afs(hda);
     if(!afs.is_ready())
     {
@@ -43,7 +45,10 @@ extern "C" void kernel_main()
     print_hexa(get_esp());
     print_new_line();
     run_process(load_process(buff,size));
-
-
+		*/
+		print_string("DEBUT");
+//		uint32 *ptr = (uint32*)0xA0000000;
+//		uint32 do_page_fault = *ptr;
+//		return ;
     while(1);
 }

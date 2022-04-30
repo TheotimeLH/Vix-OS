@@ -92,7 +92,8 @@ int strcmp(const char* a,const char* b)
 
 
 void* memset (void* pointer, int value, size_t count){
-	for(size_t i = 0; i < count; i++)
-		*(pointer+i) = value;
+	uint8 *p = pointer;
+	while(count--)
+		*p++ = (uint8) value;
 	return pointer;
 }

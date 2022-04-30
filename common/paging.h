@@ -26,15 +26,23 @@ typedef struct page_directory
 	uint32 physicalAddr;
 } page_directory_t;
 
-void initialise_paging();
-void switch_page_directory(page_directory_t *new);
+#ifdef __cplusplus
 
-page_t get_page(uint32 address, int make, page_directory_t *dir);
+extern "C" {
+#endif
+void initialise_paging();
+void switch_page_directory(page_directory_t *dir);
+
+page_t *get_page(uint32 address, int make, page_directory_t *dir);
 
 
 /* 
  * Ce qui gere les page faults
  */
 void page_fault(registers_t regs);
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

@@ -1,18 +1,22 @@
 #include "paging.h"
 #include "kheap.h"
+#include "../video/vga_driver.h"
+
+page_directory_t *kernel_directory=0;
+page_directory_t *current_directory=0;
 
 uint32 *frames;
 uint32 nframes;
 
-#define PANIC(a) panic(a, __FILE__, __LINE__);
+#define PANIC(a) panic((a), __FILE__, __LINE__);
 
 void panic(char* msg, char* file, int line){
 	
-	print_string(a);
+	print_string(msg);
 	print_string(" in file : ");
 	print_string(file);
 	print_string(" at line : ");
-	print_line(line);
+	print_new_line(line);
 	while(1);
 }
 
@@ -75,6 +79,19 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable)
 	page->user =(is_kernel)?0:1;
 	page->frame = idx;
 }
+
+void free_frame(page_t *page){
+
+	uint32 frame;
+	if(!(frame=page->frame))
+		return;
+	else
+	{
+		clear_frame(frame);
+		page->frame = 0x0;
+	}
+}
+
 // On va faire le paging
 
 void initialise_paging(){
@@ -83,7 +100,7 @@ void initialise_paging(){
 	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes));
 	memset(frames, 0, INDEX_FROM_BIT(nframes));
 	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
-	memset(kernel_directory, 0, size_of(page_directory_t));
+	memset(kernel_directory, 0, sizeof(page_directory_t));
 	current_directory = kernel_directory;
 
 	// On doit identifier 
@@ -116,7 +133,7 @@ page_t *get_page(uint32 address, int make, page_directory_t *dir)
 	uint32 table_idx = address /1024;// On cherche la talbe correspondante
 	if(dir->tables[table_idx]) // Cette table est assignée
 	{
-		return &(dir->tables[tables_idx]->pages[adress%1024]);
+		return &(dir->tables[table_idx]->pages[address%1024]);
 	}
 	else if(make)
 	{
@@ -124,7 +141,7 @@ page_t *get_page(uint32 address, int make, page_directory_t *dir)
 		dir->tables[table_idx] = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &tmp);
 		memset(dir->tables[table_idx], 0, 0x1000);
 		dir->tablesPhysical[table_idx] = tmp | 0x7;
-		return &(dir->tables[table_idx]->pages[adress%1024];
+		return &(dir->tables[table_idx]->pages[address%1024]);
 	}
 	else
 		return 0;
@@ -133,8 +150,8 @@ page_t *get_page(uint32 address, int make, page_directory_t *dir)
 
 void page_fault(registers_t regs)
 {
-	uint32 faulting_adress;
-	asm volatile("mov %%cr2, %0" : "=r" (faulting_adress));
+	uint32 faulting_address;
+	asm volatile("mov %%cr2, %0" : "=r" (faulting_address));
 
 	int present = !(regs.err_code & 0x1);
 	int rw = regs.err_code & 0x2;
@@ -147,8 +164,8 @@ void page_fault(registers_t regs)
 	if(rw) print_string("read-only ");
 	if(us) print_string("user-mode ");
 	if(reserved) print_string("reserved ");
-	print_string ") at "); // TODO mettre l'adresse en hexa
-	print_int(adress);
+	print_string (") at "); // TODO mettre l'adresse en hexa
+	print_int(faulting_address);
 	print_new_line();
 	PANIC("Page fault");
 
