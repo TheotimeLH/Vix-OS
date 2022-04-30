@@ -43,3 +43,17 @@ void print_screen(uint32 x,uint32 y,char car,uint8 fg_color,uint8 bg_color)
     asm volatile("pop %eax");
     asm volatile("pop %edi");
 }
+
+keyboard_t get_keyboard()
+{
+    uint32 eax;
+    asm volatile("mov $4,%eax");
+    asm volatile("int $0x42");
+    asm volatile("mov %%eax,%0"::"m"(eax));
+    keyboard_t ret;
+    ret.type=eax&0xFF;
+    eax=eax>>8;
+    ret.k=*(union key*)(&eax);
+
+    return ret;
+}

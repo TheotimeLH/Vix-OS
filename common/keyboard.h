@@ -1,8 +1,10 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
+#ifndef STDLIB_VERSION
 #include "common.h"
 #include "isr.h"
+#endif
 
 enum keyboard_disposition{
 	QWERTY,
@@ -36,7 +38,7 @@ typedef struct keyboard
 	union key k;
 } keyboard_t;
 
-
+#ifndef STDLIB_VERSION
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,7 @@ keyboard_t keyboard_handler();
 void init_keyboard();
 #ifdef __cplusplus
 }
+#endif
 #endif
 
 #endif

@@ -8,6 +8,7 @@ compile : $(objs) disque
 clean:
 	rm -f *.o a.out
 	rm -f disque
+	cd prog_test && make clean
 
 %.o:%.cpp
 	i686-elf-g++ -ggdb -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti

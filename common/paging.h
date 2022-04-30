@@ -40,6 +40,10 @@ page_t *get_page(uint32 address, int make, page_directory_t *dir);
  * Ce qui gere les page faults
  */
 void page_fault(registers_t regs);
+
+#define PANIC(a) panic((a), __FILE__, __LINE__);
+void panic(char* msg, char* file, int line);
+
 #ifdef __cplusplus
 }
 #endif

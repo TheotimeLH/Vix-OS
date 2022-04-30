@@ -43,17 +43,20 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
     //init_paging();
-    //init_process_tab();
+    init_process_tab();
     init_vga(0x07,0x0);
-    if(magic!=MULTIBOOT_BOOTLOADER_MAGIC)
-    
+    // if(magic!=MULTIBOOT_BOOTLOADER_MAGIC||(mbd->flags))
+    // {
+        // PANIC("memory map mal chargée par grub");
+    // }
+
 
     init_timer(1000);
-    //init_syscalls();
+    init_syscalls();
 		init_keyboard();
-    //charger_prog();
+    charger_prog();
+    while(1);
 
-    //while(1);
 
      while(1){
 			 keyboard_t k = keyboard_handler();

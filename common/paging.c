@@ -8,10 +8,8 @@ page_directory_t *current_directory=0;
 uint32 *frames;
 uint32 nframes;
 
-#define PANIC(a) panic((a), __FILE__, __LINE__);
 
 void panic(char* msg, char* file, int line){
-	
 	print_string(msg);
 	print_string(" in file : ");
 	print_string(file);
