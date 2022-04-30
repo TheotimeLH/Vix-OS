@@ -11,7 +11,9 @@ enum keyboard_disposition{
 enum special_key{
 	BACKSPACE,
 	ESCAPE,
-	SHIFT,
+	ENTER,
+	L_CTRL,
+	L_SHIFT,
 	TAB,
 	CAPS_LOCK,
 };

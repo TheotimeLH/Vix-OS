@@ -71,14 +71,76 @@ union key qwerty_config(uint8 code, int shift_key){
 			res.ch = 'r';
 			break;
 		case 0x14:
+			res.ch = 't';
 			break;
 		case 0x15:
+			res.ch = 'y';
 			break;
 		case 0x16:
+			res.ch = 'u';
 			break;
 		case 0x17:
+			res.ch = 'i';
 			break;
 		case 0x18:
+			res.ch = 'o';
+			break;
+		case 0x19:
+			res.ch = 'p';
+			break;
+		case 0x1a:
+			res.ch = '[';
+			break;
+		case 0x1b:
+			res.ch = ']';
+			break;
+		case 0x1c:
+			res.sp = ENTER;
+			break;
+		case 0x1d:
+			res.sp = L_CTRL;
+			break;
+		case 0x1e:
+			res.ch = 'a';
+			break;
+		case 0x1f:
+			res.ch = 's';
+			break;
+		case 0x20:
+			res.ch = 'd';
+			break;
+		case 0x21:
+			res.ch = 'f';
+			break;
+		case 0x22:
+			res.ch = 'g';
+			break;
+		case 0x23:
+			res.ch = 'h';
+			break;
+		case 0x24:
+			res.ch = 'j';
+			break;
+		case 0x25:
+			res.ch = 'k';
+			break;
+		case 0x26:
+			res.ch = 'l';
+			break;
+		case 0x27:
+			res.ch = ';';
+			break;
+		case 0x28:
+			res.ch = '\'';
+			break;
+		case 0x29:
+			res.ch = '`';
+			break;
+		case 0x2a:
+			res.sp = L_SHIFT;
+			break;
+		case 0x2b:
+			res.ch = '\\';
 			break;
 	}
 	return res;
