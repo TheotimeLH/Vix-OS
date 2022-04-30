@@ -142,6 +142,39 @@ union key qwerty_config(uint8 code, int shift_key){
 		case 0x2b:
 			res.ch = '\\';
 			break;
+		case 0x2c:
+			res.ch = 'z';
+			break;
+		case 0x2d:
+			res.ch = 'x';
+			break;
+		case 0x2e:
+			res.ch = 'c';
+			break;
+		case 0x2f:
+			res.ch = 'v';
+			break;
+		case 0x30:
+			res.ch = 'b';
+			break;
+		case 0x31:
+			res.ch = 'n';
+			break;
+		case 0x32:
+			res.ch = 'm';
+			break;
+		case 0x33:
+			res.ch = ',';
+			break;
+		case 0x34:
+			res.ch = '.';
+			break;
+		case 0x35:
+			res.ch = '/';
+			break;
+		case 0x36:
+			res.sp = R_SHIFT;
+			break;
 	}
 	return res;
 }

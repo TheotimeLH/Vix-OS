@@ -14,6 +14,7 @@ enum special_key{
 	ENTER,
 	L_CTRL,
 	L_SHIFT,
+	R_SHIFT,
 	TAB,
 	CAPS_LOCK,
 };
