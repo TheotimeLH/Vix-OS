@@ -31,6 +31,13 @@ int main(){
 	text_t buffer[100000]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
 	memset(buffer, 0, sizeof(text_t)*10000);
 	int cursorX = 0, cursorY = 0;
+	for(int i = 0; i < 100000; i ++){
+		buffer[i].c = ' ';
+		buffer[i].fg = WHITE;
+		buffer[i].bg = DARK;
+		buffer[i].cursor = 0;
+	}
+	buffer[0].cursor = 1;
 	
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
@@ -47,6 +54,39 @@ int main(){
 		
 		// On a pas encore les gestions claviers
 		// Il faudrait plutot considerer ça ligne par ligne, parce que la on a le probleme que chaque ligne fait au plus 80 caracteres...
+		keyboard_t kp = get_keyboard();
+
+		if(kp.type == 0){ // On va faire un handler simple
+			switch (kp.k.ch){
+				case 'h': // On va à gauche
+					if(cursorX > 0) 
+					{
+						buffer[(cursorX--)+ (cursorY + line_under)*VIDEO_W].cursor = 0;  ;
+						buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
+					}
+					break;
+				case 'k': // On va en haut
+					if(cursorY > 0) 
+					{
+						buffer[(cursorX)+ ((cursorY--) + line_under)*VIDEO_W].cursor = 0;  ;
+						buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
+					}
+					break;
+				case 'j': // On va en bas
+					buffer[(cursorX)+ ((cursorY++) + line_under)*VIDEO_W].cursor = 0;  ;
+					buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
+					break;
+				case 'l': // On va à droite
+					if(cursorX < VIDEO_W -1) 
+					{
+						buffer[(cursorX++)+ (cursorY + line_under)*VIDEO_W].cursor = 0;  ;
+						buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
+					}
+					break;
+			}
+
+		}
+
 
 	}
 	
