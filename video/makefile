@@ -3,7 +3,7 @@ vga_driver.o : vga_driver.c
 	objcopy --only-keep-debug vga_driver.o vga.debug
 
 clean : 
-	rm *.o *.iso
+	rm -f *.o *.iso
 	rm -fr isodir
 
 .PHONY: clean

@@ -60,5 +60,9 @@ clean_all :
 clean :
 	rm -f *.o *.iso
 	rm -fr isodir
+	cd common && make clean
+	cd fat_driver && make clean
+	cd ata_driver && make clean
+	cd video && make clean
 
 .PHONY : all run clean common ata_driver fat_driver video kernel
