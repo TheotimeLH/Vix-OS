@@ -12,6 +12,11 @@ typedef struct text{
 	uint8 cursor; // Le curseur est-il dessus
 } text_t;
 
+
+typedef struct line{
+	text_t* line_buffer;
+}line_t;
+
 void* memset(void p*, int value, size_t count){
 	uint8 *p = pointer;
 	while(count--)
