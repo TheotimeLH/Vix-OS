@@ -42,18 +42,17 @@ void charger_prog()
     run_process(load_process(buff));
 }
 
-uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory end
+uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory size
 
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
-    //init_paging();
     init_process_tab();
     init_vga(0x07,0x0);
     init_timer(1000);
     init_syscalls();
 	init_keyboard();
-//    memory_detection(mbd,magic);
+    init_paging(memory_detection(mbd,magic));
 
     charger_prog();
     while (1);

@@ -93,21 +93,20 @@ void free_frame(page_t *page){
 
 // On va faire le paging
 
-void init_paging(){
-	uint32 mem_end_page = 0xA0000000;
-	nframes = mem_end_page / 0x1000;
-	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes));
+void init_paging(uint32 mem_size){
+	uint32 mem_end_page = mem_size;
+	nframes = mem_end_page / 0x1000;//nombre de frames
+	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes));// je sais pas
 	memset(frames, 0, INDEX_FROM_BIT(nframes));
 	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
 	memset(kernel_directory, 0, sizeof(page_directory_t));
-	kernel_directory->physicalAddr=kernel_directory->tablesPhysical;
 	current_directory = kernel_directory;
 
 	// On doit identifier 
 	int i = 0;
-	while(i < placement_adress)
+	while(i < mem_size)
 	{
-		alloc_frame( get_page(i, 1, kernel_directory), 0, 0);
+		alloc_frame( get_page(i, 1, kernel_directory), 1, 1);
 		i += 0x1000;
 	}
 	register_interrupt_handler(14, page_fault); // On enregistre le page_fault 
@@ -122,7 +121,7 @@ void switch_page_directory(page_directory_t *dir){
 	asm volatile("mov %0, %%cr3" :: "r"(&(dir->tablesPhysical)));
 	uint32 cr0;
 	asm volatile("mov %%cr0, %0": "=r"(cr0));
-	cr0 |= 0x80000000; // On active le paging
+	cr0 |= 0x80000001; // On active le paging
 	asm volatile("mov %0, %%cr0":: "r"(cr0));
 }
 
