@@ -1,7 +1,8 @@
 #include "../stdlib/stdlib.h"
+#include "stddef.h"
 
+#define VIDEO_W 80
 #define VIDEO_H 25
-#define VIDE0_W 80
 
 char* buffer = 0; // Au départ on a un buffer vide
 
@@ -17,7 +18,7 @@ typedef struct line{
 	text_t* line_buffer;
 }line_t;
 
-void* memset(void p*, int value, size_t count){
+void* memset(void *pointer, int value, size_t count){
 	uint8 *p = pointer;
 	while(count--)
 		*p++ = (uint8) value;
@@ -34,7 +35,7 @@ int main(){
 	for(int i = 0; i < 100000; i ++){
 		buffer[i].c = ' ';
 		buffer[i].fg = WHITE;
-		buffer[i].bg = DARK;
+		buffer[i].bg = BLACK;
 		buffer[i].cursor = 0;
 	}
 	buffer[0].cursor = 1;
@@ -42,13 +43,13 @@ int main(){
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
 		int s = line_under * VIDEO_W;
-		for(i = 0; i < (VIDEO_H -2)*VIDEO_W; i++){
-			text_t actuel = buffer[i+s];
-			if(actuel.cursor){
-				print_screen(i%VIDEO_W, i/VIDEO_W, actuel.c, bg, fg);
+		for(int i = 0; i < (VIDEO_H -2)*VIDEO_W; i++){
+			text_t ac = buffer[i+s];
+			if(ac.cursor){
+				print_screen(i%VIDEO_W, i/VIDEO_W, ac.c, ac.bg, ac.fg);
 			}
 			else{
-				print_screen(i%VIDEO_W, i/VIDEO_W, actuel.c, fg, bg);
+				print_screen(i%VIDEO_W, i/VIDEO_W, ac.c, ac.fg, ac.bg);
 			}
 		}
 		
