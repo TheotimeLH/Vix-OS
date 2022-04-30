@@ -26,6 +26,11 @@ inline uint32 get_ticks()
 	return tick;
 }
 
+inline uint32 get_freq()
+{
+	return freq;
+}
+
 void init_timer(uint32 frequency){
 	register_interrupt_handler(IRQ0, &timer_callback);
 	asm volatile("cli");

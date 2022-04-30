@@ -55,5 +55,10 @@ extern "C" void kernel_main()
 			if (k.ch){
 				print_char(k.ch);
 			}
+			else if (k.sp){
+				if(k.sp == SPACE){
+					print_char(' ');
+				}
+			}
 		}
 }

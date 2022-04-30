@@ -1,6 +1,7 @@
 #include "keyboard.h"
 
 int available = 1;
+uint32 last_tick = 0;
 
 uint8 get_scancode(){
 	uint8 code;
@@ -142,6 +143,48 @@ union key qwerty_config(uint8 code, int shift_key){
 		case 0x2b:
 			res.ch = '\\';
 			break;
+		case 0x2c:
+			res.ch = 'z';
+			break;
+		case 0x2d:
+			res.ch = 'x';
+			break;
+		case 0x2e:
+			res.ch = 'c';
+			break;
+		case 0x2f:
+			res.ch = 'v';
+			break;
+		case 0x30:
+			res.ch = 'b';
+			break;
+		case 0x31:
+			res.ch = 'n';
+			break;
+		case 0x32:
+			res.ch = 'm';
+			break;
+		case 0x33:
+			res.ch = ',';
+			break;
+		case 0x34:
+			res.ch = '.';
+			break;
+		case 0x35:
+			res.ch = '/';
+			break;
+		case 0x36:
+			res.sp = R_SHIFT;
+			break;
+		case 0x37:
+			res.ch = '*';
+			break;
+		case 0x38:
+			res.sp = L_ALT;
+			break;
+		case 0x39:
+			res.sp = SPACE;
+			break;
 	}
 	return res;
 }
@@ -162,6 +205,12 @@ union key keyboard_handler(){
 		code = get_scancode();
 		available = 0;
 	}
+	/*
+	if(!available && (get_ticks() > last_tick + 10*get_freq())){
+		available = 1;
+		last_tick = get_ticks();
+	}
+	*/
 	/*
 	if(code & 0x2A){
 		shift_key = 1;
