@@ -94,7 +94,7 @@ void free_frame(page_t *page){
 
 // On va faire le paging
 
-void initialise_paging(){
+void init_paging(){
 	uint32 mem_end_page = 0x1000000;
 	nframes = mem_end_page / 0x1000;
 	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes));
@@ -119,7 +119,7 @@ void initialise_paging(){
 
 void switch_page_directory(page_directory_t *dir){
 	current_directory = dir;
-	asm volatile("mov %0, %%cr3" :: "r"(&dir->tablesPhysical));
+	asm volatile("mov %0, %%cr3" :: "r"(&(dir->tablesPhysical)));
 	uint32 cr0;
 	asm volatile("mov %%cr0, %0": "=r"(cr0));
 	cr0 |= 0x80000000; // On active le paging

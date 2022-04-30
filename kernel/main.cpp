@@ -10,7 +10,7 @@
 extern "C" void kernel_main()
 {
 		init_descriptor_tables();
-		initialise_paging();
+		init_paging();
     //init_process_tab();
     init_vga(0x07,0x0);
     //init_timer(1000);

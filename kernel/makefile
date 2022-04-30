@@ -8,10 +8,8 @@ compile : $(objs)
 clean:
 	rm -f *.o a.out
 
-
-
 %.o:%.cpp
-	i686-elf-g++ -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti
+	i686-elf-g++ -ggdb -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti
 
 prog:
 	make --directory=prog_test
