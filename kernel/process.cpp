@@ -12,7 +12,7 @@ void init_process_tab()
     }
 }
 
-uint32 load_process(uint8* elf,uint32 size,uint32 current_pid)
+uint32 load_process(uint8* elf,uint32 current_pid)
 {
     uint32 pid;
     for(pid=0;pid<n_process;pid++)

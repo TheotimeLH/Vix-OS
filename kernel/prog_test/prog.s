@@ -9,14 +9,9 @@ stack_top:
 _start:
 	mov $stack_top, %esp
 
-	movw $0x0742,(0xB8000)
-	mov $0x42694269,%eax
-
-	int $0x42
-	int $0x42
- 
+	call main
 
 1:
 	jmp 1b
- 
+
 .size _start, . - _start

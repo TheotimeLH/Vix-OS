@@ -5,6 +5,9 @@ Drive_id ata_identify(Drive d)
     bool primary=((d&0b10)==0);
     bool master=((d&0b01)==0);
 	uint16_t io_base=(primary)?0x1f0:0x170;
+    uint16_t controle_base=(primary)?0x3F6:0x376;
+
+	outb(0b00000010,controle_base);
 
 	outb((master)?0xA0:0xB0,io_base|0x6);
 	for(int i=2;i<5;i++)
@@ -74,7 +77,7 @@ Drive_id ata_identify(Drive d)
 
 	for(;i<256;i++) inw(io_base);
 
-
+	
 	return ret;
 }
 

@@ -59,7 +59,6 @@ uint32_t inline buff_8_32(uint8_t* buff,const uint32_t i)
 
 Fat_infos fat_init(Fat_system* intf)
 {
-
     Fat_infos ret;
     ret.fat_type=0;
 
