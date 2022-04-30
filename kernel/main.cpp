@@ -23,8 +23,11 @@ void charger_prog()
     int i;
     for(i=0;i<nb_entry;i++)
     {
-        if(strcmp(entries[i].get_name(),"PROG"))
+        if(strcmp(entries[i].get_name(),"MVIM"))
+				{
+						print_string("Programme MVIM charge");
             break;
+				}
     }
     if(i==nb_entry)
     {
