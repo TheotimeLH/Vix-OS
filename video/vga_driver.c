@@ -75,7 +75,15 @@ void print_char(char ch){
 		print_new_line();
 	else{
 		vga_buffer[vga_index++] = vga_entry(ch, g_fore_color, g_back_color);
-		
+		if(vga_index % TEXT_WIDTH == 0)
+			next_line_index ++;
+		if(next_line_index >= TEXT_HEIGHT){
+			// On revient au début de l'écran et on clear tout
+			//next_line_index = 0;
+			scroll(); // On scrolle
+			//clear_vga_buffer(&vga_buffer, g_fore_color, g_back_color);
+			next_line_index--;
+	}
 	}
 }
 
