@@ -6,6 +6,7 @@
 #include "process.h"
 #include "syscall.h"
 #include "../common/keyboard.h"
+#include "multiboot.h"
 
 void charger_prog()
 {
@@ -38,12 +39,15 @@ void charger_prog()
     run_process(load_process(buff));
 }
 
-extern "C" void kernel_main()
+extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
     //init_paging();
     init_process_tab();
     init_vga(0x07,0x0);
+    if(magic!=MULTIBOOT_BOOTLOADER_MAGIC)
+    
+
     init_timer(1000);
     init_syscalls();
 		//init_keyboard();

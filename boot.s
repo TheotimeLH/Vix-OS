@@ -37,6 +37,8 @@ _start:
 	mov $stackTop, %esp
 
   # call the kernel main source
+	push %eax
+	push %ebx
 	call kernel_main 
 
 	cli
