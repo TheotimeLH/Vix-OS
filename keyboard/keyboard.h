@@ -29,7 +29,7 @@ extern "C" {
 
 uint8 get_scancode();
 union key keyboard_handler();
-
+void init_keyboard();
 #ifdef __cplusplus
 }
 #endif

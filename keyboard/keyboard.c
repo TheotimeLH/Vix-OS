@@ -1,5 +1,6 @@
 #include "keyboard.h"
 
+int available = 1;
 
 uint8 get_scancode(){
 	uint8 code;
@@ -84,10 +85,21 @@ union key qwerty_config(uint8 code, int shift_key){
 }
 
 
+static void make_available(){
+	available = 1;
+}
+
+void init_keyboard(){
+	register_interrupt_handler(33, make_available);
+}
+
 union key keyboard_handler(){
-	uint8 code;
+	uint8 code = 0;
 	int shift_key = 0;
-	code = get_scancode();
+	if(available){
+		code = get_scancode();
+		available = 0;
+	}
 	/*
 	if(code & 0x2A){
 		shift_key = 1;

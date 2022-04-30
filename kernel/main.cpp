@@ -50,6 +50,7 @@ extern "C" void kernel_main()
     init_vga(0x07,0x0);
     init_timer(1000);
     init_syscalls();
+		init_keyboard();
     //charger_prog();
 
 
@@ -57,7 +58,6 @@ extern "C" void kernel_main()
 			union key k = keyboard_handler();
 			if (k.ch){
 				print_char(k.ch);
-
 			}
 		}
 }

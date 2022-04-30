@@ -4,6 +4,7 @@
 #include "../video/vga_driver.h"
 
 uint32 tick = 0;
+uint32 freq = 0;
 
 static void timer_callback(registers_t regs){
 	tick++;
@@ -11,6 +12,11 @@ static void timer_callback(registers_t regs){
 	{
 		print_string("tick\n");
 	}
+}
+
+void wait(uint32 milliseconds){
+	uint32 deb = tick;
+	while(tick <= deb + (freq/1000)*milliseconds + 1);
 }
 
 inline uint32 get_ticks()
