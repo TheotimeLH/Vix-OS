@@ -10,7 +10,17 @@ uint8 get_scancode(){
 	return code;
 }
 
-keyboard_t qwerty_config(uint8 code, int shift_key){
+
+static char shifter(char c){
+	// On traite le cas de si c est une lettre
+
+	if(0x61 <= c && c <= 0x7a){ // 
+		return c-0x20;
+	}
+	return c;
+}
+
+keyboard_t qwerty_config(uint8 code){
 	union key res;
 	uint8 type = 0;
 	res.ch = 0;
@@ -65,10 +75,7 @@ keyboard_t qwerty_config(uint8 code, int shift_key){
 			type = 1;
 			break;
 		case 0x10:
-			if(shift_key)
-				res.ch = 'Q';
-			else
-				res.ch = 'q';
+			res.ch = 'q';
 			break;
 		case 0x11:
 			res.ch = 'w';
@@ -149,7 +156,9 @@ keyboard_t qwerty_config(uint8 code, int shift_key){
 			break;
 		case 0x2a:
 			res.sp = L_SHIFT;
-			shift_key = !(shift_key);
+			//if(!shift_key){
+				shift_key = !(shift_key);
+			//}
 			type = 1;
 			break;
 		case 0x2b:
@@ -207,6 +216,9 @@ keyboard_t qwerty_config(uint8 code, int shift_key){
 			break;
 	}
 	keyboard_t fin;
+	if(shift_key && type == 0){
+		res.ch = shifter(res.ch);
+	}
 	fin.k = res;
 	fin.type = type;
 	return fin;
@@ -238,5 +250,5 @@ keyboard_t keyboard_handler(){
 		shift_key = 1;
 	}
 	*/
-	return qwerty_config(code, shift_key);
+	return qwerty_config(code);
 }

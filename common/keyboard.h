@@ -10,6 +10,7 @@ enum keyboard_disposition{
 };
 
 enum special_key{
+	UNUSED = 0,
 	BACKSPACE,
 	ESCAPE,
 	SPACE,

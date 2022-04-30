@@ -42,24 +42,24 @@ extern "C" void kernel_main()
 {
     init_descriptor_tables();
     //init_paging();
-    init_process_tab();
+    //init_process_tab();
     init_vga(0x07,0x0);
     init_timer(1000);
-    init_syscalls();
-		//init_keyboard();
-    charger_prog();
+    //init_syscalls();
+		init_keyboard();
+    //charger_prog();
 
-    while(1);
+    //while(1);
 
-    // while(1){
-			// union key k = keyboard_handler();
-			// if (k.ch){
-				// print_char(k.ch);
-			// }
-			// else if (k.sp){
-				// if(k.sp == SPACE){
-					// print_char(' ');
-				// }
-			// }
-		// }
+     while(1){
+			 keyboard_t k = keyboard_handler();
+			 if (!k.type && k.k.ch != 0){
+				 print_char(k.k.ch);
+			 }
+			 else{
+				 if(k.k.sp == SPACE){
+					 print_char(' ');
+				 }
+			 }
+		 }
 }
