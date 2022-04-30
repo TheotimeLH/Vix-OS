@@ -175,6 +175,15 @@ union key qwerty_config(uint8 code, int shift_key){
 		case 0x36:
 			res.sp = R_SHIFT;
 			break;
+		case 0x37:
+			res.ch = '*';
+			break;
+		case 0x38:
+			res.sp = L_ALT;
+			break;
+		case 0x39:
+			res.sp = SPACE;
+			break;
 	}
 	return res;
 }
