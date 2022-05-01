@@ -3,7 +3,6 @@
 #include "structures.h"
 #include "../common/malloc.h"
 
-
 #define VIDEO_W 80
 #define VIDEO_H 25-2 // On laisse 2 pour la baniere en bas
 
@@ -51,8 +50,9 @@ int main(){
 	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
-	line_t* buffer[LINE_NUMBER];
-	memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
+	//line_t* buffer[LINE_NUMBER];
+
+	//memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
 	// Le reste est vide
@@ -60,11 +60,11 @@ int main(){
 	line_t *current = (line_t*) malloc(sizeof(line_t));
 	current->size = 1;
 	current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
-
+	current->prev = current->next = NULL; // Pas de suivant ni de précédent
+	line_t *screen_start = current;
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
-	list_t *current_buff = current->line_buffer;
-	buffer[0] = current;
+	text_list_t *current_buff = current->line_buffer;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
 	
 
@@ -86,11 +86,11 @@ int main(){
 		//
 		int nb_line_aff = 0; // On ne doit pas depasser VIDEO_H
 		int curr_line = 0;
-		line_t* ac_line = buffer[line_under];
+		line_t* ac_line = screen_start;
 		uint32 posX = 0, posY = 0; // on commence à afficher en haut à gauche de l'écran
 		while(nb_line_aff < VIDEO_H && ac_line != 0){
 			// ON va afficher la ligne actuelle  (en sautant à la ligne si jamais, on atteint le bout)
-			list_t* it = ac_line->line_buffer; // normalement, il y a autant d'element que size
+			text_list_t* it = ac_line->line_buffer; // normalement, il y a autant d'element que size
 			while(it != 0){
 				text_t ac = it->e;
 				if(ac.cursor){
@@ -110,7 +110,7 @@ int main(){
 			posY++;
 			posX = 0;
 			nb_line_aff++;
-			ac_line = buffer[++curr_line];
+			ac_line = ac_line->next;
 			if(ac_line == 0)
 				break;
 		}
@@ -186,7 +186,7 @@ int main(){
 					//On va ajouter au courant notre truc
 					int premier = (current_buff->prev == 0); // Si c'est le premier de la liste
 					current->size++;
-					list_t *nouveau = insert_before(current_buff , (text_t) {kp.k.ch, WHITE, BLACK, 0});
+					text_list_t *nouveau = insert_before(current_buff , (text_t) {kp.k.ch, WHITE, BLACK, 0});
 					if(premier)
 						current->line_buffer = nouveau;
 				}
@@ -199,7 +199,7 @@ int main(){
 							case SPACE:
 								int premier = (current_buff->prev == 0); // Si c'est le premier de la liste
 								current->size++;
-								list_t *nouveau = insert_before(current_buff , (text_t) {' ', WHITE, BLACK, 0});
+								text_list_t *nouveau = insert_before(current_buff , (text_t) {' ', WHITE, BLACK, 0});
 								if(premier)
 									current->line_buffer = nouveau;
 								break;
@@ -214,6 +214,16 @@ int main(){
 								}
 								else
 									current_buff->e.c = ' ';
+							break;
+							case ENTER:
+								//On va rajouter une ligne après celle ou on est
+								current_buff->e.cursor = 0;
+								current = insert_after_line(current, init_list((text_t) {' ', WHITE, BLACK, 0}));
+								current_buff = current->line_buffer;
+								current_buff->e.cursor = 1;
+							break;
+
+
 						}
 					}
 				}

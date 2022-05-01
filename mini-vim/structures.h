@@ -11,13 +11,13 @@ typedef struct text{
 typedef struct list{
 	struct list *prev, *next;
 	text_t e;
-}list_t;
+}text_list_t;
 
 typedef struct line{
 	uint32 size;
-	list_t* line_buffer;
+	struct line *prev, *next;
+	text_list_t* line_buffer;
 }line_t;
-
 
 
 typedef enum mode{
@@ -26,8 +26,14 @@ typedef enum mode{
 	REPLACE,
 } mode_t;
 
-list_t *init_list(text_t element);
-list_t *insert_after(list_t *el, text_t element);
-list_t *insert_before(list_t *el, text_t element);
-list_t *k_shift(list_t* el, int k);
-void delete_node(list_t* el);
+line_t *init_list_line(text_list_t *element);
+line_t *insert_after_line(line_t *el, text_list_t *element);
+line_t *insert_before_line(line_t *el, text_list_t *element);
+line_t *k_shift_line(line_t* el, int k);
+void delete_node_line(line_t* el);
+
+text_list_t *init_list(text_t element);
+text_list_t *insert_after(text_list_t *el, text_t element);
+text_list_t *insert_before(text_list_t *el, text_t element);
+text_list_t *k_shift(text_list_t* el, int k);
+void delete_node(text_list_t* el);
