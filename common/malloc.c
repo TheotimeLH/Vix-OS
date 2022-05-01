@@ -29,6 +29,11 @@ uint32 first_seg = 0x9100000;
 
 void* base[30];
 
+static void init_base(){ //pas propre
+	for(int i = 0; i < 30; i ++)
+		base[i] = (void*) first_seg+i;
+}
+
 //extern void* sbrk(uint32) ;
 
 void* sbrk(uint32 sz){
@@ -39,6 +44,7 @@ void* sbrk(uint32 sz){
 // Initialise depuis un tableau de 30 pointeurs à la base du tas
 void init_tas()
 {
+	init_base();
 	for (int i=0 ; i<29 ; i++) base[i] = base+29 ;
 	base[29] = base ;
 }
@@ -96,9 +102,9 @@ void link(uint8* bloc, uint32 n)
 {
 	if (n<=8) return ;
 	uint32 k = log2(n) ;
-	if (n<3<<k+2) insert(base, base[k], bloc) ;
-	else insert(base, base[++k], bloc) ;
-	maj_heads(base, bloc) ;
+	if (n<3<<k+2) insert(base[k], bloc) ;
+	else insert(base[++k], bloc) ;
+	maj_heads(bloc) ;
 }
 
 // Retire un bloc du système de ségrégation
@@ -135,21 +141,21 @@ void free(uint8* bloc)
 	uint8* next = fin+1 ;
 	if (*next & 1) {
 		fin = next + size(next) ;
-		unlink(base, next) ; }
+		unlink(next) ; }
 	if (*prev & 1) {
 		if (*prev & 8) deb -= *prev >> 4 ;
 		else deb = **(uint8***) (prev-4) ;
-		unlink(base, deb) ;	}
+		unlink(deb) ;	}
 	n = init_bloc(deb, fin) ;
-	link(base, deb, n) ;
+	link(deb, n) ;
 }
 
 // Alloue n octets sur le tas
 void* malloc(uint32 n)
 {
-	uint8* bloc = find(base, n+5) ;
+	uint8* bloc = find(n+5) ;
 	if (bloc != NULL) {
-		unlink(base, bloc) ;
+		unlink(bloc) ;
 		uint32 n_old = size(bloc) ;
 		if (n_old>n+5) init_bloc(bloc+n+6, bloc+n_old) ; }
 	else bloc = sbrk(n+6) ;

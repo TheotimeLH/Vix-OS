@@ -1,13 +1,14 @@
 #include "../stdlib/stdlib.h"
 #include "stddef.h"
 #include "structures.h"
+#include "../common/malloc.h"
 
 
 #define VIDEO_W 80
 #define VIDEO_H 25
 
 #define BUFF_SIZE 2000
-#define line_number;
+#define LINE_NUMBER 100
 
 void* memset(void *pointer, int value, size_t count){
 	uint8 *p = pointer;
@@ -19,21 +20,18 @@ void* memset(void *pointer, int value, size_t count){
 int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
 	//
+	init_tas();
 	int line_under = 0; // la premiere ligne affichée à l'écran
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
-	text_t buffer[BUFF_SIZE];
-	memset(buffer, 0, sizeof(text_t)*BUFF_SIZE);
+	line_t* buffer[LINE_NUMBER];
+	memset(buffer, 0, LINE_NUMBER* sizeof(line_t*));
 	int cursorX = 0, cursorY = 0;
-	for(int i = 0; i < BUFF_SIZE; i ++){
-		//text_t buff[80];
-		//memset(buffer, 0, sizeof(text_t)*BUFF_SIZE);
-		
-		buffer[i].c = ' ';
-		buffer[i].fg = WHITE;
-		buffer[i].bg = BLACK;
-		buffer[i].cursor = 0;
-	}
-	buffer[0].cursor = 1;
+	// Au départ il y a juste le premier qui est initialisé
+	// Le reste est vide
+	
+	line_t *b0 = (line_t*) malloc(sizeof(line_t));
+	b0->size = 1;
+	b0->line_buffer = init_list(' ');
 
 	mode_t current_mode = NORMAL;
 	
