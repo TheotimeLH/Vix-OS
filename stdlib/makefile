@@ -6,4 +6,7 @@ crt0.o:crt0.s
 stdlib.o:stdlib.h stdlib.c
 	i686-elf-gcc -c stdlib.c -nostdlib -ffreestanding
 
+clean:
+	rm -f *.o
+
 .PHONY : all
