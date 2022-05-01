@@ -21,26 +21,34 @@ void* memset(void *pointer, int value, size_t count){
 }
 void init_banner()
 {
-	mode_text[0] = (char*) malloc(sizeof(char)*5);
-	mode_text[1] = (char*) malloc(sizeof(char)*6);
-	mode_text[2] = (char*) malloc(sizeof(char)*7);
-	mode_text[0] = "NORMAL";
-	mode_text[1] = "INSERT";
-	mode_text[2] = "REPLACE";
+	mode_text[0] = (char*) malloc(sizeof(char)*6);
+	mode_text[1] = (char*) malloc(sizeof(char)*7);
+	mode_text[2] = (char*) malloc(sizeof(char)*8);
+	char t1[6] = "NORMAL";
+	char t2[7] = "INSERT";
+	char t3[8] = "REPLACE";
+	for(int i = 0; i < 6; i++)
+		mode_text[0][i] = t1[i];
+	for(int i = 0; i < 7; i++)
+		mode_text[1][i] = t2[i];
+	for(int i = 0; i < 8; i++)
+		mode_text[2][i] = t3[i];
 }
 void render_banner(mode_t current_mode)
 {
-	for(int i = 0; i < VIDEO_W; i++)
+	
+	for(int i = current_mode+6; i < VIDEO_W; i++)
 	{
 		print_screen(i, VIDEO_H, ' ', BLACK, WHITE);
 	}
-	for(int i = 0; i < current_mode+5; i++)
+	for(int i = 0; i < current_mode+6; i++)
 		print_screen(i, VIDEO_H, mode_text[current_mode][i], BLACK,WHITE);
 }
 int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
 	//
 	init_tas();
+	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
 	line_t* buffer[LINE_NUMBER];
