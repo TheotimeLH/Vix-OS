@@ -8,43 +8,10 @@
 #include "../common/keyboard.h"
 #include "multiboot.h"
 
-void charger_prog()
-{
-    Ata_fat_system afs(hda);
-    if(!afs.is_ready())
-    {
-        print_string("erreur disque\n");
-        while(1);
-    }
-
-    Fat_infos infos=fat_init(&afs);
-    Fat_entry entries[10];
-    int nb_entry=infos.root_fat_entry.read_entries(entries,10,&infos,&afs);
-    int i;
-    for(i=0;i<nb_entry;i++)
-    {
-        if(strcmp(entries[i].get_name(),"MVIM"))
-				{
-						print_string("Programme MVIM charge");
-            break;
-				}
-    }
-    if(i==nb_entry)
-    {
-        print_string("erreur prog non trouve\n");
-        while(1);
-    }
-    
-    uint32 size=entries[i].get_size();
-    uint32 cluster_count=(size+infos.byte_per_cluster-1)/infos.byte_per_cluster;
-    uint8 buff[cluster_count*infos.byte_per_cluster];
-    entries[i].read_data(buff,cluster_count,&infos,&afs);
-    uint32 pid=load_process(buff);
-    print_string("programme charge\n");
-    run_process(pid);
-}
+void init_disk(Fat_infos *fi,Ata_fat_system *afs);
 
 uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory size
+
 
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
@@ -55,8 +22,15 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_syscalls();
 		init_keyboard();
     init_paging(memory_detection(mbd,magic));
+    Fat_infos fi;
+    Ata_fat_system afs(hda);
+    init_disk(&fi,&afs);
+    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry));
+    if(pid!=uint32(-1))
+    {
+        run_process(pid);
+    }
 
-    charger_prog();
     while (1);
     
 
@@ -72,6 +46,22 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 				 }
 			 }
 		 }
+}
+
+void init_disk(Fat_infos *fi,Ata_fat_system *afs)
+{
+    if(!afs->is_ready())
+    {
+        print_string("erreur disque\n");
+        while(1);
+    }
+    *fi=fat_init(afs);
+    if(fi->fat_type!=12&&fi->fat_type!=16&&fi->fat_type!=32)
+    {
+        print_string("erreur systeme de fichier\n");
+        while(1);
+    }
+
 }
 
 

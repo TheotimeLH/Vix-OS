@@ -21,7 +21,36 @@ void init_process_tab()
     }
 }
 
-extern uint32 nframes;
+uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
+{
+    Fat_entry entries[10];
+    int i;
+    while(1)
+    {
+        int nb_entry=dir->read_entries(entries,10,infos,afs);
+        for(i=0;i<nb_entry;i++)
+        {
+            if(strcmp(entries[i].get_name(),filename))
+            {
+                print_string("ok");
+                break;
+            }
+        }
+        if(i<nb_entry)
+            break;
+        if(nb_entry==0)
+            return uint32(-1);
+    }
+    
+    uint32 size=entries[i].get_size();
+    uint32 cluster_count=(size+infos->byte_per_cluster-1)/infos->byte_per_cluster;
+    uint8 buff[cluster_count*infos->byte_per_cluster];
+    entries[i].read_data(buff,cluster_count,infos,afs);
+    uint32 pid=load_process(buff);
+    tab_process[pid].current_dir=*dir;
+    return pid;
+}
+
 
 uint32 load_process(uint8* elf,uint32 current_pid)
 {
