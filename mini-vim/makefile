@@ -19,7 +19,10 @@ clean :
 	rm -f *.o
 	rm -f mvim
 
-test :
+unmount :
+	sudo umount ../kernel/disque
+
+test : all
 	make --directory=../
 
-.PHONY: clean test all
+.PHONY: clean test all unmount
