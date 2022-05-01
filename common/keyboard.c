@@ -152,6 +152,7 @@ keyboard_t azerty_config(uint8 code){
 			res.ch = '%';
 			break;
 		case 0x29:
+			print_string("Code 0x29\n");
 			res.ch = '`';
 			break;
 		case 0x2a:
@@ -165,7 +166,7 @@ keyboard_t azerty_config(uint8 code){
 			res.ch = '<';
 			break;
 		case 0x2c:
-			res.ch = 'z';
+			res.ch = 'w';
 			break;
 		case 0x2d:
 			res.ch = 'x';
@@ -183,16 +184,16 @@ keyboard_t azerty_config(uint8 code){
 			res.ch = 'n';
 			break;
 		case 0x32:
-			res.ch = 'm';
-			break;
-		case 0x33:
 			res.ch = ',';
 			break;
+		case 0x33:
+			res.ch = ';';
+			break;
 		case 0x34:
-			res.ch = '.';
+			res.ch = ':';
 			break;
 		case 0x35:
-			res.ch = '/';
+			res.ch = '!';
 			break;
 		case 0x36:
 			res.sp = R_SHIFT;
@@ -454,5 +455,5 @@ keyboard_t keyboard_handler(){
 		shift_key = 1;
 	}
 	*/
-	return qwerty_config(code);
+	return azerty_config(code);
 }

@@ -27,7 +27,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_process_tab();
 		init_keyboard();
     init_paging(memory_detection(mbd,magic));
-    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry));
+    uint32 pid=exec("MVIM",&afs,&fi,&(fi.root_fat_entry));
     if(pid!=uint32(-1))
     {
         run_process(pid);
