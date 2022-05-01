@@ -25,7 +25,8 @@
  * 	size:4 (if is_small)
  */
 #include "common.h"
-uint32 first_seg = 0x9100000;
+extern uint32 end;
+uint32 first_seg = (uint32)&end;
 
 void* base[30];
 

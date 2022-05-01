@@ -19,4 +19,7 @@ clean :
 	rm -f *.o
 	rm -f mvim
 
-.PHONY: clean
+test :
+	make --directory=../
+
+.PHONY: clean test all
