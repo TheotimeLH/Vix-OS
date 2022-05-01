@@ -4,6 +4,7 @@
 #include "../common/common.h"
 #include "../common/isr.h"
 #include "../fat_driver/fat_driver.h"
+#include "../common/paging.h"
 
 #define get_uint32(buff,addr) *(uint32*)(&buff[addr])
 #define get_uint16(buff,addr) *(uint16*)(&buff[addr])
@@ -19,6 +20,7 @@ typedef struct process
     proc_state state;
     registers_t saved_context;
     uint32 pg_entry;
+    page_directory_t *directory;
 } process;
 
 void init_process_tab();
