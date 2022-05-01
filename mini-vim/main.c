@@ -35,7 +35,7 @@ int main(){
 
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
-	
+	print_screen(5, 5, 'T',WHITE, BLACK); 
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement

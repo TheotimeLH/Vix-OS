@@ -10,7 +10,7 @@ all:mvim ../kernel/disque
 	cd ../kernel && make disque
 
 %.o: %.c 
-	i686-elf-gcc -g -m32 -c $< -o $@ -ffreestanding -Wall -Wextra
+	i686-elf-gcc -c $< -o $@ -nostdlib -ffreestanding
 
 mvim: linker.ld main.o structures.o ../stdlib/stdlib.o ../stdlib/crt0.o ../common/malloc.o
 	i686-elf-gcc -T $^ -o $@ -nostdlib -ffreestanding
