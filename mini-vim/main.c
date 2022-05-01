@@ -35,6 +35,7 @@ int main(){
 
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
+	list_t *current_buff = current->line_buffer;
 	buffer[0] = current;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
 	while(1){ // main loop
@@ -115,21 +116,14 @@ int main(){
 			}
 			case INSERT:
 				if(kp.type == 0 && kp.k.ch != 0){
-					buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].c = kp.k.ch; 
-					buffer[(cursorX++)+ (cursorY + line_under)*VIDEO_W].cursor = 0;  
-					buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  
-					if(cursorX >= VIDEO_W){
-						cursorX =0;
-						cursorY++;
-					}
-					if(cursorY == VIDEO_H){
-						line_under++;
-						cursorY--;
-					}
+					//On va ajouter au courant notre truc
+					current_buff->e.cursor = 0;
+					current_buff = insert_after(current , (text_t) {kp.k.ch, WHITE, BLACK, 1});
 				}
 				else{
-					if(kp.k.sp == ESCAPE){
-						current_mode = NORMAL;
+					if(kp.type == 1){
+						if(kp.k.sp == ESCAPE)
+							current_mode = NORMAL;
 					}
 				}
 
