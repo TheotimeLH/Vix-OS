@@ -21,7 +21,7 @@ typedef struct line{
 
 
 typedef enum mode{
-	NORMAL,
+	NORMAL = 0,
 	INSERT,
 	REPLACE,
 } mode_t;
