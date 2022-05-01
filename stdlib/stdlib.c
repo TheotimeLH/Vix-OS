@@ -27,6 +27,30 @@ void write(uint32 file_desc,char *str)
     asm volatile("pop %esi");
 }
 
+uint32 read(uint32 file,uint8* buff,uint32 size)
+{
+    uint32 ret;
+
+    asm volatile("push %esi");
+    asm volatile("push %ebx");
+    asm volatile("push %edi");
+
+
+    asm volatile("mov %0,%%edi":"=m"(file));
+    asm volatile("mov %0,%%esi":"=m"(buff));
+    asm volatile("mov %0,%%ebx":"=m"(size));
+    asm volatile("mov $2,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+    asm volatile("pop %ebx");
+    asm volatile("pop %esi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+
+    return ret;
+}
+
 void print_screen(uint32 x,uint32 y,char car,uint8 fg_color,uint8 bg_color)
 {
     asm volatile("push %edi");
@@ -55,5 +79,20 @@ keyboard_t get_keyboard()
     eax=eax>>8;
     ret.k=*(union key*)(&eax);
 
+    return ret;
+}
+
+uint32 open(char* filename)
+{
+    uint32 ret;
+    asm volatile("push %edi");
+
+    asm volatile("mov %0,%%edi":"=m"(filename));
+    asm volatile("mov $5,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
     return ret;
 }

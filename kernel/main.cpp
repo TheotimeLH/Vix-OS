@@ -11,20 +11,23 @@
 void init_disk(Fat_infos *fi,Ata_fat_system *afs);
 
 uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory size
+    
+Fat_infos fi;
 
 
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
     init_vga(0x07,0x0);
-    init_process_tab();
-    init_timer(1000);
-    init_syscalls();
-		init_keyboard();
-    init_paging(memory_detection(mbd,magic));
-    Fat_infos fi;
     Ata_fat_system afs(hda);
     init_disk(&fi,&afs);
+    print_int(fi.byte_per_cluster);
+    init_timer(1000);
+    
+    init_syscalls(&afs,&fi);
+    init_process_tab();
+		init_keyboard();
+    init_paging(memory_detection(mbd,magic));
     uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry));
     if(pid!=uint32(-1))
     {

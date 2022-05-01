@@ -305,9 +305,27 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
     return read;
 }
 
-// bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* buff)
-// {
-    // if(!m_is_directory)
-        // return false;
-    // *buff
-// }
+Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+{
+    Fat_entry entries[10];
+    int i;
+    int nb_entries;
+    dir->init_offset();
+    while(1)
+    {
+        int nb_entry=dir->read_entries(entries,10,infos,afs);
+        if(nb_entry==0)
+        {
+            *ok=false;
+            return Fat_entry();
+        }
+        for(i=0;i<nb_entry;i++)
+        {
+            if(strcmp(entries[i].get_name(),name))
+            {
+                *ok=true;
+                return entries[i];
+            }
+        }
+    }
+}

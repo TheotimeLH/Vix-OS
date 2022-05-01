@@ -11,7 +11,7 @@ clean:
 	cd prog_test && make clean
 
 %.o:%.cpp
-	i686-elf-g++ -ggdb -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti
+	i686-elf-g++ -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti
 
 disque:prog_test/prog.s prog_test/main.c
 	dd if=/dev/zero of=disque count=100
@@ -21,8 +21,11 @@ disque:prog_test/prog.s prog_test/main.c
 	sudo mkdir disque_mnt
 	sudo mount disque disque_mnt
 	sudo cp prog_test/prog disque_mnt
+	sudo echo "fichier test">file
+	sudo cp file disque_mnt
+	sudo rm -f file
 	sudo umount disque
-	sudo rm -r disque_mnt
+	sudo rm -rf disque_mnt
 
 
 .PHONY : compile clean

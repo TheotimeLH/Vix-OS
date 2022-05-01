@@ -5,10 +5,19 @@ const uint32 n_process=10;
 process tab_process[n_process];
 extern uint32 placement_adress;
 extern page_directory_t* kernel_directory;
-
+uint32 current_pid;
+extern Fat_infos fi;
+process* current_proc;
 
 void init_process_tab()
 {
+    for(int i=0;i<n_process;i++)
+    {
+        for(uint32 j=0;j<max_opened_files;j++)
+        {
+            tab_process[i].opened_files[j].buff=(uint8*)kmalloc(fi.byte_per_cluster);
+        }
+    }
     for(int i=0;i<n_process;i++)
     {
         tab_process[i].state=FREE;
@@ -25,6 +34,7 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
 {
     Fat_entry entries[10];
     int i;
+    dir->init_offset();
     while(1)
     {
         int nb_entry=dir->read_entries(entries,10,infos,afs);
@@ -32,7 +42,6 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
         {
             if(strcmp(entries[i].get_name(),filename))
             {
-                print_string("ok");
                 break;
             }
         }
@@ -48,9 +57,14 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
     entries[i].read_data(buff,cluster_count,infos,afs);
     uint32 pid=load_process(buff);
     tab_process[pid].current_dir=*dir;
+    tab_process[pid].opened_files[STDIN].type=STDIN;
+    tab_process[pid].opened_files[STDOUT].type=STDOUT;
+    for(int i=2;i<max_opened_files;i++)
+    {
+        tab_process[pid].opened_files[i].type=CLOSED_FILE;
+    }
     return pid;
 }
-
 
 uint32 load_process(uint8* elf,uint32 current_pid)
 {
@@ -130,6 +144,8 @@ void run_process(uint32 pid)
     process *proc=&tab_process[pid];
     if(proc->state!=RUNNABLE)
         return;
+    current_pid=pid;
+    current_proc=proc;
     switch_page_directory(proc->directory);
     asm volatile("jmp *%0"::"a"(proc->saved_context.eip));
     switch_page_directory(kernel_directory);
