@@ -51,6 +51,7 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
             return uint32(-1);
     }
     
+		
     uint32 size=entries[i].get_size();
     uint32 cluster_count=(size+infos->byte_per_cluster-1)/infos->byte_per_cluster;
     uint8 buff[cluster_count*infos->byte_per_cluster];

@@ -45,10 +45,12 @@ list_t *k_shift(list_t* el, int k) // un déplacement de k cases
 	}
 }	
 
-list_t *delete_node(list_t* el){
+void delete_node(list_t* el){
 	if(el->prev != 0)
 		el->prev->next = el->next;
 	if(el->next != 0)
 		el->next->prev = el->prev;
+	// Il faudrait free la memoire
+	//free((uint8*) el);
 }
 

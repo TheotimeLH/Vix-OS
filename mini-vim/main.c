@@ -5,10 +5,13 @@
 
 
 #define VIDEO_W 80
-#define VIDEO_H 25
+#define VIDEO_H 25-2 // On laisse 2 pour la baniere en bas
 
 #define BUFF_SIZE 2000
 #define LINE_NUMBER 100
+
+char* mode_text[3];
+
 
 void* memset(void *pointer, int value, size_t count){
 	uint8 *p = pointer;
@@ -16,11 +19,36 @@ void* memset(void *pointer, int value, size_t count){
 		*p++ = (uint8) value;
 	return pointer;
 }
-
+void init_banner()
+{
+	mode_text[0] = (char*) malloc(sizeof(char)*6);
+	mode_text[1] = (char*) malloc(sizeof(char)*7);
+	mode_text[2] = (char*) malloc(sizeof(char)*8);
+	char t1[6] = "NORMAL";
+	char t2[7] = "INSERT";
+	char t3[8] = "REPLACE";
+	for(int i = 0; i < 6; i++)
+		mode_text[0][i] = t1[i];
+	for(int i = 0; i < 7; i++)
+		mode_text[1][i] = t2[i];
+	for(int i = 0; i < 8; i++)
+		mode_text[2][i] = t3[i];
+}
+void render_banner(mode_t current_mode)
+{
+	
+	for(int i = current_mode+6; i < VIDEO_W; i++)
+	{
+		print_screen(i, VIDEO_H, ' ', BLACK, WHITE);
+	}
+	for(int i = 0; i < current_mode+6; i++)
+		print_screen(i, VIDEO_H, mode_text[current_mode][i], BLACK,WHITE);
+}
 int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
 	//
 	init_tas();
+	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
 	line_t* buffer[LINE_NUMBER];
@@ -31,7 +59,7 @@ int main(){
 	
 	line_t *current = (line_t*) malloc(sizeof(line_t));
 	current->size = 1;
-	current->line_buffer = init_list((text_t) {'T', WHITE, BLACK, 0});
+	current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
 
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
@@ -39,18 +67,13 @@ int main(){
 	buffer[0] = current;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
 	
-	list_t* a = init_list((text_t) {' ', WHITE, BLACK, 0});
-	print_screen(3, 3, a->e.c, a->e.fg, a->e.bg);
-	list_t* b = insert_after(a, (text_t) {'E', RED, BLACK, 0});
-	print_screen(3, 4, a->next->e.c, a->next->e.fg, a->next->e.bg);
-	print_screen(3, 5, b->e.c, b->e.fg, b->e.bg);
 
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement
 		if(get_ticks() % 100 == 0){
 			for(int i = 0; i < VIDEO_W; i++)
-				for(int j = 0; j < VIDEO_H; j++)
+				for(int j = 0; j < VIDEO_H+2; j++)
 					print_screen(i, j, ' ', WHITE, BLACK);
 		}
 		/*
@@ -58,6 +81,8 @@ int main(){
 		if(current_buff->prev != 0)
 				print_screen(4, 3, current_buff->prev->e.c, current_buff->prev->e.fg, current_buff->prev->e.bg);
 		*/
+		render_banner(current_mode);
+		//
 		//
 		int nb_line_aff = 0; // On ne doit pas depasser VIDEO_H
 		int curr_line = 0;
@@ -111,7 +136,12 @@ int main(){
 				if(kp.type == 0){ // On va faire un handler simple
 					switch (kp.k.ch){
 						case 'h': // On va à gauche
-							// TODO
+							if(current_buff->prev != 0)
+							{
+								current_buff->e.cursor = 0;
+								current_buff = current_buff->prev;
+								current_buff->e.cursor = 1;
+							}
 							break;
 						case 'k': // On va en haut
 							// TODO
@@ -120,11 +150,34 @@ int main(){
 							// TODO
 							break;
 						case 'l': // On va à droite
-							// TODO
+							if(current_buff->next != 0)
+							{
+								current_buff->e.cursor = 0;
+								current_buff = current_buff->next;
+								current_buff->e.cursor = 1;
+							}
 							break;
 						case 'i': // On passe en insert mode
 							current_mode = INSERT;
 							break;
+						case 'x': //
+							if(current_buff->next != 0) 
+							{
+								current_buff = current_buff->next;
+								current_buff->e.cursor= 1;
+								delete_node(current_buff->prev);
+							}
+							else if(current_buff->prev !=0)
+							{
+								current_buff = current_buff->prev;
+								current_buff->e.cursor= 1;
+								delete_node(current_buff->next);
+							}
+							else// TODO : Faire un truc plus propre
+							{ 
+								current_buff->e.c = ' ';
+							}
+						break;
 					}
 				break;
 			}
@@ -151,7 +204,16 @@ int main(){
 									current->line_buffer = nouveau;
 								break;
 							case BACKSPACE: // On va supprimer le caractere d'avant
-
+								if(current_buff->prev != 0)
+								{
+									if(current_buff->prev->prev == 0)
+									{
+										current->line_buffer = current_buff;
+									}
+									delete_node(current_buff->prev);
+								}
+								else
+									current_buff->e.c = ' ';
 						}
 					}
 				}

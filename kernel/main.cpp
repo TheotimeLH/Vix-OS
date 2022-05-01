@@ -33,6 +33,10 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     {
         run_process(pid);
     }
+		else
+		{
+			print_string("Erreur lors du chargement");
+		}
 
     while (1);
     
