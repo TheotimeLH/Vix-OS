@@ -136,32 +136,48 @@ int main(){
 				if(kp.type == 0){ // On va faire un handler simple
 					switch (kp.k.ch){
 						case 'h': // On va à gauche
-							if(current_buff->prev != 0)
+							if(current_buff->prev != NULL)
 							{
 								current_buff->e.cursor = 0;
 								current_buff = current_buff->prev;
 								current_buff->e.cursor = 1;
+								cursorX--;
 							}
 							break;
 						case 'k': // On va en haut
-							// TODO
+							if(current->prev != NULL)
+							{
+								current_buff->e.cursor = 0; // Il faut connaitre la position x et y
+								current = current->prev;
+								cursorX = cursorX < current->size ? cursorX : current->size-1;
+								current_buff = k_shift(current->line_buffer, cursorX);
+								current_buff->e.cursor = 1;
+							}
 							break;
 						case 'j': // On va en bas
-							// TODO
+							if(current->next != NULL)
+							{
+								current_buff->e.cursor = 0; // Il faut connaitre la position x et y
+								current = current->next;
+								cursorX = cursorX < current->size ? cursorX : current->size-1;
+								current_buff = k_shift(current->line_buffer, cursorX);
+								current_buff->e.cursor = 1;
+							}
 							break;
 						case 'l': // On va à droite
-							if(current_buff->next != 0)
+							if(current_buff->next != NULL)
 							{
 								current_buff->e.cursor = 0;
 								current_buff = current_buff->next;
 								current_buff->e.cursor = 1;
+								cursorX ++;
 							}
 							break;
 						case 'i': // On passe en insert mode
 							current_mode = INSERT;
 							break;
 						case 'x': //
-							if(current_buff->next != 0) 
+							if(current_buff->next != NULL) 
 							{
 								current_buff = current_buff->next;
 								current_buff->e.cursor= 1;
@@ -177,6 +193,13 @@ int main(){
 							{ 
 								current_buff->e.c = ' ';
 							}
+						break;
+						case 'o': // On va ajouter une ligne après et passer en INSERT mode
+							current_buff->e.cursor = 0;
+							current = insert_after_line(current, init_list((text_t) {' ', WHITE, BLACK, 0}));
+							current_buff = current->line_buffer;
+							current_buff->e.cursor = 1;
+							current_mode = INSERT;
 						break;
 					}
 				break;
@@ -211,6 +234,7 @@ int main(){
 										current->line_buffer = current_buff;
 									}
 									delete_node(current_buff->prev);
+									current->size--;
 								}
 								else
 									current_buff->e.c = ' ';

@@ -6,6 +6,7 @@ line_t* init_list_line(text_list_t *element)
 	line_t* liste = (line_t*) malloc(sizeof(line_t));
 	liste->prev = liste->next = 0;
 	liste->line_buffer = element;
+	liste->size = 1;
 	return liste;
 }
 
@@ -90,11 +91,11 @@ text_list_t *k_shift(text_list_t* el, int k) // un déplacement de k cases
 	text_list_t* p = el;
 	if(k > 0){
 		while(k-- && p->next) p = p->next;
-		return p->next;
+		return p;
 	}
 	else{
 		while(k++ && p->prev) p = p->prev;
-		return p->prev;
+		return p;
 	}
 }	
 
