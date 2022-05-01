@@ -13,7 +13,8 @@ list_t* init_list(text_t element)
 list_t *insert_after(list_t* el, text_t element)
 {
 	list_t* after = init_list(element);
-	el->next->prev = after;
+	if(el->next != 0)
+		el->next->prev = after;
 	after->next = el->next;
 	el->next = after;
 	after->prev = el;
@@ -23,7 +24,8 @@ list_t *insert_after(list_t* el, text_t element)
 list_t *insert_before(list_t* el, text_t element) 
 {
 	list_t* before = init_list(element);
-	el->prev->next = before;
+	if(el->prev != 0)
+		el->prev->next = before;
 	before->prev = el->prev;
 	el->prev = before;
 	before->next = el;
@@ -42,4 +44,11 @@ list_t *k_shift(list_t* el, int k) // un déplacement de k cases
 		return p->prev;
 	}
 }	
+
+list_t *delete_node(list_t* el){
+	if(el->prev != 0)
+		el->prev->next = el->next;
+	if(el->next != 0)
+		el->next->prev = el->prev;
+}
 
