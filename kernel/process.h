@@ -41,6 +41,7 @@ typedef struct process
 } process;
 
 void init_process_tab();
+uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir);
 uint32 load_process(uint8* elf,uint32 current_pid=0);
 void run_process(uint32 pid);
 
