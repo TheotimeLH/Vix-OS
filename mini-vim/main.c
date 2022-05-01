@@ -31,7 +31,7 @@ int main(){
 	
 	line_t *current = (line_t*) malloc(sizeof(line_t));
 	current->size = 1;
-	current->line_buffer = init_list((text_t) {'T', WHITE, BLACK, 0});
+	current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
 
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
@@ -39,11 +39,6 @@ int main(){
 	buffer[0] = current;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
 	
-	list_t* a = init_list((text_t) {' ', WHITE, BLACK, 0});
-	print_screen(3, 3, a->e.c, a->e.fg, a->e.bg);
-	list_t* b = insert_after(a, (text_t) {'E', RED, BLACK, 0});
-	print_screen(3, 4, a->next->e.c, a->next->e.fg, a->next->e.bg);
-	print_screen(3, 5, b->e.c, b->e.fg, b->e.bg);
 
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
@@ -151,7 +146,8 @@ int main(){
 									current->line_buffer = nouveau;
 								break;
 							case BACKSPACE: // On va supprimer le caractere d'avant
-
+								if(current_buff->prev != 0)
+									delete_node(current_buff->prev);
 						}
 					}
 				}
