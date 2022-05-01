@@ -24,6 +24,7 @@ typedef enum mode{
 	NORMAL = 0,
 	INSERT,
 	REPLACE,
+	COMMAND,
 } mode_t;
 
 line_t *init_list_line(text_list_t *element);

@@ -9,7 +9,8 @@
 #define BUFF_SIZE 2000
 #define LINE_NUMBER 100
 
-char* mode_text[3];
+char* mode_text[4];
+int mode_size[4];
 
 
 void* memset(void *pointer, int value, size_t count){
@@ -23,24 +24,32 @@ void init_banner()
 	mode_text[0] = (char*) malloc(sizeof(char)*6);
 	mode_text[1] = (char*) malloc(sizeof(char)*7);
 	mode_text[2] = (char*) malloc(sizeof(char)*8);
+	mode_text[3] = (char*) malloc(sizeof(char)*8);
+	mode_size[0] = 6;
+	mode_size[1] = 7;
+	mode_size[2] = 8;
+	mode_size[3] = 8;
 	char t1[6] = "NORMAL";
 	char t2[7] = "INSERT";
 	char t3[8] = "REPLACE";
+	char t4[8] = "COMMAND";
 	for(int i = 0; i < 6; i++)
 		mode_text[0][i] = t1[i];
 	for(int i = 0; i < 7; i++)
 		mode_text[1][i] = t2[i];
 	for(int i = 0; i < 8; i++)
 		mode_text[2][i] = t3[i];
+	for(int i = 0; i < 8; i++)
+		mode_text[3][i] = t4[i];
 }
 void render_banner(mode_t current_mode)
 {
 	
-	for(int i = current_mode+6; i < VIDEO_W; i++)
+	for(int i = mode_size[current_mode]; i < VIDEO_W; i++)
 	{
 		print_screen(i, VIDEO_H, ' ', BLACK, WHITE);
 	}
-	for(int i = 0; i < current_mode+6; i++)
+	for(int i = 0; i < mode_size[current_mode]; i++)
 		print_screen(i, VIDEO_H, mode_text[current_mode][i], BLACK,WHITE);
 }
 int main(){
@@ -66,6 +75,9 @@ int main(){
 	current->line_buffer->e.cursor = 1;
 	text_list_t *current_buff = current->line_buffer;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
+	
+	char command_buffer[80]; // Le buffer pour contenir la commande en cours
+	memset(command_buffer, 0, sizeof(char)*80);
 	
 
 	while(1){ // main loop
@@ -201,6 +213,11 @@ int main(){
 							current_buff->e.cursor = 1;
 							current_mode = INSERT;
 						break;
+						case ':':
+							// On passe en mode commande
+							current_mode = COMMAND;
+
+						break;
 					}
 				break;
 			}
@@ -249,6 +266,31 @@ int main(){
 
 
 						}
+					}
+				}
+
+			break;
+			case COMMAND :
+				print_screen(0, 24, ':', WHITE, BLACK); // ON affiche le truc
+				int i = -1;
+				while(command_buffer[++i]) print_screen(1+i, 24, command_buffer[i], WHITE, BLACK);
+				if(kp.type == 0) // ON rajoute un truc à la commande
+				{
+					command_buffer[i] = kp.k.ch;
+				}
+				else
+				{
+					switch (kp.k.sp){
+						case ESCAPE:
+							memset(command_buffer, 0, sizeof(char)*80);
+							current_mode = NORMAL;
+							break;
+						case SPACE:
+							command_buffer[i] = ' ';
+							break;
+						case ENTER:
+							// La il faut interpreter la commande
+						break;
 					}
 				}
 
