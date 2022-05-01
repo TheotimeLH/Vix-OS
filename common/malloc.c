@@ -14,7 +14,7 @@
  * 	taille (si >= 16)
  * 	- quelconque -
  * 	successeur (uint8*)
- * 	prédecesseur (uint8*)
+ * 	prédecesseur (uint8**)
  * 	entête
  *
  * Entête (8 bits) :
@@ -24,28 +24,22 @@
  * 	is_small (<16)
  * 	size:4 (if is_small)
  */
+
 #include "common.h"
-extern uint32 end;
-uint32 first_seg = (uint32)&end;
 
-void* base[30];
+extern uint32 end ;
+uint8* brk = &end ;
+void* base[30] ;
 
-static void init_base(){ //pas propre
-	for(int i = 0; i < 30; i ++)
-		base[i] = (void*) first_seg+i;
+// Inrémente la taille du tas
+uint8* sbrk(uint32 n)
+{
+	return brk += n ;
 }
 
-//extern void* sbrk(uint32) ;
-
-void* sbrk(uint32 sz){
-	first_seg += sz;
-	return (void*) first_seg;
-}
-
-// Initialise depuis un tableau de 30 pointeurs à la base du tas
+// Initialise le tas
 void init_tas()
 {
-	init_base();
 	for (int i=0 ; i<29 ; i++) base[i] = base+29 ;
 	base[29] = base ;
 }
@@ -56,10 +50,10 @@ uint32 init_bloc(uint8* deb, uint8* fin)
 	uint32 n = fin-deb ;
  	*fin = *deb = ((n&15)<<4) + ((n<16)<<3) +1 ;
 	if (n >= 16) *(uint32*) ++deb = n ;
-	return n ; 
+	link(deb, n) ;
 }
 
-// Taille du bloc en octets (hors entêtes)
+// Taille du bloc en octets
 uint32 size(uint8* bloc)
 {
 	if (*bloc & 8) return *bloc >> 4 ;
@@ -147,8 +141,7 @@ void free(uint8* bloc)
 		if (*prev & 8) deb -= *prev >> 4 ;
 		else deb = **(uint8***) (prev-4) ;
 		unlink(deb) ;	}
-	n = init_bloc(deb, fin) ;
-	link(deb, n) ;
+	init_bloc(deb, fin) ;
 }
 
 // Alloue n octets sur le tas
@@ -159,8 +152,14 @@ void* malloc(uint32 n)
 		unlink(bloc) ;
 		uint32 n_old = size(bloc) ;
 		if (n_old>n+5) init_bloc(bloc+n+6, bloc+n_old) ; }
-	else bloc = sbrk(n+6) ;
+	else {
+		uint32 nbrk = n+6 ;
+		if (*brk & 1) {
+			if (*brk & 8) nbrk -= *brk >> 4 ;
+			else brk -= size(**(uint8***) (brk-4)) ; }
+		bloc = sbrk(nbrk)-n-5 ;	}
 	*(bloc+n+5) = *bloc = 0	;
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
 }
+
