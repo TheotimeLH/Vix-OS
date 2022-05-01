@@ -6,7 +6,7 @@
 #define VIDEO_W 80
 #define VIDEO_H 25
 
-#define BUFF_SIZE 1000
+#define BUFF_SIZE 2000
 #define line_number;
 
 void* memset(void *pointer, int value, size_t count){
@@ -20,12 +20,18 @@ int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
 	//
 	int line_under = 0; // la premiere ligne affichée à l'écran
-	text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
+	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
+	text_t buffer[BUFF_SIZE];
 	memset(buffer, 0, sizeof(text_t)*BUFF_SIZE);
 	int cursorX = 0, cursorY = 0;
 	for(int i = 0; i < BUFF_SIZE; i ++){
-		text_t buff[80];
-		memset(buffer, 0, sizeof(text_t)*BUFF_SIZE);
+		//text_t buff[80];
+		//memset(buffer, 0, sizeof(text_t)*BUFF_SIZE);
+		
+		buffer[i].c = ' ';
+		buffer[i].fg = WHITE;
+		buffer[i].bg = BLACK;
+		buffer[i].cursor = 0;
 	}
 	buffer[0].cursor = 1;
 
