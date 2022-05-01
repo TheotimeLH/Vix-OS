@@ -21,7 +21,6 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_vga(0x07,0x0);
     Ata_fat_system afs(hda);
     init_disk(&fi,&afs);
-    print_int(fi.byte_per_cluster);
     init_timer(1000);
     
     init_syscalls(&afs,&fi);
