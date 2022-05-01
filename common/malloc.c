@@ -24,11 +24,15 @@
  * 	is_small (<16)
  * 	size:4 (if is_small)
  */
-/*
 #include "common.h"
+uint32 first_seg = 0x9100000;
 
+//extern void* sbrk(uint32) ;
 
-extern void* sbrk(uint32) ;
+void* sbrk(uint32 sz){
+	first_seg += sz;
+	return (void*) first_seg;
+}
 
 // Initialise depuis un tableau de 30 pointeurs à la base du tas
 void init_tas(void* base[30])
@@ -151,4 +155,3 @@ void* malloc(void* base[30], uint32 n)
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
 }
-*/
