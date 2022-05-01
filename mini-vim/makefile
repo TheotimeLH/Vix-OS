@@ -9,10 +9,14 @@ all:mvim ../kernel/disque
 ../kernel/disque:
 	cd ../kernel && make disque
 
-mvim:main.c
-	i686-elf-gcc -c main.c -nostdlib -ffreestanding
-	i686-elf-gcc -o mvim main.o ../stdlib/stdlib.o ../stdlib/crt0.o -nostdlib -ffreestanding
+%.o: %.c 
+	i686-elf-gcc -g -m32 -c $< -o $@ -ffreestanding -Wall -Wextra
+
+mvim: linker.ld main.o structures.o ../stdlib/stdlib.o ../stdlib/crt0.o ../common/malloc.o
+	i686-elf-gcc -T $^ -o $@ -nostdlib -ffreestanding
 
 clean :
 	rm -f *.o
 	rm -f mvim
+
+.PHONY: clean
