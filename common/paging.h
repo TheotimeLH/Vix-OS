@@ -34,6 +34,7 @@ void init_paging(uint32 mem_size);
 void switch_page_directory(page_directory_t *dir);
 
 page_t *get_page(uint32 address, int make, page_directory_t *dir);
+void alloc_frame(page_t *page, int is_kernel, int is_writeable,uint32 page_virtual_address,bool is_identity);
 
 
 /* 

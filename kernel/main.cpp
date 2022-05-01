@@ -39,7 +39,9 @@ void charger_prog()
     uint32 cluster_count=(size+infos.byte_per_cluster-1)/infos.byte_per_cluster;
     uint8 buff[cluster_count*infos.byte_per_cluster];
     entries[i].read_data(buff,cluster_count,&infos,&afs);
-    run_process(load_process(buff));
+    uint32 pid=load_process(buff);
+    print_string("programme charge\n");
+    run_process(pid);
 }
 
 uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory size
@@ -47,8 +49,8 @@ uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory size
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
-    init_process_tab();
     init_vga(0x07,0x0);
+    init_process_tab();
     init_timer(1000);
     init_syscalls();
 	init_keyboard();

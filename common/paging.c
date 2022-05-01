@@ -60,19 +60,20 @@ static uint32 first_frame(){ // On cherche la premiere frame libre
 			}
 		}
 	}
+	return (uint32)-1;
 }
 
-void alloc_frame(page_t *page, int is_kernel, int is_writeable)
+void alloc_frame(page_t *page, int is_kernel, int is_writeable,uint32 page_virtual_address,bool is_identity)
 {
 	if(page->frame != 0)
 	{
 		return; // La frame a déjà été allouée
 	}
-	uint32 idx = first_frame();
+	uint32 idx = (is_identity)?page_virtual_address/0x1000:first_frame();
 	if(idx == (uint32) -1){
 		PANIC("No free frames"); // Faut gerer les erreurs
 	}
-	set_frame(idx * 0x1000);
+	if(!is_identity) set_frame(idx * 0x1000);
 	page->present=1;
 	page->rw = (is_writeable)?1:0;
 	page->user =(is_kernel)?0:1;
@@ -94,20 +95,26 @@ void free_frame(page_t *page){
 // On va faire le paging
 
 void init_paging(uint32 mem_size){
-	uint32 mem_end_page = mem_size;
+	uint32 mem_end_page = mem_size+0x100000;
 	nframes = mem_end_page / 0x1000;//nombre de frames
-	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes));// je sais pas
+	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes)*4);// je sais pas pourquoi index_from_bit donc je rajoute *4
 	memset(frames, 0, INDEX_FROM_BIT(nframes));
 	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
 	memset(kernel_directory, 0, sizeof(page_directory_t));
 	current_directory = kernel_directory;
 
-	// On doit identifier 
+	// On doit identifier et allouer les frames du kernel
 	int i = 0;
-	while(i < mem_size)
+	while(i < placement_adress)
 	{
-		alloc_frame( get_page(i, 1, kernel_directory), 1, 1);
+		alloc_frame( get_page(i, 1, kernel_directory), 1, 1,i,false);
 		i += 0x1000;
+	}
+	//on identifie le reste sans allouer
+	while(i<mem_end_page)
+	{
+		alloc_frame(get_page(i,1,kernel_directory),1,1,i,true);
+		i+=0x1000;
 	}
 	register_interrupt_handler(14, page_fault); // On enregistre le page_fault 
 	// Et la on active le paging
@@ -117,9 +124,14 @@ void init_paging(uint32 mem_size){
 
 
 void switch_page_directory(page_directory_t *dir){
+	uint32 cr0;
+	asm volatile("mov %%cr0, %0": "=r"(cr0));
+	cr0 &= ~0x80000000; // On desactive le paging
+	asm volatile("mov %0, %%cr0":: "r"(cr0));
+
 	current_directory = dir;
 	asm volatile("mov %0, %%cr3" :: "r"(&(dir->tablesPhysical)));
-	uint32 cr0;
+
 	asm volatile("mov %%cr0, %0": "=r"(cr0));
 	cr0 |= 0x80000001; // On active le paging
 	asm volatile("mov %0, %%cr0":: "r"(cr0));
@@ -158,14 +170,16 @@ void page_fault(registers_t regs)
 	int reserved = regs.err_code & 0x8;
 	int id = regs.err_code & 0x10;
 
-	print_string("Page fault ! ( ");
-	if(present) print_string("present ");
-	if(rw) print_string("read-only ");
-	if(us) print_string("user-mode ");
-	if(reserved) print_string("reserved ");
-	print_string (") at "); // TODO mettre l'adresse en hexa
-	print_hexa(faulting_address);
-	print_new_line();
-	PANIC("Page fault");
+	// print_string("Page fault ! ( ");
+	// if(present) print_string("present ");
+	// if(rw) print_string("read-only ");
+	// if(us) print_string("user-mode ");
+	// if(reserved) print_string("reserved ");
+	// print_string (") at "); // TODO mettre l'adresse en hexa
+	// print_hexa(faulting_address);
+	// print_new_line();
+	if(current_directory==kernel_directory) PANIC("Page fault");
+	alloc_frame(get_page(faulting_address,1,current_directory),1,1,faulting_address,false);
+	// print_string("handled !\n");
 
 }

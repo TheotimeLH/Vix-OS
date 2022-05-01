@@ -1,7 +1,10 @@
 #include "process.h"
+#include "../common/kheap.h"
 
 const uint32 n_process=10;
 process tab_process[n_process];
+extern uint32 placement_adress;
+extern page_directory_t* kernel_directory;
 
 
 void init_process_tab()
@@ -9,8 +12,16 @@ void init_process_tab()
     for(int i=0;i<n_process;i++)
     {
         tab_process[i].state=FREE;
+        tab_process[i].directory=(page_directory_t*)kmalloc_a(sizeof(page_directory_t));
+	    memset(tab_process[i].directory, 0, sizeof(page_directory_t));
+        for(uint32 pn=0;pn<1024;pn++)
+        {
+            get_page(pn<<22,1,tab_process[i].directory);
+        }
     }
 }
+
+extern uint32 nframes;
 
 uint32 load_process(uint8* elf,uint32 current_pid)
 {
@@ -25,6 +36,15 @@ uint32 load_process(uint8* elf,uint32 current_pid)
         print_string("tous les processus pris\n");
         return pid;
     }
+    process* proc=&tab_process[pid];
+
+    //on map le kernel
+	for(uint32 i=0;i<placement_adress;i+=0x1000)
+	{
+		alloc_frame(get_page(i,1,proc->directory),1,1,i,true);
+	}
+    
+    switch_page_directory(proc->directory);
 
     char elf_sign[4]="ELF";
     bool is_elf=true;
@@ -37,7 +57,6 @@ uint32 load_process(uint8* elf,uint32 current_pid)
         print_string("erreur de format\n");
         return n_process;
     }
-    process* proc=&tab_process[pid];
     
     proc->pg_entry=get_uint32(elf,0x18);
     proc->ppid=current_pid;
@@ -73,6 +92,7 @@ uint32 load_process(uint8* elf,uint32 current_pid)
         }
     }
     proc->state=RUNNABLE;
+    switch_page_directory(kernel_directory);
     return pid;
 }
 
@@ -81,5 +101,7 @@ void run_process(uint32 pid)
     process *proc=&tab_process[pid];
     if(proc->state!=RUNNABLE)
         return;
+    switch_page_directory(proc->directory);
     asm volatile("jmp *%0"::"a"(proc->saved_context.eip));
+    switch_page_directory(kernel_directory);
 }
