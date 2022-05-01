@@ -24,14 +24,20 @@
  * 	is_small (<16)
  * 	size:4 (if is_small)
  */
-/*
 #include "common.h"
+uint32 first_seg = 0x9100000;
 
+void* base[30];
 
-extern void* sbrk(uint32) ;
+//extern void* sbrk(uint32) ;
+
+void* sbrk(uint32 sz){
+	first_seg += sz;
+	return (void*) first_seg;
+}
 
 // Initialise depuis un tableau de 30 pointeurs à la base du tas
-void init_tas(void* base[30])
+void init_tas()
 {
 	for (int i=0 ; i<29 ; i++) base[i] = base+29 ;
 	base[29] = base ;
@@ -62,7 +68,7 @@ uint32 log2(uint32 n)
 }
 
 // Insère un bloc avant un autre
-void insert(void* base[30], uint8* next, uint8* new)
+void insert(uint8* next, uint8* new)
 {
 	uint32 n_new = size(new) ;
 	uint32 n_next = (next==base[29]) ? 4 : size(next) ;
@@ -74,7 +80,7 @@ void insert(void* base[30], uint8* next, uint8* new)
 }
 
 // Update les pointeurs têtes de listes
-void maj_heads(void* base[30], uint8* bloc)
+void maj_heads(uint8* bloc)
 {
 	uint32 n = size(bloc) ;
 	uint8** prev = *(uint8***) (bloc+n-4) ;
@@ -86,7 +92,7 @@ void maj_heads(void* base[30], uint8* bloc)
 }
 
 // Ajoute un bloc dans le système de ségrégation
-void link(void* base[30], uint8* bloc, uint32 n)
+void link(uint8* bloc, uint32 n)
 {
 	if (n<=8) return ;
 	uint32 k = log2(n) ;
@@ -96,7 +102,7 @@ void link(void* base[30], uint8* bloc, uint32 n)
 }
 
 // Retire un bloc du système de ségrégation
-void unlink(void* base[30], uint8* bloc)
+void unlink(uint8* bloc)
 {
 	uint32 n = size(bloc) ;
 	uint8** prev = *(uint8***) (bloc+n-4) ;
@@ -107,7 +113,7 @@ void unlink(void* base[30], uint8* bloc)
 }
 
 // Renvoie un bloc libre de taille >=n, NULL si inexistant
-uint8* find(void* base[30], uint32 n)
+uint8* find(uint32 n)
 {
 	uint8* bloc = base[log2(n)] ;
 	while (bloc != base[29]) {
@@ -119,7 +125,7 @@ uint8* find(void* base[30], uint32 n)
 }
 
 // Libère un bloc alloué
-void free(void* base[30], uint8* bloc)
+void free(uint8* bloc)
 {
 	bloc -= 5 ;
 	uint32 n = size(bloc) ;
@@ -139,7 +145,7 @@ void free(void* base[30], uint8* bloc)
 }
 
 // Alloue n octets sur le tas
-void* malloc(void* base[30], uint32 n)
+void* malloc(uint32 n)
 {
 	uint8* bloc = find(base, n+5) ;
 	if (bloc != NULL) {
@@ -151,4 +157,3 @@ void* malloc(void* base[30], uint32 n)
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
 }
-*/

@@ -2,7 +2,7 @@
 #include "../common/descriptor_tables.h"
 #include "../common/timer.h"
 #include "../fat_driver/fat_driver.h"
-#include "../common/paging.h"
+#include "../common/paging.h" 
 #include "process.h"
 #include "syscall.h"
 #include "../common/keyboard.h"
@@ -53,7 +53,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_process_tab();
     init_timer(1000);
     init_syscalls();
-	init_keyboard();
+		init_keyboard();
     init_paging(memory_detection(mbd,magic));
 
     charger_prog();
