@@ -24,7 +24,7 @@ int main(){
 	int line_under = 0; // la premiere ligne affichée à l'écran
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
 	line_t* buffer[LINE_NUMBER];
-	memset(buffer, 0, LINE_NUMBER* sizeof(line_t*));
+	memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
 	// Le reste est vide
@@ -35,15 +35,19 @@ int main(){
 
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
+	buffer[0] = current;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement
-		for(int i = 0; i < VIDEO_W; i++)
-			for(int j = 0; j < VIDEO_H; j++)
-				print_screen(i, j, ' ', WHITE, BLACK);
+		if(get_ticks() % 5 == 0){
+			for(int i = 0; i < VIDEO_W; i++)
+				for(int j = 0; j < VIDEO_H; j++)
+					print_screen(i, j, ' ', WHITE, BLACK);
+		}
 		//
 		int nb_line_aff = 0; // On ne doit pas depasser VIDEO_H
+		int curr_line = 0;
 		line_t* ac_line = buffer[line_under];
 		uint32 posX = 0, posY = 0; // on commence à afficher en haut à gauche de l'écran
 		while(nb_line_aff < VIDEO_H){
@@ -64,7 +68,13 @@ int main(){
 					posX =0;
 				}
 			}
+			posY++;
+			nb_line_aff++;
+			ac_line = buffer[++curr_line];
+			if(ac_line == 0)
+				break;
 		}
+
 
 
 		/*
@@ -80,35 +90,22 @@ int main(){
 		
 		// On a pas encore les gestions claviers
 		// Il faudrait plutot considerer ça ligne par ligne, parce que la on a le probleme que chaque ligne fait au plus 80 caracteres...
-		/*
 		keyboard_t kp = get_keyboard();
 		switch (current_mode){
 			case NORMAL:
 				if(kp.type == 0){ // On va faire un handler simple
 					switch (kp.k.ch){
 						case 'h': // On va à gauche
-							if(cursorX > 0) 
-							{
-								if(
-							}
+							// TODO
 							break;
 						case 'k': // On va en haut
-							if(cursorY > 0) 
-							{
-								buffer[(cursorX)+ ((cursorY--) + line_under)*VIDEO_W].cursor = 0;  ;
-								buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
-							}
+							// TODO
 							break;
 						case 'j': // On va en bas
-							buffer[(cursorX)+ ((cursorY++) + line_under)*VIDEO_W].cursor = 0;  ;
-							buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
+							// TODO
 							break;
 						case 'l': // On va à droite
-							if(cursorX < VIDEO_W -1) 
-							{
-								buffer[(cursorX++)+ (cursorY + line_under)*VIDEO_W].cursor = 0;  ;
-								buffer[(cursorX)+ (cursorY + line_under)*VIDEO_W].cursor = 1;  ;
-							}
+							// TODO
 							break;
 						case 'i': // On passe en insert mode
 							current_mode = INSERT;
@@ -140,7 +137,6 @@ int main(){
 
 
 			}
-			*/
 
 
 	}
