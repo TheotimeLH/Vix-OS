@@ -262,6 +262,7 @@ int main(){
 								current = insert_after_line(current, init_list((text_t) {' ', WHITE, BLACK, 0}));
 								current_buff = current->line_buffer;
 								current_buff->e.cursor = 1;
+								cursorX = 0;
 							break;
 
 
