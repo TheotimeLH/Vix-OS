@@ -51,6 +51,32 @@ public:
             }
         }
     };
+    Fat_entry(const Fat_entry &obj)
+    :Fat_entry(obj.m_first_cluster,obj.m_is_directory,(char*)obj.m_name,obj.m_size,obj.m_entry_sector,obj.m_entry_offset)
+    {};
+    constexpr Fat_entry& operator=(const Fat_entry& obj)
+    {
+        m_is_directory=obj.m_is_directory;
+        m_first_cluster=obj.m_first_cluster;
+        m_current_cluster=obj.m_first_cluster;
+        m_current_entry_offset=0;
+        m_last_entry=0;
+        m_size=obj.m_size;
+        m_entry_sector=obj.m_entry_sector;
+        m_entry_offset=obj.m_entry_offset;
+        m_name[8]='\0';
+        for(int i=0;i<8;i++)
+        {
+            m_name[i]=obj.m_name[i];
+            if(m_name[i]==0||m_name[i]==' ')
+            {
+                m_name[i]=0;
+                break;
+            }
+        }
+        
+        return *this;
+    }
     char* get_name(){return m_name;};
     bool is_directory(){return m_is_directory;};
     void init_offset(){m_current_cluster=m_first_cluster;m_current_entry_offset=0;m_last_entry=false;};
@@ -74,7 +100,7 @@ public:
     //  - pour la racine en fat12/16 : infos.sector_size/32
     //  - sinon, infos.byte_per_cluster/32
     uint32_t read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf);
-    bool add_entry(char* name,bool is_directory,Fat_entry* buff);//TODO
+    bool add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_infos* infos,Fat_system* intf);
 private:
     bool m_is_directory;
     uint32_t m_first_cluster;//0 for root (FAT12/16)

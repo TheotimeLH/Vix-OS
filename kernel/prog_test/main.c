@@ -3,11 +3,12 @@
 int main()
 {
     write(0,"programme lance\n");
-    uint32 file=open("FILE");
+    uint32 file=open("FILE2");
 
     char buff[100]="j'écris dans le fichier test depuis un\nprogramme utilisateur !!!";
     write(file,buff);
 
+    file=open("FILE2");
     uint32 size=read(file,buff,99);
     buff[size+1]=0;
     write(0,buff);

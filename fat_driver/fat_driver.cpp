@@ -292,6 +292,19 @@ bool set_fat_cluster(uint32 cluster,uint32 val,Fat_system* intf,Fat_infos* infos
     return true;
 }
 
+void fill_zeros(uint32 cluster,Fat_system* intf,Fat_infos* infos)
+{
+    uint8 buff[infos->cluster_size];
+    for(int i=0;i<infos->cluster_size;i++)
+    {
+        buff[i]=0;
+    }
+    intf->write(infos->cluster_size,
+        infos->data+(cluster-2)*infos->cluster_size,
+        buff,
+        infos->sector_size);
+}
+
 uint32_t Fat_entry::read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* infos,Fat_system* intf)
 {
     if(m_is_directory)
@@ -302,7 +315,6 @@ uint32_t Fat_entry::read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* 
     if(m_current_cluster>=last_cluster)
         return 0;
 
-    uint32_t ret(0);
     for(uint32_t i=0;i<cluster_count;i++)
     {
         intf->read(infos->cluster_size,
@@ -330,7 +342,7 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
     uint8_t buff[buff_size];
     uint16_t entry_per_buff=buff_size/32;
     bool buff_empty(true);
-    uint32 buff_addr;
+    uint32 buff_addr(0);
 
     
     uint32_t last_cluster=fat_last_cluster(infos);
@@ -401,7 +413,7 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
         uint32_t first_cluster=buff_8_16(buff,32*m_current_entry_offset+0x1A);
         if(infos->fat_type==32)
         {
-            first_cluster=first_cluster|(buff_8_16(buff,32*m_current_entry_offset+0x14)>>16);
+            first_cluster=first_cluster|(buff_8_16(buff,32*m_current_entry_offset+0x14)<<16);
         }
         uint32_t size=buff_8_32(buff,32*m_current_entry_offset+0X1C);
         buffer[read]=Fat_entry(first_cluster,is_directory,(char*)(buff+32*m_current_entry_offset),size,
@@ -413,11 +425,127 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
     return read;
 }
 
+bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_infos* infos,Fat_system* intf)
+{
+    if(!m_is_directory)
+        return false;
+    
+    init_offset();
+    uint32_t buff_size=(m_first_cluster==0)?infos->sector_size:infos->byte_per_cluster;
+    uint8_t buff[buff_size];
+    uint16_t entry_per_buff=buff_size/32;
+    bool buff_empty(true);
+    uint32 buff_addr(0);
+    uint32_t last_cluster=fat_last_cluster(infos);
+
+    while(1)
+    {
+        if(m_current_entry_offset>=entry_per_buff)//update cluster si on peut
+        {
+            m_current_entry_offset=0;
+            if(m_first_cluster==0)
+            {
+                if(m_current_cluster==infos->root_size-1)
+                {
+                    m_current_entry_offset=entry_per_buff;
+                    m_last_entry=true;
+                    return false;
+                }
+                else
+                    m_current_cluster++;
+            }
+            else
+            {
+                uint32_t next_cluster=fat_next_cluster(m_current_cluster,intf,infos);
+                if(next_cluster>=last_cluster)
+                {
+                    m_current_entry_offset=entry_per_buff;
+                    m_last_entry=true;
+                    break;
+                }
+                else
+                    m_current_cluster=next_cluster;
+            }
+            
+        }
+
+        if(m_current_entry_offset==0||buff_empty)//recharger de la memoire
+        {
+            if(m_first_cluster==0)
+            {
+                intf->read(1,infos->root+m_current_cluster,buff,infos->sector_size);
+                buff_addr=infos->root+m_current_cluster;
+            }
+            else
+            {
+                intf->read(infos->cluster_size,
+                    infos->data+(m_current_cluster-2)*infos->cluster_size,
+                    buff,
+                    infos->sector_size);
+                buff_addr=infos->data+(m_current_cluster-2)*infos->cluster_size;
+            }
+            buff_empty=false;
+        }
+
+        if(buff[32*m_current_entry_offset]==0x05
+            ||buff[32*m_current_entry_offset]==0xE5
+            ||buff[32*m_current_entry_offset]==0)
+        {
+            break;
+        }
+        else
+        {
+            m_current_entry_offset++;
+            continue;
+        }
+
+    }
+
+
+    if(m_last_entry)
+    {
+        uint32 next_cluster=fat_free_cluster(intf,infos);
+        if(next_cluster>=last_cluster)
+            return false;
+        set_fat_cluster(m_current_cluster,next_cluster,intf,infos);
+        m_current_cluster=next_cluster;
+        set_fat_cluster(m_current_cluster,0xFFFFFFFF,intf,infos);
+        fill_zeros(m_current_cluster,intf,infos);
+        m_current_entry_offset=0;
+    }
+
+    buff[32*m_current_entry_offset+0x0B]=(is_directory)?0x10:0;
+    uint32_t first_cluster=fat_free_cluster(intf,infos);
+    if(first_cluster>=last_cluster)
+        return false;
+    set_fat_cluster(first_cluster,0xFFFFFFFF,intf,infos);
+
+    if(is_directory) fill_zeros(first_cluster,intf,infos);
+
+    *((uint16*)&buff[32*m_current_entry_offset+0x1A])=first_cluster;
+    if(infos->fat_type==32)
+    {
+        *((uint16*)&buff[32*m_current_entry_offset+0x14])=first_cluster>>16;
+    }
+    *((uint32*)&buff[32*m_current_entry_offset+0X1C])=0;
+    bool found_zero=false;
+    for(int i=0;i<8;i++)
+    {
+        if(name[i]==0)
+            found_zero=true;
+        buff[32*m_current_entry_offset+i]=(found_zero)?' ':name[i];
+    }
+    if(!intf->write(buff_size/infos->sector_size,buff_addr,buff,infos->sector_size))
+        return false;
+    *entry_ret=Fat_entry(first_cluster,is_directory,name,0,
+        buff_addr+(m_current_entry_offset*32)/((uint32)infos->sector_size),(m_current_entry_offset*32)%((uint32)infos->sector_size));
+    return true;
+}
+
 Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
 {
     Fat_entry entries[10];
     int i;
-    int nb_entries;
     dir->init_offset();
     while(1)
     {
@@ -457,7 +585,7 @@ bool Fat_entry::write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system
     bool empty_buffer(true);
     while(write_size<size)
     {
-        if(offset==0)
+        if(offset==0&&m_size!=0)
         {
             next_cluster=fat_free_cluster(intf,infos);
             if(next_cluster>=last_cluster)

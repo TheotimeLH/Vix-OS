@@ -111,8 +111,12 @@ static void syscall(registers_t regs)
         current_proc->opened_files[i].cursor=0;
         if(!ok)
         {
-            *eax=uint32(-1);
-            return;
+            if(!current_proc->current_dir.add_entry((char*)regs.edi,false,
+                &current_proc->opened_files[i].entry,infos,afs))
+            {
+                *eax=uint32(-1);
+                return;
+            }
         }
         *eax=i;
         break;
