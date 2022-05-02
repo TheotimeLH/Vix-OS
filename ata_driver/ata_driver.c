@@ -153,6 +153,8 @@ bool ata_write(Drive d,uint8_t count,uint32_t lba,uint16_t *buffer)
 
 	uint16_t io_base=(primary)?0x1f0:0x170;
 
+	uint8 status;
+
 	outb(((master)?0xE0:0xF0)|(lba>>24),io_base|0x6);//drive select + 24-27 of lba
 	outb(0,io_base|0x1);//error
 	outb(count,io_base|0x2);//count
@@ -164,7 +166,7 @@ bool ata_write(Drive d,uint8_t count,uint32_t lba,uint16_t *buffer)
 	uint16_t count_16=(count==0)?256:count;
 	for(int i=0;i<count_16;i++)
 	{
-		uint8_t status=inb(io_base|0x7);
+		status=inb(io_base|0x7);
 		while((status&(1<<7))&&(!(status&(1<<3))))
 		{
 			status=inb(io_base|0x7);
@@ -179,6 +181,16 @@ bool ata_write(Drive d,uint8_t count,uint32_t lba,uint16_t *buffer)
 			outw(buffer[i*256+j],io_base);
 		}
 	}
+
+	outb(0xE7,io_base|0x7);
+	do
+	{
+		status=inb(io_base|0x7);
+		if((status&1)||(status&(1<<5)))//err
+		{
+			return false;
+		}
+	}while(status&(1<<7));
 
 	return true;
 	
