@@ -1,3 +1,6 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
 #include "../stdlib/stdlib.h"
 #include "../common/malloc.h"
 
@@ -46,3 +49,6 @@ text_list_t *insert_after(text_list_t *el, text_t element);
 text_list_t *insert_before(text_list_t *el, text_t element);
 text_list_t *k_shift(text_list_t* el, int k);
 void delete_node(text_list_t* el);
+
+
+#endif

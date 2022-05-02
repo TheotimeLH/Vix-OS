@@ -1,6 +1,7 @@
 #include "../stdlib/stdlib.h"
 #include "stddef.h" 
 #include "structures.h"
+#include "command_handler.h"
 #include "../common/malloc.h"
 
 #define VIDEO_W 80
@@ -289,9 +290,14 @@ int main(){
 						case SPACE:
 							command_buffer[i] = ' ';
 							break;
+						case BACKSPACE:
+							command_buffer[i-1]= 0;
+							break;
 						case ENTER:
 							// La il faut interpreter la commande
 							interpret_command(command_buffer, current, screen_start);
+							memset(command_buffer, 0, sizeof(char)*80);
+							current_mode = NORMAL;
 						break;
 					}
 				}
