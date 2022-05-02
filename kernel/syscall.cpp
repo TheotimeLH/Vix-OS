@@ -75,6 +75,10 @@ static void syscall(registers_t regs)
         {
             print_string((char*)regs.esi);
         }
+        else if(current_proc->opened_files[regs.edi].type==FAT_ENTRY)
+        {
+            current_proc->opened_files[regs.edi].entry.write_data((uint8*)regs.esi,regs.ebx,infos,afs);
+        }
         break;
     case 2://read
         *eax=read(regs.edi,(uint8*)regs.esi,regs.ebx);

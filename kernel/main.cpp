@@ -27,7 +27,8 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_process_tab();
 		init_keyboard();
     init_paging(memory_detection(mbd,magic));
-    uint32 pid=exec("MVIM",&afs,&fi,&(fi.root_fat_entry));
+
+    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry));
     if(pid!=uint32(-1))
     {
         run_process(pid);
@@ -38,20 +39,6 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 		}
 
     while (1);
-    
-
-
-     while(1){
-			 keyboard_t k = keyboard_handler();
-			 if (!k.type && k.k.ch != 0){
-				 print_char(k.k.ch);
-			 }
-			 else{
-				 if(k.k.sp == SPACE){
-					 print_char(' ');
-				 }
-			 }
-		 }
 }
 
 void init_disk(Fat_infos *fi,Ata_fat_system *afs)

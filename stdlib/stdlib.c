@@ -13,15 +13,23 @@ uint32 get_ticks()
 
 void write(uint32 file_desc,char *str)
 {
+    fwrite(file_desc,(uint8*)str,strlen(str));
+}
+
+void fwrite(uint32 file_desc,uint8 *data,uint32 size)
+{
     asm volatile("push %esi");
     asm volatile("push %eax");
     asm volatile("push %edi");
+    asm volatile("push %ebx");
 
-    asm volatile("mov %0,%%esi":"=m"(str));
+    asm volatile("mov %0,%%esi":"=m"(data));
+    asm volatile("mov %0,%%ebx":"=m"(size));
     asm volatile("mov $1,%eax");
     asm volatile("mov %0,%%edi":"=m"(file_desc));
     asm volatile("int $0x42");
 
+    asm volatile("pop %ebx");
     asm volatile("pop %edi");
     asm volatile("pop %eax");
     asm volatile("pop %esi");
@@ -95,4 +103,11 @@ uint32 open(char* filename)
 
     asm volatile("mov %%eax,%0"::"m"(ret));
     return ret;
+}
+
+uint32 strlen(char* str)
+{
+	uint32 ret;
+	for(ret=0;str[ret]!=0;ret++);
+	return ret;
 }

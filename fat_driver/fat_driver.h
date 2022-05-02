@@ -35,10 +35,10 @@ class Fat_entry
 {
 public:
     Fat_entry(){};
-    Fat_entry(bool is_directory,char* name):Fat_entry(0,is_directory,name,0){};
-    Fat_entry(uint32_t cluster,bool is_directory,char* name,uint32_t size)
+    Fat_entry(bool is_directory,char* name):Fat_entry(0,is_directory,name,0,0,0){};
+    Fat_entry(uint32_t cluster,bool is_directory,char* name,uint32_t size,uint32 entry_sector,uint32 entry_offset)
     :m_is_directory(is_directory),m_first_cluster(cluster),m_current_cluster(cluster),
-    m_current_entry_offset(0),m_last_entry(0),m_size(size)
+    m_current_entry_offset(0),m_last_entry(0),m_size(size),m_entry_sector(entry_sector),m_entry_offset(entry_offset)
     {
         m_name[8]='\0';
         for(int i=0;i<8;i++)
@@ -63,7 +63,7 @@ public:
     //utiliser init_offset pour repartir du début
     //attention, le buffer doit être de taille cluster_count*infos.byte_per_cluster
     uint32_t read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* infos,Fat_system* intf);
-    bool add_entry(char* name,bool is_directory,Fat_entry* buff);
+    bool write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system* intf);//append data at the end of the file
 
     //uniquement pour les répertoires
     //renvoit le nombre d'entrées lues, s'il est inférieur à size,
@@ -74,6 +74,7 @@ public:
     //  - pour la racine en fat12/16 : infos.sector_size/32
     //  - sinon, infos.byte_per_cluster/32
     uint32_t read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf);
+    bool add_entry(char* name,bool is_directory,Fat_entry* buff);//TODO
 private:
     bool m_is_directory;
     uint32_t m_first_cluster;//0 for root (FAT12/16)
@@ -82,6 +83,8 @@ private:
     bool m_last_entry;//..
     uint32_t m_size;//en octets
     char m_name[9];
+    uint32 m_entry_sector;//addresse des infos sur l'entrée en secteur
+    uint32 m_entry_offset;//offset en byte
 };
 
 Fat_infos fat_init(Fat_system* intf);

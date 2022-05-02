@@ -232,12 +232,13 @@ int main(){
 				}
 				else{
 					if(kp.type == 1){
+						int premier;
 						switch (kp.k.sp){
 							case ESCAPE:
 								current_mode = NORMAL;
 								break;
 							case SPACE:
-								int premier = (current_buff->prev == 0); // Si c'est le premier de la liste
+								premier = (current_buff->prev == 0); // Si c'est le premier de la liste
 								current->size++;
 								text_list_t *nouveau = insert_before(current_buff , (text_t) {' ', WHITE, BLACK, 0});
 								if(premier)
