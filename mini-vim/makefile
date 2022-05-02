@@ -12,7 +12,7 @@ all:mvim ../kernel/disque
 %.o: %.c 
 	i686-elf-gcc -c $< -o $@ -nostdlib -ffreestanding
 
-mvim: linker.ld main.o structures.o ../stdlib/stdlib.o ../stdlib/crt0.o ../common/malloc.o
+mvim: linker.ld main.o structures.o ../stdlib/stdlib.o ../stdlib/crt0.o ../common/malloc.o buffer_handler.o command_handler.o
 	i686-elf-gcc -T $^ -o $@ -nostdlib -ffreestanding
 
 clean :

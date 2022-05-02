@@ -1,6 +1,14 @@
 #include "../stdlib/stdlib.h"
 #include "../common/malloc.h"
 
+typedef struct pair
+{
+	void* fst;
+	void* snd;
+} pair_t;
+
+
+
 typedef struct text{
 	char c;
 	uint8 fg; // La couleur du premier plan

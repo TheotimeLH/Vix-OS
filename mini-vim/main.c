@@ -78,7 +78,6 @@ int main(){
 	
 	char command_buffer[80]; // Le buffer pour contenir la commande en cours
 	memset(command_buffer, 0, sizeof(char)*80);
-	
 
 	while(1){ // main loop
 		// On va afficher à l'écran le buffer
@@ -292,6 +291,7 @@ int main(){
 							break;
 						case ENTER:
 							// La il faut interpreter la commande
+							interpret_command(command_buffer, current, screen_start);
 						break;
 					}
 				}
