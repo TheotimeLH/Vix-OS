@@ -20,7 +20,7 @@
 stackBottom:
 
 # define the maximum size of stack to 512 bytes
-.skip 16384
+.skip 0x100000
 
 
 # set the stack top which grows from higher to lower
