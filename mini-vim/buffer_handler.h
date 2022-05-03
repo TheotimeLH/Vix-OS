@@ -5,6 +5,7 @@
 #include "../stdlib/stdlib.h"
 
 line_t* buffer_from_file(char* filename, uint32 size);
+void save_to_file(char* filename, line_t* file);
 
 
 #endif

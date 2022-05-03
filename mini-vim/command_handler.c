@@ -47,6 +47,13 @@ uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
 		// Il faudrait flush aussi
 		return 2;
 	}
+	if(strcmp(comm, "w"))
+	{
+		line_t* file = scr_start;
+		while(file->prev) file = file->prev; // On va au début du fichier
+		save_to_file(parm, file);
+		return 4;
+	}
 	
 
 }

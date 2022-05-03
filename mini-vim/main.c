@@ -77,6 +77,7 @@ int main(){
 	current->line_buffer->e.cursor = 1;
 	text_list_t *current_buff = current->line_buffer;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
+	line_t* file_begin = screen_start; 
 	
 	char command_buffer[80]; // Le buffer pour contenir la commande en cours
 	memset(command_buffer, 0, sizeof(char)*80);
@@ -300,16 +301,21 @@ int main(){
 							uint32 bm = interpret_command(command_buffer, current, screen_start);
 							memset(command_buffer, 0, sizeof(char)*80);
 
-							if(bm & 0x1)
+							if(bm & 0x1) // On a eu une lecture de fichier
 							{
 								current_buff = current->line_buffer;
 								current_buff->e.cursor = 1;
+								file_begin = screen_start;
 								cursorX = 0;
 							}
-							if(bm & 0x2) 
+							if(bm & 0x2)  // Une demande d'arret
 							{
 								running = 0;
 								write(0, "PROGRAM STOPPING");
+							}
+							if(bm & 0x4) // Une sauvegarde
+							{
+
 							}
 							current_mode = NORMAL;
 						break;

@@ -40,3 +40,44 @@ line_t* buffer_from_file(char* filename, uint32 size){
 	}
 	return final;
 }
+
+static char* to_string(line_t* file)
+{
+	// On détermine d'abord la taille
+	line_t* actuel = file;
+	uint32 size = 0;
+	int continuer = 1;
+	while(actuel != 0) // On pourrait faire confiance à la size donnée dans les lignes 
+	{
+		text_list_t* ligne = actuel->line_buffer;
+		while(ligne)
+		{
+			ligne = ligne->next;
+			size++;
+		}
+		actuel = actuel->next;
+		size++; // Caractere de saut de ligne
+	}
+	//On va maintenant calculer le buffer
+	
+	char* buff = (char*) malloc(sizeof(char)*size);
+	int i;
+	actuel = file;
+	while(actuel)
+	{
+		text_list_t* ligne = actuel->line_buffer;
+		while(ligne)
+		{
+			buff[i++] = ligne->e.c;
+			ligne = ligne->next;
+		}
+		actuel = actuel->next;
+		buff[i++]  = '\n';
+	}
+	return buff;
+}
+void save_to_file(char* filename, line_t* file)
+{
+	uint32 f = open(filename);
+	write(f, to_string(file));
+}
