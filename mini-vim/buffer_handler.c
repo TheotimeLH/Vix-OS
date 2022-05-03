@@ -22,7 +22,7 @@ line_t buffer_from_file(char* filename, uint32 size){
 		if(buff[i] == '\n')
 		{
 			// On saute une ligne
-			line_t* next_line = malloc(sizeof(line_t*));
+			line_t* next_line = malloc(sizeof(line_t));
 			next_line->prev = actuel;
 			next_line->next = 0;
 			actuel->line_buffer = current_text_list;
