@@ -38,7 +38,7 @@ uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
 	if(strcmp(comm, "e"))
 	{
 		// On doit ouvrir un fichier
-		*curr_buff = buffer_from_file(parm, 100); // On dit de taille 1000, à changer
+		*curr_buff = *buffer_from_file(parm, 100); // On dit de taille 1000, à changer
 		*scr_start = *curr_buff;
 		return 1; // On va faire un bitmask pour dire ce qui a été modifié
 	}

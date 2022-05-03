@@ -213,6 +213,7 @@ int main(){
 							current_buff = current->line_buffer;
 							current_buff->e.cursor = 1;
 							current_mode = INSERT;
+							cursorX = 0;
 						break;
 						case ':':
 							// On passe en mode commande
@@ -297,15 +298,19 @@ int main(){
 						case ENTER:
 							// La il faut interpreter la commande
 							uint32 bm = interpret_command(command_buffer, current, screen_start);
+							memset(command_buffer, 0, sizeof(char)*80);
 
 							if(bm & 0x1)
 							{
 								current_buff = current->line_buffer;
 								current_buff->e.cursor = 1;
+								cursorX = 0;
 							}
 							if(bm & 0x2) 
+							{
 								running = 0;
-							memset(command_buffer, 0, sizeof(char)*80);
+								write(0, "PROGRAM STOPPING");
+							}
 							current_mode = NORMAL;
 						break;
 					}
