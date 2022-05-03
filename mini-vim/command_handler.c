@@ -10,7 +10,6 @@ static pair_t split_on(char* buff, char c)
 		r++;
 		if(buff[i] == c)
 		{
-			r++;
 			buff[i] = 0;
 			break;
 		}
@@ -30,7 +29,7 @@ static int strcmp(const char* a,const char* b)
     }
     return 1;
 }
-void interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
+uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
 {
 	// Déja on doit déterminer les différents éléments
 	pair_t res = split_on(com_buff, ' ');
@@ -39,9 +38,14 @@ void interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
 	if(strcmp(comm, "e"))
 	{
 		// On doit ouvrir un fichier
-		*curr_buff = buffer_from_file(parm, 1000); // On dit de taille 1000, à changer
+		*curr_buff = buffer_from_file(parm, 100); // On dit de taille 1000, à changer
 		*scr_start = *curr_buff;
-		print_screen(5,5,'T', BLACK,WHITE);
+		return 1; // On va faire un bitmask pour dire ce qui a été modifié
+	}
+	if(strcmp(comm, "q"))
+	{
+		// Il faudrait flush aussi
+		return 2;
 	}
 	
 

@@ -2,7 +2,9 @@
 
 
 line_t buffer_from_file(char* filename, uint32 size){
-	char* buff = malloc(sizeof(char)*size); // On alloue un buffer
+	//char* buff = malloc(sizeof(char)*size); // On alloue un buffer
+	char buff[100];
+	size = 99;
 	uint32 file = open(filename);
 	uint32 size_file = read(file, buff, size);
 	buff[size_file+1] = 0;
@@ -30,7 +32,6 @@ line_t buffer_from_file(char* filename, uint32 size){
 		else
 		{
 			current_pos = insert_after(current_pos, (text_t) {buff[i], WHITE, BLACK, 0});
-			print_screen(6, 5, 'T' , WHITE, BLACK);
 		}
 	}
 	return final;

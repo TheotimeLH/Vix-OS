@@ -56,6 +56,7 @@ void render_banner(mode_t current_mode)
 int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
 	//
+	int running = 1;
 	init_tas();
 	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
@@ -80,10 +81,10 @@ int main(){
 	char command_buffer[80]; // Le buffer pour contenir la commande en cours
 	memset(command_buffer, 0, sizeof(char)*80);
 
-	while(1){ // main loop
+	while(running){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement
-		if(get_ticks() % 100 == 0){
+		if(get_ticks() % 1000 == 0){
 			for(int i = 0; i < VIDEO_W; i++)
 				for(int j = 0; j < VIDEO_H+2; j++)
 					print_screen(i, j, ' ', WHITE, BLACK);
@@ -295,7 +296,15 @@ int main(){
 							break;
 						case ENTER:
 							// La il faut interpreter la commande
-							interpret_command(command_buffer, current, screen_start);
+							uint32 bm = interpret_command(command_buffer, current, screen_start);
+
+							if(bm & 0x1)
+							{
+								current_buff = current->line_buffer;
+								current_buff->e.cursor = 1;
+							}
+							if(bm & 0x2) 
+								running = 0;
 							memset(command_buffer, 0, sizeof(char)*80);
 							current_mode = NORMAL;
 						break;
