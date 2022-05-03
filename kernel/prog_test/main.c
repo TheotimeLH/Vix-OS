@@ -3,19 +3,28 @@
 int main()
 {
     write(0,"programme lance\n");
-    uint32 file=open("FILE2");
 
-    char buff[100]="j'écris dans le fichier test depuis un\nprogramme utilisateur !!!";
-    write(file,buff);
+    uint32 pid=1;
+    if(get_pid()==0)
+    {
+        pid=0;
+        write(0,"pid null\n");
+        exec("PROG");
+    }
 
-    file=open("FILE2");
-    uint32 size=read(file,buff,99);
-    buff[size+1]=0;
-    write(0,buff);
 
-    write(0,"\nok");
-
-    while(1);
+    uint32 ticks=0;
+    while(1)
+    {
+        if(1)//get_ticks()>=ticks+1000)
+        {
+            if(pid==0)
+                write(0,"prog0\n");
+            else
+                write(0,"prog1\n");
+       //     ticks=get_ticks();
+        }
+    }
 
     return 0;	
 }

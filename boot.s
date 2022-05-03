@@ -26,6 +26,11 @@ stackBottom:
 # set the stack top which grows from higher to lower
 stackTop:
 
+.skip 0x10000
+
+.global kernel_stack
+kernel_stack:
+
 .section .text
 .global _start
 .type _start, @function
@@ -49,5 +54,13 @@ hltLoop:
 
 	hlt
 	jmp hltLoop
+
+.global return_proc
+return_proc:
+	mov %ebx,%esp
+	pop %ebx
+	pop %esi
+	pop %ebp
+	ret
 
 .size _start, . - _start

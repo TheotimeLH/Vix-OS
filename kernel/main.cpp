@@ -21,14 +21,14 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_vga(0x07,0x0);
     Ata_fat_system afs(hda);
     init_disk(&fi,&afs);
-    init_timer(1000);
     
     init_syscalls(&afs,&fi);
     init_process_tab();
 		init_keyboard();
     init_paging(memory_detection(mbd,magic));
 
-    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry));
+    init_timer(1000);
+    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry),-1);
     if(pid!=uint32(-1))
     {
         run_process(pid);

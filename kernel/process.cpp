@@ -5,6 +5,7 @@ const uint32 n_process=10;
 process tab_process[n_process];
 extern uint32 placement_adress;
 extern page_directory_t* kernel_directory;
+extern page_directory_t* current_directory;
 uint32 current_pid;
 extern Fat_infos fi;
 process* current_proc;
@@ -28,9 +29,10 @@ void init_process_tab()
             get_page(pn<<22,1,tab_process[i].directory);
         }
     }
+    current_pid=-1;
 }
 
-uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
+uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,uint32 ppid)
 {
     Fat_entry entries[10];
     int i;
@@ -51,12 +53,11 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
             return uint32(-1);
     }
     
-		
     uint32 size=entries[i].get_size();
     uint32 cluster_count=(size+infos->byte_per_cluster-1)/infos->byte_per_cluster;
     uint8 buff[cluster_count*infos->byte_per_cluster];
     entries[i].read_data(buff,cluster_count,infos,afs);
-    uint32 pid=load_process(buff);
+    uint32 pid=load_process(buff,ppid);
     tab_process[pid].current_dir=*dir;
     tab_process[pid].opened_files[STDIN].type=STDIN;
     tab_process[pid].opened_files[STDOUT].type=STDOUT;
@@ -67,7 +68,7 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir)
     return pid;
 }
 
-uint32 load_process(uint8* elf,uint32 current_pid)
+uint32 load_process(uint8* elf,uint32 ppid)
 {
     uint32 pid;
     for(pid=0;pid<n_process;pid++)
@@ -103,7 +104,7 @@ uint32 load_process(uint8* elf,uint32 current_pid)
     }
     
     proc->pg_entry=get_uint32(elf,0x18);
-    proc->ppid=current_pid;
+    proc->ppid=ppid;
     proc->saved_context.ds=0x10;
     proc->saved_context.cs=0x10;
     proc->saved_context.ss=0x10;
@@ -136,12 +137,13 @@ uint32 load_process(uint8* elf,uint32 current_pid)
         }
     }
     proc->state=RUNNABLE;
-    switch_page_directory(kernel_directory);
+    switch_page_directory(current_directory);
     return pid;
 }
 
 void run_process(uint32 pid)
 {
+    bool debug=current_pid!=-1;
     process *proc=&tab_process[pid];
     if(proc->state!=RUNNABLE)
         return;
@@ -150,4 +152,30 @@ void run_process(uint32 pid)
     switch_page_directory(proc->directory);
     asm volatile("jmp *%0"::"a"(proc->saved_context.eip));
     switch_page_directory(kernel_directory);
+}
+
+
+uint32 trans_ebp;
+extern uint32 kernel_stack;
+extern "C" void switch_context()
+{
+    if(current_pid==-1)
+        return;
+    do
+    {
+        current_pid=(current_pid+1)%n_process;
+    }while(tab_process[current_pid].state!=RUNNABLE);
+
+    asm volatile("mov %%ebp,%0":"=r"(trans_ebp));
+    current_proc->saved_context.ebp=trans_ebp;
+    asm volatile("mov %%ebx,%0":"=r"(trans_ebp));
+    current_proc->saved_context.ebx=trans_ebp;
+
+    current_proc=&tab_process[current_pid];
+    asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
+    switch_page_directory(current_proc->directory);
+    trans_ebp=current_proc->saved_context.ebp;
+    asm volatile("mov %0,%%ebp"::"a"(trans_ebp));
+    trans_ebp=current_proc->saved_context.ebx;
+    asm volatile("mov %0,%%ebx"::"a"(trans_ebp));
 }

@@ -9,6 +9,7 @@ Fat_infos *infos=0;
 extern uint32 current_pid;
 extern uint32 n_process;
 extern process *current_proc;
+extern uint32 kernel_stack;
 
 uint32 read(uint32 file,uint8 *buffer,uint32 size)
 {
@@ -58,9 +59,12 @@ uint32 read(uint32 file,uint8 *buffer,uint32 size)
     return read_size;
 }
 
+uint32 global_save_pid;
+extern uint32 return_proc;
 static void syscall(registers_t regs)
 {
-    //rétablir le contexte du noyau ??
+    uint32 current_pid_save=current_pid;
+    current_pid=-1;
     uint32* eax=(uint32*)(regs.esp-4);
     keyboard_t key;
     bool ok;
@@ -102,7 +106,7 @@ static void syscall(registers_t regs)
         if(i==max_opened_files)
         {
             *eax=uint32(-1);
-            return;
+            break;;
         }
         current_proc->opened_files[i].type=FAT_ENTRY;
         
@@ -115,14 +119,27 @@ static void syscall(registers_t regs)
                 &current_proc->opened_files[i].entry,infos,afs))
             {
                 *eax=uint32(-1);
-                return;
+                break;
             }
         }
         *eax=i;
         break;
+    case 6://exec
+        asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
+        global_save_pid=exec((char*)regs.edi,afs,infos,&current_proc->current_dir,current_pid_save);
+        asm volatile("mov %%ebp,%0":"=r"(current_proc->saved_context.ebp));
+        asm volatile("lea -0xC(%%ebp),%0":"=a"(current_proc->saved_context.ebx));
+        asm volatile("mov %0,(%%ebp)"::"a"(&return_proc));
+        sti();
+        run_process(global_save_pid);
+        break;
+    case 7://get pid
+        *eax=current_pid_save;
+        break;
     default:
         break;
     }
+    current_pid=current_pid_save;
 }
 
 void init_syscalls(Ata_fat_system* syst,Fat_infos *fi)

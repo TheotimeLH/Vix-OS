@@ -105,6 +105,30 @@ uint32 open(char* filename)
     return ret;
 }
 
+void exec(char* filename)
+{
+    asm volatile("push %edi");
+    asm volatile("push %eax");
+
+    asm volatile("mov %0,%%edi":"=m"(filename));
+    asm volatile("mov $6,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %eax");
+    asm volatile("pop %edi");
+}
+
+uint32 get_pid()
+{
+    uint32 pid;
+
+    asm volatile("mov $7,%eax");
+    asm volatile("int $0x42");
+    asm volatile("mov %%eax,%0"::"m"(pid));
+
+    return pid;
+}
+
 uint32 strlen(char* str)
 {
 	uint32 ret;
