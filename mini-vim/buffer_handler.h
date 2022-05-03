@@ -4,7 +4,7 @@
 #include "structures.h"
 #include "../stdlib/stdlib.h"
 
-line_t* buffer_from_file(char* filename, uint32 size);
+line_t buffer_from_file(char* filename, uint32 size);
 
 
 #endif
