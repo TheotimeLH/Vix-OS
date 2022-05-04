@@ -5,7 +5,7 @@
 #include "buffer_handler.h"
 
 
-uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start);
+uint32 interpret_command(char* com_buff, file_t* file);
 
 
 

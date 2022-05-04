@@ -67,8 +67,10 @@ int main(){
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
 	// Le reste est vide
-	
+	file_t file;
 	line_t *current = (line_t*) malloc(sizeof(line_t));
+	file.filename = 0; // Nom de fichier vide
+	file.file_buffer = current;
 	current->size = 1;
 	current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
 	current->prev = current->next = NULL; // Pas de suivant ni de précédent
@@ -298,11 +300,13 @@ int main(){
 							break;
 						case ENTER:
 							// La il faut interpreter la commande
-							uint32 bm = interpret_command(command_buffer, current, screen_start);
+							uint32 bm = interpret_command(command_buffer, &file);
 							memset(command_buffer, 0, sizeof(char)*80);
 
 							if(bm & 0x1) // On a eu une lecture de fichier
 							{
+								current = file.file_buffer;
+								screen_start = current;
 								current_buff = current->line_buffer;
 								current_buff->e.cursor = 1;
 								file_begin = screen_start;

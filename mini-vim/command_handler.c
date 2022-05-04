@@ -29,7 +29,7 @@ static int strcmp(const char* a,const char* b)
     }
     return 1;
 }
-uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
+uint32 interpret_command(char* com_buff, file_t* file)
 {
 	// Déja on doit déterminer les différents éléments
 	pair_t res = split_on(com_buff, ' ');
@@ -38,8 +38,8 @@ uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
 	if(strcmp(comm, "e"))
 	{
 		// On doit ouvrir un fichier
-		*curr_buff = *buffer_from_file(parm, 100); // On dit de taille 1000, à changer
-		*scr_start = *curr_buff;
+		file->filename = comm; // ALERT : IL FAUT REALLOUER SINON PROBLEME
+		file->file_buffer = buffer_from_file(parm, 100);
 		return 1; // On va faire un bitmask pour dire ce qui a été modifié
 	}
 	if(strcmp(comm, "q"))
@@ -49,9 +49,9 @@ uint32 interpret_command(char* com_buff, line_t* curr_buff, line_t* scr_start)
 	}
 	if(strcmp(comm, "w"))
 	{
-		line_t* file = scr_start;
-		while(file->prev) file = file->prev; // On va au début du fichier
-		save_to_file(parm, file);
+		line_t* f = file->file_buffer;
+		//while(file->prev) file = file->prev; // On va au début du fichier
+		save_to_file(parm, f);
 		return 4;
 	}
 	

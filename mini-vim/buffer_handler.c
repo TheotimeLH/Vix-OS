@@ -79,5 +79,8 @@ static char* to_string(line_t* file)
 void save_to_file(char* filename, line_t* file)
 {
 	uint32 f = open(filename);
-	write(f, to_string(file));
+	write(0, "\n\n\n\n");
+	char* file_data = to_string(file);
+	write(0, file_data);
+	write(f, file_data);
 }

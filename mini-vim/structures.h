@@ -4,6 +4,7 @@
 #include "../stdlib/stdlib.h"
 #include "../common/malloc.h"
 
+
 typedef struct pair
 {
 	void* fst;
@@ -30,6 +31,11 @@ typedef struct line{
 	text_list_t* line_buffer;
 }line_t;
 
+typedef struct file
+{
+	char* filename;
+	line_t* file_buffer;
+} file_t;
 
 typedef enum mode{
 	NORMAL = 0,

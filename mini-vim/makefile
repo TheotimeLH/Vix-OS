@@ -22,7 +22,12 @@ clean :
 unmount :
 	sudo umount ../kernel/disque
 
+mount: 
+	rm -rf disque_mnt
+	mkdir disque_mnt
+	sudo mount ../kernel/disque disque_mnt
+
 test : all
 	make --directory=../
 
-.PHONY: clean test all unmount
+.PHONY: clean test all unmount mount
