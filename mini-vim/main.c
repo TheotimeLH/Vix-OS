@@ -63,6 +63,7 @@ int main(){
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
 	//line_t* buffer[LINE_NUMBER];
 
+	write(0, "Lancement de MVIM");
 	sub_mode_t submode = NONE;
 	//memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
 	int cursorX = 0, cursorY = 0;

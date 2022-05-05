@@ -8,7 +8,7 @@ static node_t* new_node(int final)
 	node_t* state = (node_t*) malloc(sizeof(node_t));
 	state->id = possible_id ++;
 	state->final_state = final;
-	state->transition = (node_t**) malloc(sizeof(node_t*)*256);
+	memset(state->transition, 0, sizeof(node_t*) * 256); // on met que des 0
 	return state;
 }
 

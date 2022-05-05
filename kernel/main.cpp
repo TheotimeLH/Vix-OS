@@ -31,6 +31,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     uint32 pid=exec("MVIM",&afs,&fi,&(fi.root_fat_entry),-1);
     if(pid!=uint32(-1))
     {
+			print_string("Lancement du programme\n");
         run_process(pid);
     }
 		else
