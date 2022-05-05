@@ -1,6 +1,9 @@
 #ifndef AUTOMATA_H
 #define AUTOMATA_H
 
+#include "../stdlib/stdlib.h"
+#include "../common/malloc.h"
+
 typedef enum direction
 {
 	UP,
@@ -13,13 +16,9 @@ typedef struct command
 {
 	int del : 1; // Est ce que ça sert à supprimer qqch
 	int mov : 1; // Est ce que c'est associé à un mouvement
-	direction movement;
+	direction_t movement;
 } command_t;
 
-typedef struct transition_function
-{
-	
-}
 
 typedef struct node
 {
