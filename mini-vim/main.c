@@ -63,6 +63,7 @@ int main(){
 	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
 	//line_t* buffer[LINE_NUMBER];
 
+	sub_mode_t submode = NONE;
 	//memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
@@ -87,7 +88,7 @@ int main(){
 	while(running){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement
-		if(get_ticks() % 1000 == 0){
+		if(get_ticks() % 100 == 0){
 			for(int i = 0; i < VIDEO_W; i++)
 				for(int j = 0; j < VIDEO_H+2; j++)
 					print_screen(i, j, ' ', WHITE, BLACK);
@@ -218,10 +219,39 @@ int main(){
 							current_mode = INSERT;
 							cursorX = 0;
 						break;
+						case 'd':
+							if(submode == NORMAL)
+								submode = DELETE;
+							else if (submode == DELETE)
+							{ // on va supprimer la ligne actuelle
+								if(current->next)
+								{
+									current = current->next;
+									delete_node_line(current->prev);
+								}
+								else if(current->prev)
+								{
+									current = current->prev;
+									delete_node_line(current->next);
+								}
+								else
+								{
+									current = (line_t*)malloc(sizeof(line_t));
+									current->size = 1;
+									current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
+									current->prev = current->next = NULL;
+									file.file_buffer = current;
+									screen_start = current;
+								}
+								current_buff = current->line_buffer;
+								current_buff->e.cursor = 1;
+								submode = NORMAL;
+							}
+						break;
 						case ':':
 							// On passe en mode commande
 							current_mode = COMMAND;
-
+						
 						break;
 					}
 				break;

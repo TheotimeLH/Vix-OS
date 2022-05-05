@@ -44,6 +44,11 @@ typedef enum mode{
 	COMMAND,
 } mode_t;
 
+typedef enum submode{
+	NONE = 0,
+	DELETE,
+} sub_mode_t;
+
 line_t *init_list_line(text_list_t *element);
 line_t *insert_after_line(line_t *el, text_list_t *element);
 line_t *insert_before_line(line_t *el, text_list_t *element);
