@@ -2,8 +2,8 @@
 #include "stddef.h" 
 #include "structures.h"
 #include "command_handler.h"
-//#include "../common/malloc.h"
-#include "malloc_test.h"
+#include "../common/malloc.h"
+#include "normal_automata.h"
 
 #define MINI_VIM_PROGRAM 
 
@@ -59,13 +59,9 @@ void render_banner(mode_t current_mode)
 int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
 	init_tas();
-	void* pointeur = malloc(8);
-	write(0, "Lancement de MVIM\n");
 	int running = 1;
 	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
-	//text_tab_t buffer[BUFF_SIZE]; // Pour l'instant on a juste un buffer alloué n'importe comment, il faudra utiliser malloc
-	//line_t* buffer[LINE_NUMBER];
 
 	sub_mode_t submode = NONE;
 	//memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));

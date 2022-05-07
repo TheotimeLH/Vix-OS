@@ -38,8 +38,16 @@ uint8* sbrk(uint32 n)
 }
 
 // Initialise le tas
+
+static void init_base()
+{
+	for(int i = 0; i < 30; i ++)
+		base[i] = (void*) brk +i;
+}
+
 void init_tas()
 {
+	init_base();
 	for (int i=0 ; i<29 ; i++) base[i] = base+29 ;
 	base[29] = base ;
 }

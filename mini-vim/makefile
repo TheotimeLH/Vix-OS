@@ -1,5 +1,5 @@
 INCLUDE_C = $(wildcard ./*.c)
-INCLUDE_O = main.o command_handler.o structures.o buffer_handler.o #$(INCLUDE_C:.c=.o)
+INCLUDE_O = $(INCLUDE_C:.c=.o)
 
 
 all:mvim ../kernel/disque
@@ -16,7 +16,7 @@ all:mvim ../kernel/disque
 %.o: %.c 
 	i686-elf-gcc -c $< -o $@ -nostdlib -ffreestanding
 
-mvim: linker.ld ../stdlib/crt0.o malloc_test.o ../stdlib/stdlib.o $(INCLUDE_O)
+mvim: linker.ld ../stdlib/stdlib.o ../stdlib/crt0.o ../common/malloc.o  $(INCLUDE_O)
 	i686-elf-gcc -T $^ -o $@ -nostdlib -ffreestanding
 
 clean :

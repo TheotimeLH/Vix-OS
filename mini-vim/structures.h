@@ -2,8 +2,8 @@
 #define STRUCTURES_H
 
 #include "../stdlib/stdlib.h"
-//#include "../common/malloc.h"
-#include "malloc_test.h"
+#include "../common/malloc.h"
+//#include "malloc_test.h"
 
 
 typedef struct pair
