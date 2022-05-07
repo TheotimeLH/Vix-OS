@@ -6,6 +6,7 @@
 
 typedef enum direction
 {
+	STILL,
 	UP,
 	DOWN,
 	RIGHT,

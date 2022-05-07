@@ -63,6 +63,24 @@ int main(){
 	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
 
+	automata_t automata = new_automata();
+
+	// On va ajouter les commandes 
+	// ---------------------
+	// Commandes de déplacement
+	add_command(&automata, (command_t) {0, 1, DOWN}, "j");
+	add_command(&automata, (command_t) {0, 1, UP}, "k");
+	add_command(&automata, (command_t) {0, 1, RIGHT}, "l");
+	add_command(&automata, (command_t) {0, 1, LEFT}, "h");
+	// Commandes de suppression
+	add_command(&automata, (command_t) {1, 1, DOWN}, "dj");
+	add_command(&automata, (command_t) {1, 1, UP}, "dk");
+	add_command(&automata, (command_t) {1, 1, RIGHT}, "dl");
+	add_command(&automata, (command_t) {1, 1, LEFT}, "dh");
+	add_command(&automata, (command_t) {1, 0, STILL}, "dd");
+
+	// ---------------------
+
 	sub_mode_t submode = NONE;
 	//memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
 	int cursorX = 0, cursorY = 0;
@@ -151,6 +169,7 @@ int main(){
 		switch (current_mode){
 			case NORMAL:
 				if(kp.type == 0){ // On va faire un handler simple
+					
 					switch (kp.k.ch){
 						case 'h': // On va à gauche
 							if(current_buff->prev != NULL)
