@@ -26,7 +26,7 @@
  */
 
 #include "common.h"
-
+extern write(int, char*);
 extern uint32 end ;
 uint8* brk = &end ;
 void* base[30] ;

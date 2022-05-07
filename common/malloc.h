@@ -1,7 +1,6 @@
 #ifndef MALLOC_H
 #define MALLOC_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

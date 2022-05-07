@@ -1,5 +1,56 @@
 #include "stdlib.h"
 
+uint32 digit_count(int num)
+{
+	uint32 count = 0;
+	if(num == 0)
+		return 1;
+	else
+	{
+		while(num)
+		{
+			count++;
+			num /= 10;
+		}
+		return count;
+	}
+}
+
+void itoa(int num, char* number)
+{
+	int dg = digit_count(num);
+	int i = dg-1;
+	if(num == 0 && dg == 1)
+	{
+		number[0] = '0';
+		number[1] = '\0';
+	}
+	else
+	{
+		while(num)
+		{
+			char x = num%10;
+			number[i--] = x +'0';
+			num /= 10;
+		}
+		number[dg] = '\0';
+	}
+}
+
+void write_char(uint32 file_desc, char c)
+{
+	write(0, &c);
+}
+
+void write_int(uint32 file_desc, int num)
+{
+	char str[digit_count(num) + 1];
+	itoa(num, str);
+	write(0, str);
+}
+
+
+
 uint32 get_ticks()
 {
     uint32 tick;
