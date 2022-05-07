@@ -39,7 +39,10 @@ void itoa(int num, char* number)
 
 void putchar(char c)
 {
-	write(0, &c);
+	char str[2];
+	str[0] = c;
+	str[1] = '\0';
+	write(0, str);
 }
 
 void print_int(int num)
@@ -55,9 +58,9 @@ void print_hexa(uint32 x)
 	{
 		uint32 c=(x&(0xF<<(i*4)))>>(i*4);
 		if(c>9)
-			put_char(c+0x41-10);
+			putchar(c+0x41-10);
 		else
-			put_char(c+0x30);
+			putchar(c+0x30);
 	}
 }
 
