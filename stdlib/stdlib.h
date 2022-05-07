@@ -28,8 +28,9 @@ typedef enum vga_color {
 	WHITE,
 } vga_color;
 
-void write_char(uint32 file_desc, char c);
-void write_int(uint32 file_desc, int i);
+void putchar(char c);
+void print_int(int i);
+void print_hexa(uint32 x);
 uint32 get_ticks();
 void write(uint32 file_desc,char *str);
 void fwrite(uint32 file_desc,uint8 *data,uint32 size);

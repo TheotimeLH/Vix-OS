@@ -37,18 +37,29 @@ void itoa(int num, char* number)
 	}
 }
 
-void write_char(uint32 file_desc, char c)
+void putchar(char c)
 {
 	write(0, &c);
 }
 
-void write_int(uint32 file_desc, int num)
+void print_int(int num)
 {
 	char str[digit_count(num) + 1];
 	itoa(num, str);
 	write(0, str);
 }
 
+void print_hexa(uint32 x)
+{
+	for(int i=7;i>=0;i--)
+	{
+		uint32 c=(x&(0xF<<(i*4)))>>(i*4);
+		if(c>9)
+			put_char(c+0x41-10);
+		else
+			put_char(c+0x30);
+	}
+}
 
 
 uint32 get_ticks()
