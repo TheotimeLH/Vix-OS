@@ -3,6 +3,7 @@
 
 #include "../stdlib/stdlib.h"
 #include "../common/malloc.h"
+#include "structures.h"
 
 typedef enum direction
 {
@@ -15,7 +16,9 @@ typedef enum direction
 
 typedef struct command
 {
-	int del : 1; // Est ce que ça sert à supprimer qqch
+	mode_t new_mode;
+	int del : 2; // Est ce que ça sert à supprimer qqch 
+							// le deuxieme bit sert à savoir si on supprime un caractere ou toute une ligne
 	int mov : 1; // Est ce que c'est associé à un mouvement
 	direction_t movement;
 } command_t;

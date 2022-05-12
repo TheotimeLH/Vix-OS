@@ -50,5 +50,22 @@ void add_command(automata_t* automaton, command_t command, char* lex)
 
 command_t* enter_char(automata_t* automaton, char c) // 
 {
-
+	automaton->current_state = automaton->current_state->transition[c];
+	if (automaton->current_state)
+	{
+		if(automaton->current_state->final_state)
+		{
+			command_t* res = malloc(sizeof(command_t));
+			*res = commands[automaton->current_state->command_number];
+			automaton->current_state = automaton->initial_state;
+			return res;
+		}
+		return 0; // On est pas sur une commande
+	}
+	else
+	{
+		// On a atteint un code faux
+		automaton->current_state = automaton->initial_state; // on revient au début
+		return 0;
+	}
 }	
