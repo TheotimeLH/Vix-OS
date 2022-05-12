@@ -46,3 +46,9 @@ void add_command(automata_t* automaton, command_t command, char* lex)
 	
 	// on est arrivés à la fin de l'arbre
 }
+
+
+commant_t* enter_char(automata_t* automaton, char c) // 
+{
+
+}	

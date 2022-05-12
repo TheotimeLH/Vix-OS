@@ -336,6 +336,7 @@ int main(){
 				}
 				else
 				{
+					uint32 bm;
 					switch (kp.k.sp){
 						case ESCAPE:
 							memset(command_buffer, 0, sizeof(char)*80);
@@ -348,8 +349,9 @@ int main(){
 							command_buffer[i-1]= 0;
 							break;
 						case ENTER:
+							bm = interpret_command(command_buffer, &file);
+
 							// La il faut interpreter la commande
-							uint32 bm = interpret_command(command_buffer, &file);
 							memset(command_buffer, 0, sizeof(char)*80);
 
 							if(bm & 0x1) // On a eu une lecture de fichier
