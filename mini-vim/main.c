@@ -19,7 +19,7 @@ line_t *screen_start;
 char* mode_text[4];
 int mode_size[4];
 
-void apply_delete(int del_mode, line_t* current_line, text_list_t* current_text)
+void apply_delete(int del_mode)
 {
 	if(del_mode == 1) // on va juste delete le caractere actuel
 	{
@@ -79,15 +79,15 @@ void init_banner()
 	for(int i = 0; i < 8; i++)
 		mode_text[3][i] = t4[i];
 }
-void render_banner(mode_t current_mode)
+void render_banner(mode_t current_line_mode)
 {
 	
-	for(int i = mode_size[current_mode]; i < VIDEO_W; i++)
+	for(int i = mode_size[current_line_mode]; i < VIDEO_W; i++)
 	{
 		print_screen(i, VIDEO_H, ' ', BLACK, WHITE);
 	}
-	for(int i = 0; i < mode_size[current_mode]; i++)
-		print_screen(i, VIDEO_H, mode_text[current_mode][i], BLACK,WHITE);
+	for(int i = 0; i < mode_size[current_line_mode]; i++)
+		print_screen(i, VIDEO_H, mode_text[current_line_mode][i], BLACK,WHITE);
 }
 int main(){
 	// Donc déjà il faut lire un fichier (mais bon ça c'est pour plus tard
@@ -121,16 +121,16 @@ int main(){
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
 	// Le reste est vide
-	line_t *current = (line_t*) malloc(sizeof(line_t));
+	line_t *current_line = (line_t*) malloc(sizeof(line_t));
 	file.filename = 0; // Nom de fichier vide
-	file.file_buffer = current;
-	current->size = 1;
-	current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
-	current->prev = current->next = NULL; // Pas de suivant ni de précédent
-	screen_start = current;
-	mode_t current_mode = NORMAL;
-	current->line_buffer->e.cursor = 1;
-	text_list_t *current_buff = current->line_buffer;
+	file.file_buffer = current_line;
+	current_line->size = 1;
+	current_line->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
+	current_line->prev = current_line->next = NULL; // Pas de suivant ni de précédent
+	screen_start = current_line;
+	mode_t current_line_mode = NORMAL;
+	current_line->line_buffer->e.cursor = 1;
+	text_list_t *current_text = current_line->line_buffer;
 	print_screen(5, 5, 'T',WHITE, BLACK); 
 	line_t* file_begin = screen_start; 
 	
@@ -146,11 +146,11 @@ int main(){
 					print_screen(i, j, ' ', WHITE, BLACK);
 		}
 		/*
-		print_screen(3, 3, current_buff->e.c, current_buff->e.fg, current_buff->e.bg);
-		if(current_buff->prev != 0)
-				print_screen(4, 3, current_buff->prev->e.c, current_buff->prev->e.fg, current_buff->prev->e.bg);
+		print_screen(3, 3, current_text->e.c, current_line_buff->e.fg, current_line_buff->e.bg);
+		if(current_text->prev != 0)
+				print_screen(4, 3, current_text->prev->e.c, current_line_buff->prev->e.fg, current_line_buff->prev->e.bg);
 		*/
-		render_banner(current_mode);
+		render_banner(current_line_mode);
 		//
 		//
 		int nb_line_aff = 0; // On ne doit pas depasser VIDEO_H
@@ -200,75 +200,75 @@ int main(){
 		// On a pas encore les gestions claviers
 		// Il faudrait plutot considerer ça ligne par ligne, parce que la on a le probleme que chaque ligne fait au plus 80 caracteres...
 		keyboard_t kp = get_keyboard();
-		switch (current_mode){
+		switch (current_line_mode){
 			case NORMAL:
 				if(kp.type == 0){ // On va faire un handler simple
 					switch (kp.k.ch){
 						case 'h': // On va à gauche
-							if(current_buff->prev != NULL)
+							if(current_text->prev != NULL)
 							{
-								current_buff->e.cursor = 0;
-								current_buff = current_buff->prev;
-								current_buff->e.cursor = 1;
+								current_text->e.cursor = 0;
+								current_text = current_line_buff->prev;
+								current_text->e.cursor = 1;
 								cursorX--;
 							}
 							break;
 						case 'k': // On va en haut
-							if(current->prev != NULL)
+							if(current_line->prev != NULL)
 							{
-								current_buff->e.cursor = 0; // Il faut connaitre la position x et y
-								current = current->prev;
-								cursorX = cursorX < current->size ? cursorX : current->size-1;
-								current_buff = k_shift(current->line_buffer, cursorX);
-								current_buff->e.cursor = 1;
+								current_text->e.cursor = 0; // Il faut connaitre la position x et y
+								current_line = current_line->prev;
+								cursorX = cursorX < current_line->size ? cursorX : current_line->size-1;
+								current_text = k_shift(current_line->line_buffer, cursorX);
+								current_text->e.cursor = 1;
 							}
 							break;
 						case 'j': // On va en bas
-							if(current->next != NULL)
+							if(current_line->next != NULL)
 							{
-								current_buff->e.cursor = 0; // Il faut connaitre la position x et y
-								current = current->next;
-								cursorX = cursorX < current->size ? cursorX : current->size-1;
-								current_buff = k_shift(current->line_buffer, cursorX);
-								current_buff->e.cursor = 1;
+								current_text->e.cursor = 0; // Il faut connaitre la position x et y
+								current_line = current_line->next;
+								cursorX = cursorX < current_line->size ? cursorX : current_line->size-1;
+								current_text = k_shift(current_line->line_buffer, cursorX);
+								current_text->e.cursor = 1;
 							}
 							break;
 						case 'l': // On va à droite
-							if(current_buff->next != NULL)
+							if(current_text->next != NULL)
 							{
-								current_buff->e.cursor = 0;
-								current_buff = current_buff->next;
-								current_buff->e.cursor = 1;
+								current_text->e.cursor = 0;
+								current_text = current_line_buff->next;
+								current_text->e.cursor = 1;
 								cursorX ++;
 							}
 							break;
 						case 'i': // On passe en insert mode
-							current_mode = INSERT;
+							current_line_mode = INSERT;
 							break;
 						case 'x': //
-							if(current_buff->next != NULL) 
+							if(current_text->next != NULL) 
 							{
-								current_buff = current_buff->next;
-								current_buff->e.cursor= 1;
-								delete_node(current_buff->prev);
+								current_text = current_line_buff->next;
+								current_text->e.cursor= 1;
+								delete_node(current_text->prev);
 							}
-							else if(current_buff->prev !=0)
+							else if(current_text->prev !=0)
 							{
-								current_buff = current_buff->prev;
-								current_buff->e.cursor= 1;
-								delete_node(current_buff->next);
+								current_text = current_line_buff->prev;
+								current_text->e.cursor= 1;
+								delete_node(current_text->next);
 							}
 							else// TODO : Faire un truc plus propre
 							{ 
-								current_buff->e.c = ' ';
+								current_text->e.c = ' ';
 							}
 						break;
 						case 'o': // On va ajouter une ligne après et passer en INSERT mode
-							current_buff->e.cursor = 0;
-							current = insert_after_line(current, init_list((text_t) {' ', WHITE, BLACK, 0}));
-							current_buff = current->line_buffer;
-							current_buff->e.cursor = 1;
-							current_mode = INSERT;
+							current_text->e.cursor = 0;
+							current_line = insert_after_line(current_line, init_list((text_t) {' ', WHITE, BLACK, 0}));
+							current_text = current_line->line_buffer;
+							current_text->e.cursor = 1;
+							current_line_mode = INSERT;
 							cursorX = 0;
 						break;
 						case 'd':
@@ -277,35 +277,35 @@ int main(){
 							else if (submode == DELETE)
 							{ // on va supprimer la ligne actuelle
 								/*
-								if(current->next)
+								if(current_line->next)
 								{
-									current = current->next;
-									delete_node_line(current->prev);
+									current_line = current_line->next;
+									delete_node_line(current_line->prev);
 								}
-								else if(current->prev)
+								else if(current_line->prev)
 								{
-									current = current->prev;
-									delete_node_line(current->next);
+									current_line = current_line->prev;
+									delete_node_line(current_line->next);
 								}
 								else
 								{
-									current = (line_t*)malloc(sizeof(line_t));
-									current->size = 1;
-									current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
-									current->prev = current->next = NULL;
-									file.file_buffer = current;
-									screen_start = current;
+									current_line = (line_t*)malloc(sizeof(line_t));
+									current_line->size = 1;
+									current_line->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
+									current_line->prev = current_line->next = NULL;
+									file.file_buffer = current_line;
+									screen_start = current_line;
 								}
-								current_buff = current->line_buffer;
-								current_buff->e.cursor = 1;
+								current_text = current_line->line_buffer;
+								current_text->e.cursor = 1;
 								submode = NORMAL;
 								*/
-								apply_delete(3, current, current_buff);
+								apply_delete(3, current_line, current_text);
 							}
 						break;
 						case ':':
 							// On passe en mode commande
-							current_mode = COMMAND;
+							current_line_mode = COMMAND;
 						
 						break;
 					}
@@ -319,12 +319,12 @@ int main(){
 					else if(command->del) // mode de delete
 					{
 						// On va donc juste supprimmer la ligne
-						if(current->next)
+						if(current_line->next)
 						{
-							current = current->next;
-							delete_node_line(current->prev);
+							current_line = current_line->next;
+							delete_node_line(current_line->prev);
 						}
-						else if(current->prev)
+						else if(current_line->prev)
 						{
 							
 						}
@@ -340,45 +340,45 @@ int main(){
 			case INSERT:
 				if(kp.type == 0 && kp.k.ch != 0){
 					//On va ajouter au courant notre truc
-					int premier = (current_buff->prev == 0); // Si c'est le premier de la liste
-					current->size++;
-					text_list_t *nouveau = insert_before(current_buff , (text_t) {kp.k.ch, WHITE, BLACK, 0});
+					int premier = (current_text->prev == 0); // Si c'est le premier de la liste
+					current_line->size++;
+					text_list_t *nouveau = insert_before(current_text , (text_t) {kp.k.ch, WHITE, BLACK, 0});
 					if(premier)
-						current->line_buffer = nouveau;
+						current_line->line_buffer = nouveau;
 				}
 				else{
 					if(kp.type == 1){
 						int premier;
 						switch (kp.k.sp){
 							case ESCAPE:
-								current_mode = NORMAL;
+								current_line_mode = NORMAL;
 								break;
 							case SPACE:
-								premier = (current_buff->prev == 0); // Si c'est le premier de la liste
-								current->size++;
-								text_list_t *nouveau = insert_before(current_buff , (text_t) {' ', WHITE, BLACK, 0});
+								premier = (current_text->prev == 0); // Si c'est le premier de la liste
+								current_line->size++;
+								text_list_t *nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
 								if(premier)
-									current->line_buffer = nouveau;
+									current_line->line_buffer = nouveau;
 								break;
 							case BACKSPACE: // On va supprimer le caractere d'avant
-								if(current_buff->prev != 0)
+								if(current_text->prev != 0)
 								{
-									if(current_buff->prev->prev == 0)
+									if(current_text->prev->prev == 0)
 									{
-										current->line_buffer = current_buff;
+										current_line->line_buffer = current_text;
 									}
-									delete_node(current_buff->prev);
-									current->size--;
+									delete_node(current_text->prev);
+									current_line->size--;
 								}
 								else
-									current_buff->e.c = ' ';
+									current_text->e.c = ' ';
 							break;
 							case ENTER:
 								//On va rajouter une ligne après celle ou on est
-								current_buff->e.cursor = 0;
-								current = insert_after_line(current, init_list((text_t) {' ', WHITE, BLACK, 0}));
-								current_buff = current->line_buffer;
-								current_buff->e.cursor = 1;
+								current_text->e.cursor = 0;
+								current_line = insert_after_line(current_line, init_list((text_t) {' ', WHITE, BLACK, 0}));
+								current_text = current_line->line_buffer;
+								current_text->e.cursor = 1;
 								cursorX = 0;
 							break;
 
@@ -402,7 +402,7 @@ int main(){
 					switch (kp.k.sp){
 						case ESCAPE:
 							memset(command_buffer, 0, sizeof(char)*80);
-							current_mode = NORMAL;
+							current_line_mode = NORMAL;
 							break;
 						case SPACE:
 							command_buffer[i] = ' ';
@@ -418,10 +418,10 @@ int main(){
 
 							if(bm & 0x1) // On a eu une lecture de fichier
 							{
-								current = file.file_buffer;
-								screen_start = current;
-								current_buff = current->line_buffer;
-								current_buff->e.cursor = 1;
+								current_line = file.file_buffer;
+								screen_start = current_line;
+								current_text = current_line->line_buffer;
+								current_text->e.cursor = 1;
 								file_begin = screen_start;
 								cursorX = 0;
 							}
@@ -434,7 +434,7 @@ int main(){
 							{
 
 							}
-							current_mode = NORMAL;
+							current_line_mode = NORMAL;
 						break;
 					}
 				}
