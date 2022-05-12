@@ -38,6 +38,6 @@ typedef struct automata
 
 automata_t new_automata();
 void add_command(automata_t* automaton ,command_t command, char* lex);
-void enter_char(automata_t* automaton, char c);
+command_t* enter_char(automata_t* automaton, char c);
 
 #endif

@@ -48,7 +48,7 @@ void add_command(automata_t* automaton, command_t command, char* lex)
 }
 
 
-commant_t* enter_char(automata_t* automaton, char c) // 
+command_t* enter_char(automata_t* automaton, char c) // 
 {
 
 }	
