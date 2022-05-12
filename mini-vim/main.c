@@ -13,10 +13,13 @@
 #define BUFF_SIZE 2000
 #define LINE_NUMBER 100
 
+file_t file;
+line_t *screen_start;
+
 char* mode_text[4];
 int mode_size[4];
 
-void apply_delete(int del_mode, line_t* current_line, text_list_t current_text)
+void apply_delete(int del_mode, line_t* current_line, text_list_t* current_text)
 {
 	if(del_mode == 1) // on va juste delete le caractere actuel
 	{
@@ -24,27 +27,27 @@ void apply_delete(int del_mode, line_t* current_line, text_list_t current_text)
 	}
 	if(del_mode == 3) // on va supprimer toute la ligne
 	{
-		if(current->next)
+		if(current_line->next)
 		{
-			current = current->next;
-			delete_node_line(current->prev);
+			current_line = current_line->next; // peut etre ça va marcher
+			delete_node_line(current_line->prev);
 		}
-		else if(current->prev)
+		else if(current_line->prev)
 		{
-			current = current->prev;
-			delete_node_line(current->next);
+			current_line = current_line->prev;
+			delete_node_line(current_line->next);
 		}
 		else
 		{
-			current = (line_t*)malloc(sizeof(line_t));
-			current->size = 1;
-			current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
-			current->prev = current->next = NULL;
-			file.file_buffer = current;
-			screen_start = current;
+			current_line = (line_t*)malloc(sizeof(line_t));
+			current_line->size = 1;
+			current_line->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
+			current_line->prev = current_line->next = NULL;
+			file.file_buffer = current_line;
+			screen_start = current_line;
 		}
-		current_buff = current->line_buffer;
-		current_buff->e.cursor = 1;
+		current_text = current_line->line_buffer;
+		current_text->e.cursor = 1;
 	}
 }
 void* memset(void *pointer, int value, size_t count){
@@ -118,14 +121,13 @@ int main(){
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
 	// Le reste est vide
-	file_t file;
 	line_t *current = (line_t*) malloc(sizeof(line_t));
 	file.filename = 0; // Nom de fichier vide
 	file.file_buffer = current;
 	current->size = 1;
 	current->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
 	current->prev = current->next = NULL; // Pas de suivant ni de précédent
-	line_t *screen_start = current;
+	screen_start = current;
 	mode_t current_mode = NORMAL;
 	current->line_buffer->e.cursor = 1;
 	text_list_t *current_buff = current->line_buffer;
@@ -201,7 +203,6 @@ int main(){
 		switch (current_mode){
 			case NORMAL:
 				if(kp.type == 0){ // On va faire un handler simple
-					/*
 					switch (kp.k.ch){
 						case 'h': // On va à gauche
 							if(current_buff->prev != NULL)
@@ -275,6 +276,7 @@ int main(){
 								submode = DELETE;
 							else if (submode == DELETE)
 							{ // on va supprimer la ligne actuelle
+								/*
 								if(current->next)
 								{
 									current = current->next;
@@ -297,6 +299,8 @@ int main(){
 								current_buff = current->line_buffer;
 								current_buff->e.cursor = 1;
 								submode = NORMAL;
+								*/
+								apply_delete(3, current, current_buff);
 							}
 						break;
 						case ':':
@@ -305,7 +309,7 @@ int main(){
 						
 						break;
 					}
-				*/
+				/*
 				command_t* command = enter_char(automata, kp.k.ch);
 				if(command) // On a bien recup une commande
 				{
@@ -330,6 +334,7 @@ int main(){
 
 					}
 				}
+				*/
 				break;
 			}
 			case INSERT:
