@@ -15,6 +15,8 @@
 
 file_t file;
 line_t *screen_start;
+text_list_t* current_text;
+line_t* current_line;
 
 char* mode_text[4];
 int mode_size[4];
