@@ -40,6 +40,9 @@ keyboard_t get_keyboard();
 uint32 open(char* filename);
 void exec(char* filename);
 uint32 get_pid();
+void exit(uint32 i);
+uint32 wait(uint32* status);
+uint32 get_ppid();
 
 uint32 strlen(char* str);
 

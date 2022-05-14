@@ -28,7 +28,8 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_paging(memory_detection(mbd,magic));
 
     init_timer(1000);
-    uint32 pid=exec("MVIM",&afs,&fi,&(fi.root_fat_entry),-1);
+    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry),-1);
+
     if(pid!=uint32(-1))
     {
 			print_string("Lancement du programme\n");

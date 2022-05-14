@@ -14,6 +14,8 @@ void isr_handler(registers_t regs){
 		print_string("received interrupt :");
 		print_int(regs.int_no);
 		print_new_line();
+		if(regs.int_no==13)
+			while(1);
 	}
 	//print_string("error code :");
 	//print_int(regs.err_code);

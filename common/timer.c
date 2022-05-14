@@ -10,7 +10,7 @@ extern void switch_context();
 
 static void timer_callback(registers_t regs){
 	tick++;
-	switch_context();
+	switch_context(regs.esp);
 }
 
 void wait(uint32 milliseconds){

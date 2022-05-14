@@ -8,7 +8,6 @@ page_directory_t *current_directory=0;
 uint32 *frames;
 uint32 nframes;
 
-
 void panic(char* msg, char* file, int line){
 	print_string(msg);
 	print_string(" in file : ");
@@ -82,14 +81,43 @@ void alloc_frame(page_t *page, int is_kernel, int is_writeable,uint32 page_virtu
 
 void free_frame(page_t *page){
 
-	uint32 frame;
-	if(!(frame=page->frame))
+	uint32 frame=page->frame;
+	if(!frame)
 		return;
 	else
 	{
-		clear_frame(frame);
+		clear_frame(frame*0x1000);
 		page->frame = 0x0;
 	}
+}
+
+uint32 memory_use()
+{
+	int mem_use=0;
+	for(int i = 0; i < INDEX_FROM_BIT(nframes); i++){
+		for(int j = 0; j < 32; j++){
+			uint32 to_test = 0x1 << j;
+			if(frames[i] & to_test){
+				mem_use++;
+			}
+		}
+	}
+	return mem_use;
+}
+
+void free_dir(page_directory_t *dir)
+{
+	for(int i=0;i<1024;i++)
+	{
+		for(int j=0;j<1024;j++)
+		{
+			if(dir->tables[i]->pages[j].frame<<12>placement_adress)
+			{
+				free_frame(&dir->tables[i]->pages[j]);
+				*(uint32*)&dir->tables[i]->pages[j]=0;
+			}
+		}
+	}	
 }
 
 // On va faire le paging
@@ -97,7 +125,7 @@ void free_frame(page_t *page){
 void init_paging(uint32 mem_size){
 	uint32 mem_end_page = mem_size+0x100000;
 	nframes = mem_end_page / 0x1000;//nombre de frames
-	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes)*4);// je sais pas pourquoi index_from_bit donc je rajoute *4
+	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes)*4);// je sais pas pourquoi index_from_bit donc je rajoute *4 (du coup je l'ai enlevé, ca a l'air de mieux marcher...) (je l'ai remis)
 	memset(frames, 0, INDEX_FROM_BIT(nframes));
 	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
 	memset(kernel_directory, 0, sizeof(page_directory_t));

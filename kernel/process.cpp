@@ -34,6 +34,7 @@ void init_process_tab()
 
 uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,uint32 ppid)
 {
+
     Fat_entry entries[10];
     int i;
     dir->init_offset();
@@ -58,6 +59,8 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,u
     uint8 buff[cluster_count*infos->byte_per_cluster];
     entries[i].read_data(buff,cluster_count,infos,afs);
     uint32 pid=load_process(buff,ppid);
+    if(pid==-1)
+        return pid;
     tab_process[pid].current_dir=*dir;
     tab_process[pid].opened_files[STDIN].type=STDIN;
     tab_process[pid].opened_files[STDOUT].type=STDOUT;
@@ -78,8 +81,16 @@ uint32 load_process(uint8* elf,uint32 ppid)
     }
     if(pid==n_process)
     {
-        print_string("tous les processus pris\n");
-        return pid;
+        for(pid=0;pid<n_process;pid++)
+        {
+            if(tab_process[pid].state==ZOMBIE)
+            {
+                tab_process[pid].state=FREE;
+                break;
+            }
+        }
+        if(pid==n_process)
+            return (uint32)-1;
     }
     process* proc=&tab_process[pid];
 
@@ -100,7 +111,7 @@ uint32 load_process(uint8* elf,uint32 ppid)
     if(!(elf[0]==0x7F&&is_elf))
     {
         print_string("erreur de format\n");
-        return n_process;
+        return -1;
     }
     
     proc->pg_entry=get_uint32(elf,0x18);
@@ -143,33 +154,95 @@ uint32 load_process(uint8* elf,uint32 ppid)
 
 void run_process(uint32 pid)
 {
-    bool debug=current_pid!=-1;
+    if(pid>=n_process)
+        return;
     process *proc=&tab_process[pid];
     if(proc->state!=RUNNABLE)
         return;
+    switch_page_directory(proc->directory);
     current_pid=pid;
     current_proc=proc;
-    switch_page_directory(proc->directory);
     asm volatile("jmp *%0"::"a"(proc->saved_context.eip));
     switch_page_directory(kernel_directory);
 }
 
+uint32 sys_wait(uint32* status,uint32 pid)
+{
+    bool has_son=false;
+    for(int i=0;i<n_process;i++)
+    {
+        if((tab_process[i].state==ZOMBIE||tab_process[i].state==RUNNABLE)&&tab_process[i].ppid==pid)
+        {
+            has_son=true;
+        }
+        if(tab_process[i].state==ZOMBIE&&tab_process[i].ppid==pid)
+        {
+            *status=tab_process[i].status;
+            tab_process[i].state=FREE;
+            tab_process[pid].state=RUNNABLE;
+            return i;
+        }
+    }
+    if(!has_son)
+    {
+        tab_process[pid].state=RUNNABLE;
+        return -1;
+    }
+
+    tab_process[pid].state=WAITING;
+    return -1;
+}
 
 uint32 trans_ebp;
 extern uint32 kernel_stack;
-extern "C" void switch_context()
+uint32 global_pid;
+extern "C" void switch_context(uint32 curr_esp)
 {
+    current_proc->saved_context.esp=curr_esp;
     if(current_pid==-1)
         return;
-    do
-    {
-        current_pid=(current_pid+1)%n_process;
-    }while(tab_process[current_pid].state!=RUNNABLE);
 
     asm volatile("mov %%ebp,%0":"=r"(trans_ebp));
     current_proc->saved_context.ebp=trans_ebp;
     asm volatile("mov %%ebx,%0":"=r"(trans_ebp));
     current_proc->saved_context.ebx=trans_ebp;
+
+    do
+    {
+        current_pid=(current_pid+1)%n_process;
+        if(tab_process[current_pid].state==WAITING)
+        {
+            global_pid=sys_wait(&tab_process[current_pid].status,current_pid);
+            if(global_pid==-1&&tab_process[current_pid].state==RUNNABLE)
+            {
+                //pas de fils, return -1
+                current_proc=&tab_process[current_pid];
+                asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
+                switch_page_directory(current_proc->directory);
+                *(uint32*)(tab_process[current_pid].saved_context.esp-4)=-1;//eax
+                trans_ebp=current_proc->saved_context.ebp;
+                asm volatile("mov %0,%%ebp"::"a"(trans_ebp));
+                trans_ebp=current_proc->saved_context.ebx;
+                asm volatile("mov %0,%%ebx"::"a"(trans_ebp));
+                return;
+            }
+            else if(global_pid!=-1)
+            {
+                //un fils est fini, process runnable
+                current_proc=&tab_process[current_pid];
+                asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
+                switch_page_directory(current_proc->directory);
+                *(uint32*)(tab_process[current_pid].saved_context.esp-4)=global_pid;
+                *(uint32*)(tab_process[current_pid].saved_context.esp-16)=current_proc->status;
+
+                trans_ebp=current_proc->saved_context.ebp;
+                asm volatile("mov %0,%%ebp"::"a"(trans_ebp));
+                trans_ebp=current_proc->saved_context.ebx;
+                asm volatile("mov %0,%%ebx"::"a"(trans_ebp));
+                return;
+            }
+        }
+    }while(tab_process[current_pid].state!=RUNNABLE);
 
     current_proc=&tab_process[current_pid];
     asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
