@@ -131,5 +131,6 @@ struct Fat_infos
 };
 
 Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok);
+Fat_entry open_dir(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok);
 
 #endif

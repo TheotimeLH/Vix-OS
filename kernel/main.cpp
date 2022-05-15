@@ -14,11 +14,14 @@ uint32 memory_detection(multiboot_info_t *mbd,uint32 magic);//return memory size
     
 Fat_infos fi;
 
+void logo();
+
 
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
     init_descriptor_tables();
     init_vga(0x07,0x0);
+    logo();
     Ata_fat_system afs(hda);
     init_disk(&fi,&afs);
     
@@ -30,6 +33,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_timer(1000);
     uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry),-1);
 
+    init_vga(0x07,0x0);
     if(pid!=uint32(-1))
     {
 			print_string("Lancement du programme\n");
@@ -41,6 +45,23 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 		}
 
     while (1);
+}
+
+void logo()
+{
+
+    char logo[148]="\
+__   __ _                 ___   ___ \
+\\ \\ / /(_)__ __   ___    / _ \\ / __|\
+ \\   / | |\\ \\ /  |___|  | (_) |\\__ \\\
+  \\_/  |_|/_\\_\\          \\___/ |___/";
+    for(int i=0;i<4;i++)
+    {
+        for(int j=0;j<36;j++)
+        {
+            write_char(j+22,i+10,logo[i*36+j]);
+        }
+    }
 }
 
 void init_disk(Fat_infos *fi,Ata_fat_system *afs)

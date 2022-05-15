@@ -542,7 +542,7 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
     return true;
 }
 
-Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+Fat_entry open(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
 {
     Fat_entry entries[10];
     int i;
@@ -564,6 +564,32 @@ Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *d
             }
         }
     }
+}
+
+Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+{
+    Fat_entry ret=open(name,afs,infos,dir,ok);
+    if(!(*ok))
+        return ret;
+    if(ret.is_directory())
+    {
+        *ok=false;
+        return ret;
+    }
+    return ret;
+}
+
+Fat_entry open_dir(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+{
+    Fat_entry ret=open(name,afs,infos,dir,ok);
+    if(!(*ok))
+        return ret;
+    if(!ret.is_directory())
+    {
+        *ok=false;
+        return ret;
+    }
+    return ret;
 }
 
 

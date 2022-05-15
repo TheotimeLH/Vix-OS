@@ -20,10 +20,14 @@ disque:prog_test/prog.s prog_test/main.c
 	sudo rm -rf disque_mnt
 	sudo mkdir disque_mnt
 	sudo mount disque disque_mnt
+	sudo mkdir disque_mnt/dir
 	sudo cp prog_test/prog disque_mnt
 	sudo echo "fichier test">file
 	sudo cp file disque_mnt
+	sudo echo "fichier test dans un sous repertoire">file2
+	sudo cp file2 disque_mnt/dir
 	sudo rm -f file
+	sudo rm -f file2
 	sudo umount disque
 	sudo rm -rf disque_mnt
 

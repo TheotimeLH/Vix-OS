@@ -9,50 +9,18 @@ void pause()
 
 int main()
 {
-    write(0,"[");
-    print_int(get_pid());
-    write(0,"] ");
-    write(0,"programme lance, pere : ");
-    print_int(get_ppid());
+    change_directory("DIR");
+    uint32 f2=open("FILE2");
+    change_directory("..");
+    uint32 f1=open("FILE");
+    char data[101];
+    uint32 size=read(f2,data,100);
+    data[size]=0;
+    write(0,data);
     write(0,"\n");
-
-    if(get_pid()==0)
-    {
-        exec("PROG");
-        pause();
-        exec("PROG");
-    }
-    else
-    {
-        exit(get_pid());
-    }
-
-    pause();
-
-    uint32 pid;
-    do
-    {
-        uint32 status;
-        pid=wait(&status);
-        if(pid==-1)
-        {
-            write(0,"[");
-            print_int(get_pid());
-            write(0,"] ");
-            write(0,"pas de fils");
-        }
-        else
-        {
-            write(0,"[");
-            print_int(get_pid());
-            write(0,"] ");
-            write(0,"fils termine : ");
-            print_int(pid);
-            write(0," status : ");
-            print_int(status);
-            write(0,"\n");
-        }
-    }while(pid!=-1);
+    size=read(f1,data,100);
+    data[size]=0;
+    write(0,data);
 
     while(1);
 

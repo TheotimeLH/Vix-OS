@@ -69,6 +69,7 @@ static void syscall(registers_t regs)
     current_pid=-1;
     uint32* eax=(uint32*)(regs.esp-4);
     uint32* ebx=(uint32*)(regs.esp-16);
+    Fat_entry fat_entry;
 
     keyboard_t key;
     bool ok;
@@ -112,7 +113,6 @@ static void syscall(registers_t regs)
             *eax=uint32(-1);
             break;;
         }
-        current_proc->opened_files[i].type=FAT_ENTRY;
         
         current_proc->opened_files[i].entry=
             open_file((char*)regs.edi,afs,infos,&current_proc->current_dir,&ok);
@@ -126,6 +126,7 @@ static void syscall(registers_t regs)
                 break;
             }
         }
+        current_proc->opened_files[i].type=FAT_ENTRY;
         *eax=i;
         break;
     case 6://exec
@@ -180,6 +181,16 @@ static void syscall(registers_t regs)
         break;
     case 10://get_ppid
         *eax=current_proc->ppid;
+        break;
+    case 11://cd
+        fat_entry=open_dir((char*)regs.edi,afs,infos,&current_proc->current_dir,&ok);
+        if(!ok)
+        {
+            *eax=0;
+            break;
+        }
+        *eax=1;
+        current_proc->current_dir=fat_entry;
         break;
     default:
         break;

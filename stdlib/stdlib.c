@@ -234,6 +234,21 @@ uint32 get_ppid()
 
 }
 
+uint32 change_directory(char* name)
+{
+    uint32 ret;
+    asm volatile("push %edi");
+
+    asm volatile("mov %0,%%edi":"=m"(name));
+    asm volatile("mov $0xB,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+    return ret;
+}
+
 uint32 strlen(char* str)
 {
 	uint32 ret;

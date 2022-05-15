@@ -43,6 +43,7 @@ uint32 get_pid();
 void exit(uint32 i);
 uint32 wait(uint32* status);
 uint32 get_ppid();
+uint32 change_directory(char* name);//1 si c'est ok, 0 sinon
 
 uint32 strlen(char* str);
 
