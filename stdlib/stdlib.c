@@ -249,6 +249,27 @@ uint32 change_directory(char* name)
     return ret;
 }
 
+uint32 list_entries(char* buff,uint32 n_entries)
+{
+    uint32 ret;
+
+    asm volatile("push %esi");
+    asm volatile("push %edi");
+
+
+    asm volatile("mov %0,%%edi":"=m"(buff));
+    asm volatile("mov %0,%%esi":"=m"(n_entries));
+    asm volatile("mov $0xC,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+    asm volatile("pop %esi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+
+    return ret;
+}
+
 uint32 strlen(char* str)
 {
 	uint32 ret;

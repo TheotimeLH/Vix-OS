@@ -9,18 +9,24 @@ void pause()
 
 int main()
 {
-    change_directory("DIR");
-    uint32 f2=open("FILE2");
-    change_directory("..");
-    uint32 f1=open("FILE");
-    char data[101];
-    uint32 size=read(f2,data,100);
-    data[size]=0;
-    write(0,data);
-    write(0,"\n");
-    size=read(f1,data,100);
-    data[size]=0;
-    write(0,data);
+    char buff[100];
+    uint32 size=list_entries(buff,10);
+    for(int i=0;i<size;i++)
+    {
+        write(0,&buff[i*10]);
+        if(buff[i*10+9]=='d')
+        {
+            write(0," d\n");
+        }
+        else if(buff[i*10+9]=='f')
+        {
+            write(0," f\n");
+        }
+        else
+        {
+            write(0," e\n");
+        }
+    }
 
     while(1);
 

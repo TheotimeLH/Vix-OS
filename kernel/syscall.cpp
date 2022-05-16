@@ -60,6 +60,28 @@ uint32 read(uint32 file,uint8 *buffer,uint32 size)
     return read_size;
 }
 
+uint32 read_entries(char* buff,uint32 n_entries)
+{
+    Fat_entry fat_buff[n_entries];
+    uint32 ret=current_proc->current_dir.read_entries(fat_buff,n_entries,infos,afs);
+    for(uint32 i=0;i<ret;i++)
+    {
+        char* name=fat_buff[i].get_name();
+        for(int j=0;j<9;j++)
+        {
+            buff[i*10+j]=name[j];
+        }
+        if(fat_buff[i].is_directory())
+        {
+            buff[i*10+9]='d';
+        }
+        else
+        {
+            buff[i*10+9]='f';
+        }
+    }
+}
+
 uint32 global_save_pid;
 extern uint32 return_proc;
 uint32 global_var,global_var2;
@@ -191,6 +213,9 @@ static void syscall(registers_t regs)
         }
         *eax=1;
         current_proc->current_dir=fat_entry;
+        break;
+    case 12://ls
+        *eax=read_entries((char*)regs.edi,regs.esi);
         break;
     default:
         break;
