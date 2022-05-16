@@ -24,7 +24,7 @@ int mode_size[4];
 
 void new_file()
 {
-	line_t *current_line = (line_t*) malloc(sizeof(line_t));
+	current_line = (line_t*) malloc(sizeof(line_t));
 	file.filename = 0; // Nom de fichier vide
 	file.file_buffer = current_line;
 	current_line->size = 1;

@@ -31,7 +31,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_paging(memory_detection(mbd,magic));
 
     init_timer(1000);
-    uint32 pid=exec("PROG",&afs,&fi,&(fi.root_fat_entry),-1);
+    uint32 pid=exec("MVIM",&afs,&fi,&(fi.root_fat_entry),-1);
 
     init_vga(0x07,0x0);
     if(pid!=uint32(-1))
