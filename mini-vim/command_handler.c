@@ -54,6 +54,10 @@ uint32 interpret_command(char* com_buff, file_t* file)
 		save_to_file(parm, f);
 		return 4;
 	}
+	if(strcmp(comm, "n"))
+	{
+		return 8;
+	}
 	
 
 }

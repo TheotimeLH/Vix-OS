@@ -21,6 +21,20 @@ line_t* current_line;
 char* mode_text[4];
 int mode_size[4];
 
+
+void new_file()
+{
+	line_t *current_line = (line_t*) malloc(sizeof(line_t));
+	file.filename = 0; // Nom de fichier vide
+	file.file_buffer = current_line;
+	current_line->size = 1;
+	current_line->line_buffer = init_list((text_t) {' ', WHITE, BLACK, 0});
+	current_line->prev = current_line->next = NULL; // Pas de suivant ni de précédent
+	screen_start = current_line;
+	current_text = current_line->line_buffer;
+	current_text->e.cursor= 1;
+}
+
 void apply_delete(int del_mode)
 {
 	if(del_mode == 1) // on va juste delete le caractere actuel
@@ -29,12 +43,16 @@ void apply_delete(int del_mode)
 	}
 	if(del_mode == 3) // on va supprimer toute la ligne
 	{
-		if(current_line->next)
+		if(current_line->next != NULL)
 		{
-			current_line = current_line->next; // peut etre ça va marcher
+			current_line = current_line->next; 
+			if(current_line->prev->prev == NULL) // Si on était sur la premiere ligne
+			{
+				screen_start = current_line;
+			}
 			delete_node_line(current_line->prev);
 		}
-		else if(current_line->prev)
+		else if(current_line->prev != NULL)
 		{
 			current_line = current_line->prev;
 			delete_node_line(current_line->next);
@@ -60,6 +78,15 @@ void* memset(void *pointer, int value, size_t count){
 }
 void init_banner()
 {
+	mode_text[0] = "NORMAL";
+	mode_text[1] = "INSERT";
+	mode_text[2] = "REPLACE";
+	mode_text[3] = "COMMAND";
+	mode_size[0] = 6;
+	mode_size[1] = 7;
+	mode_size[2] = 8;
+	mode_size[3] = 8;
+	/*
 	mode_text[0] = (char*) malloc(sizeof(char)*6);
 	mode_text[1] = (char*) malloc(sizeof(char)*7);
 	mode_text[2] = (char*) malloc(sizeof(char)*8);
@@ -80,6 +107,7 @@ void init_banner()
 		mode_text[2][i] = t3[i];
 	for(int i = 0; i < 8; i++)
 		mode_text[3][i] = t4[i];
+		*/
 }
 void render_banner(mode_t current_line_mode)
 {
@@ -123,7 +151,7 @@ int main(){
 	int cursorX = 0, cursorY = 0;
 	// Au départ il y a juste le premier qui est initialisé
 	// Le reste est vide
-	line_t *current_line = (line_t*) malloc(sizeof(line_t));
+	current_line = (line_t*) malloc(sizeof(line_t));
 	file.filename = 0; // Nom de fichier vide
 	file.file_buffer = current_line;
 	current_line->size = 1;
@@ -132,9 +160,7 @@ int main(){
 	screen_start = current_line;
 	mode_t current_line_mode = NORMAL;
 	current_line->line_buffer->e.cursor = 1;
-	text_list_t *current_text = current_line->line_buffer;
-	print_screen(5, 5, 'T',WHITE, BLACK); 
-	line_t* file_begin = screen_start; 
+	current_text = current_line->line_buffer;
 	
 	char command_buffer[80]; // Le buffer pour contenir la commande en cours
 	memset(command_buffer, 0, sizeof(char)*80);
@@ -142,7 +168,7 @@ int main(){
 	while(running){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement
-		if(get_ticks() % 100 == 0){
+		if(get_ticks() % 1000 == 0){
 			for(int i = 0; i < VIDEO_W; i++)
 				for(int j = 0; j < VIDEO_H+2; j++)
 					print_screen(i, j, ' ', WHITE, BLACK);
@@ -210,7 +236,7 @@ int main(){
 							if(current_text->prev != NULL)
 							{
 								current_text->e.cursor = 0;
-								current_text = current_line_buff->prev;
+								current_text = current_text->prev;
 								current_text->e.cursor = 1;
 								cursorX--;
 							}
@@ -239,7 +265,7 @@ int main(){
 							if(current_text->next != NULL)
 							{
 								current_text->e.cursor = 0;
-								current_text = current_line_buff->next;
+								current_text = current_text->next;
 								current_text->e.cursor = 1;
 								cursorX ++;
 							}
@@ -250,13 +276,13 @@ int main(){
 						case 'x': //
 							if(current_text->next != NULL) 
 							{
-								current_text = current_line_buff->next;
+								current_text = current_text->next;
 								current_text->e.cursor= 1;
 								delete_node(current_text->prev);
 							}
 							else if(current_text->prev !=0)
 							{
-								current_text = current_line_buff->prev;
+								current_text = current_text->prev;
 								current_text->e.cursor= 1;
 								delete_node(current_text->next);
 							}
@@ -302,7 +328,8 @@ int main(){
 								current_text->e.cursor = 1;
 								submode = NORMAL;
 								*/
-								apply_delete(3, current_line, current_text);
+								apply_delete(3);
+								submode = NORMAL;
 							}
 						break;
 						case ':':
@@ -424,7 +451,6 @@ int main(){
 								screen_start = current_line;
 								current_text = current_line->line_buffer;
 								current_text->e.cursor = 1;
-								file_begin = screen_start;
 								cursorX = 0;
 							}
 							if(bm & 0x2)  // Une demande d'arret
@@ -435,6 +461,12 @@ int main(){
 							if(bm & 0x4) // Une sauvegarde
 							{
 
+							}
+							if(bm & 8) // C'est un nouveau fichier
+							{
+								new_file();
+								write(0, "OUVERTURE D'UN NOUVEAU FICHIER");
+								cursorX = cursorY = 0;
 							}
 							current_line_mode = NORMAL;
 						break;
