@@ -47,7 +47,7 @@ void putchar(char c)
 
 void print_int(int num)
 {
-	char str[digit_count(num) + 1];
+	char* str[digit_count(num) + 1];
 	itoa(num, str);
 	write(0, str);
 }

@@ -17,10 +17,10 @@ typedef enum direction
 typedef struct command
 {
 	mode_t new_mode;
-	int del : 2; // Est ce que ça sert à supprimer qqch 
+	int del : 3; // Est ce que ça sert à supprimer qqch 
 							// le deuxieme bit sert à savoir si on supprime un caractere ou toute une ligne
-	int mov : 1; // Est ce que c'est associé à un mouvement
-	direction_t movement;
+	int mov : 2; // Est ce que c'est associé à un mouvement
+	direction_t dir;
 } command_t;
 
 
