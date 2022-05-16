@@ -20,6 +20,7 @@ line_t *screen_start;
 text_list_t* current_text;
 line_t* current_line;
 int cursorX = 0;
+int cursorY = 0; 
 
 char* mode_text[4];
 int mode_size[4];
@@ -52,6 +53,12 @@ void apply_move(direction_t dir)
 				cursorX = cursorX < current_line->size ? cursorX : current_line->size-1;
 				current_text = k_shift(current_line->line_buffer, cursorX);
 				current_text->e.cursor = 1;
+				cursorY--;
+				if(cursorY < 0)
+				{
+					screen_start = current_line;
+					cursorY = 0;
+				}
 			}
 			break;
 		case DOWN:
@@ -62,6 +69,13 @@ void apply_move(direction_t dir)
 				cursorX = cursorX < current_line->size ? cursorX : current_line->size-1;
 				current_text = k_shift(current_line->line_buffer, cursorX);
 				current_text->e.cursor = 1;
+				cursorY++;
+				if(cursorY > VIDEO_H)
+				{
+					screen_start = screen_start->next;
+					cursorY = VIDEO_H;
+				}
+
 			}
 			break;
 		case RIGHT:
@@ -150,6 +164,7 @@ void apply_delete(int del_mode)
 		{
 			current_line = current_line->prev;
 			delete_node_line(current_line->next);
+			cursorY--;
 		}
 		else
 		{
@@ -216,7 +231,7 @@ int main(){
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=1, .mov=0, .dir=STILL}, "x");
 	//Ajout en mode insertion
 	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=DOWN}, "o");
-	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=DOWN}, "O");
+	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=UP}, "O");
 	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=RIGHT}, "a");
 	// Commandes de changement de mode
 	add_command(&automata, (command_t) {.new_mode=COMMAND,.del=0, .mov=0, .dir=STILL}, ":");
@@ -430,25 +445,27 @@ int main(){
 								text_list_t *nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
 								if(premier)
 									current_line->line_buffer = nouveau;
+								cursorX++;
 								break;
 							case BACKSPACE: // On va supprimer le caractere d'avant
 								if(current_text->prev != 0)
 								{
-									if(current_text->prev->prev == 0)
-									{
-										current_line->line_buffer = current_text;
-									}
-									delete_node(current_text->prev);
-									current_line->size--;
+									apply_move(LEFT);
+									apply_delete(1);
 								}
 								else
-									current_text->e.c = ' ';
+								{
+									int t = (current_line->prev==0);
+									apply_delete(3);
+									if(t)
+										apply_move(UP);
+								}
 							break;
 							case ENTER:
 								//On va rajouter une ligne après celle ou on est
 								current_text->e.cursor = 0;
-								current_line = insert_after_line(current_line, init_list((text_t) {' ', WHITE, BLACK, 0}));
-								current_text = current_line->line_buffer;
+								apply_insert(DOWN);
+								apply_move(DOWN);
 								current_text->e.cursor = 1;
 								cursorX = 0;
 							break;
@@ -497,6 +514,7 @@ int main(){
 								current_text = current_line->line_buffer;
 								current_text->e.cursor = 1;
 								cursorX = 0;
+								cursorY = 0;
 							}
 							if(bm & 0x2)  // Une demande d'arret
 							{
@@ -511,7 +529,8 @@ int main(){
 							{
 								new_file();
 								//write(0, "OUVERTURE D'UN NOUVEAU FICHIER");
-								cursorX =  0;
+								cursorX = 0;
+								cursorY = 0;
 							}
 							current_mode = NORMAL;
 						break;
