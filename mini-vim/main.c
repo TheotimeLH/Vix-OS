@@ -85,6 +85,32 @@ void apply_move(direction_t dir)
 	}
 }
 
+void apply_insert(direction_t dir)
+{
+	switch(dir)
+	{
+		case DOWN:
+			insert_after_line(current_line, init_list((text_t) {' ', WHITE, BLACK, 0}));
+			break;
+		case RIGHT:
+			if(current_text->next == NULL)
+				insert_after(current_text, (text_t) {' ', WHITE, BLACK, 0});
+	}
+}
+
+void apply_move_delete(direction_t dir)
+{
+	switch(dir)
+	{
+		case RIGHT:
+			apply_move(LEFT);
+			break;
+		case DOWN:
+			apply_move(UP);
+			break;
+	}
+}
+
 void apply_delete(int del_mode)
 {
 	if(del_mode == 1) // on va juste delete le caractere actuel
@@ -188,6 +214,10 @@ int main(){
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=1, .mov=1, .dir=LEFT}, "dh");
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=3, .mov=0, .dir=STILL}, "dd");
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=1, .mov=0, .dir=STILL}, "x");
+	//Ajout en mode insertion
+	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=DOWN}, "o");
+	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=DOWN}, "O");
+	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=RIGHT}, "a");
 	// Commandes de changement de mode
 	add_command(&automata, (command_t) {.new_mode=COMMAND,.del=0, .mov=0, .dir=STILL}, ":");
 	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=0, .dir=STILL}, "i");
@@ -362,9 +392,16 @@ int main(){
 						}
 						if(command->mov) // si on doit bouger
 						{
+							if(command->new_mode == INSERT)
+							{
+								apply_insert(command->dir);
+							}
 							apply_move(command->dir);
 							if(command->del)
+							{
+								apply_move_delete(command->mov);
 								apply_delete(command->del);
+							}
 						}
 						current_mode = command->new_mode;
 					}
