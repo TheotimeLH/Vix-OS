@@ -294,12 +294,45 @@ bool set_fat_cluster(uint32 cluster,uint32 val,Fat_system* intf,Fat_infos* infos
 
 void fill_zeros(uint32 cluster,Fat_system* intf,Fat_infos* infos)
 {
-    uint8 buff[infos->cluster_size];
-    for(int i=0;i<infos->cluster_size;i++)
+    uint8 buff[infos->byte_per_cluster];
+    for(int i=0;i<infos->byte_per_cluster;i++)
     {
         buff[i]=0;
     }
     intf->write(infos->cluster_size,
+        infos->data+(cluster-2)*infos->cluster_size,
+        buff,
+        infos->sector_size);
+}
+
+void init_dir(uint32 cluster,uint32 parent,Fat_system* intf,Fat_infos* infos)
+{
+    uint8 buff[infos->sector_size];
+    for(int i=0;i<infos->sector_size;i++)
+    {
+        buff[i]=0;
+    }
+
+    buff[0x0]='.';
+    for(int i=0x1;i<0x8;i++)
+    {
+        buff[i]=' ';
+    }
+    buff[0xB]=0x10;
+    *(uint16*)&buff[0x1A]=cluster&0xFFFF;
+    *(uint16*)&buff[0x14]=(cluster>>16)&0xFFFF;
+
+    buff[0x0+0x20]='.';
+    buff[0x1+0x20]='.';
+    for(int i=0x2;i<0x8;i++)
+    {
+        buff[i+0x20]=' ';
+    }
+    buff[0xB+0x20]=0x10;
+    *(uint16*)&buff[0x1A+0x20]=parent&0xFFFF;
+    *(uint16*)&buff[0x14+0x20]=(parent>>16)&0xFFFF;
+
+    intf->write(1,
         infos->data+(cluster-2)*infos->cluster_size,
         buff,
         infos->sector_size);
@@ -511,16 +544,27 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
         m_current_cluster=next_cluster;
         set_fat_cluster(m_current_cluster,0xFFFFFFFF,intf,infos);
         fill_zeros(m_current_cluster,intf,infos);
+        for(int i=0;i<buff_size;i++)
+            buff[i]=0;
+        buff_addr=infos->data+(m_current_cluster-2)*infos->cluster_size;
         m_current_entry_offset=0;
     }
 
+    //on met l'entrée dans m_current_cluster, à l'offset m_current_entry_offset
+    //(buff contient déjà le contenu de ce cluster)
     buff[32*m_current_entry_offset+0x0B]=(is_directory)?0x10:0;
     uint32_t first_cluster=fat_free_cluster(intf,infos);
     if(first_cluster>=last_cluster)
         return false;
     set_fat_cluster(first_cluster,0xFFFFFFFF,intf,infos);
 
-    if(is_directory) fill_zeros(first_cluster,intf,infos);
+    if(is_directory)
+    {
+        //on remplit de zeros
+        fill_zeros(first_cluster,intf,infos);
+        //on ajoute les entrées "." et ".."
+        init_dir(first_cluster,m_first_cluster,intf,infos);
+    }
 
     *((uint16*)&buff[32*m_current_entry_offset+0x1A])=first_cluster;
     if(infos->fat_type==32)

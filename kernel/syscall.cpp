@@ -201,10 +201,15 @@ static void syscall(registers_t regs)
             *ebx=i;
         }
         break;
-    case 10://get_ppid
+    case 0xA://get_ppid
         *eax=current_proc->ppid;
         break;
-    case 11://cd
+    case 0xB://cd
+        if(strcmp((char*)regs.edi,"."))
+        {
+            current_proc->current_dir.init_offset();
+            break;
+        }
         fat_entry=open_dir((char*)regs.edi,afs,infos,&current_proc->current_dir,&ok);
         if(!ok)
         {
@@ -214,8 +219,18 @@ static void syscall(registers_t regs)
         *eax=1;
         current_proc->current_dir=fat_entry;
         break;
-    case 12://ls
+    case 0xC://ls
         *eax=read_entries((char*)regs.edi,regs.esi);
+        break;
+    case 0xD://mkdir
+        open_dir((char*)regs.edi,afs,infos,&current_proc->current_dir,&ok);
+        if(ok)
+        {
+            *eax=0;
+            break;
+        }
+        ok=current_proc->current_dir.add_entry((char*)regs.edi,true,&fat_entry,infos,afs);
+        *eax=(ok)?1:0;
         break;
     default:
         break;

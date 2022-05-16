@@ -45,7 +45,6 @@ void exit(uint32 i);
 uint32 wait(uint32* status);
 uint32 get_ppid();
 uint32 change_directory(char* name);//1 si c'est ok, 0 sinon
-
 //list_entries : charge les noms des n_entries prochaines entrées
 //du répertoire courant dans buff
 //buff doit avoir une taille 10*n_entries :
@@ -55,6 +54,7 @@ uint32 change_directory(char* name);//1 si c'est ok, 0 sinon
 //"cd ." permet de réinitialiser le répertoire courant pour
 //revenir à la première entrée
 uint32 list_entries(char* buff,uint32 n_entries);
+uint32 make_directory(char* name);
 
 uint32 strlen(char* str);
 
