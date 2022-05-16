@@ -194,6 +194,97 @@ uint32 get_pid()
     return pid;
 }
 
+void exit(uint32 i)
+{
+    asm volatile("push %edi");
+    asm volatile("mov $8,%eax");
+    asm volatile("mov %0,%%edi":"=m"(i));
+    asm volatile("int $0x42");
+    asm volatile("pop %edi");
+}
+
+uint32 wait(uint32* status)
+{
+    asm volatile("push %ebx");
+
+    int sys_wait_ret;
+
+    do
+    {
+        asm volatile("mov $9,%eax");
+        asm volatile("int $0x42");
+        asm volatile("mov %%eax,%0"::"m"(sys_wait_ret));
+        asm volatile("mov %%ebx,%0"::"m"(*status));
+    }while (sys_wait_ret==-2);
+
+    asm volatile("pop %ebx");
+
+    return sys_wait_ret;
+}
+
+uint32 get_ppid()
+{
+    uint32 ppid;
+
+    asm volatile("mov $0xA,%eax");
+    asm volatile("int $0x42");
+    asm volatile("mov %%eax,%0"::"m"(ppid));
+
+    return ppid;
+
+}
+
+uint32 change_directory(char* name)
+{
+    uint32 ret;
+    asm volatile("push %edi");
+
+    asm volatile("mov %0,%%edi":"=m"(name));
+    asm volatile("mov $0xB,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+    return ret;
+}
+
+uint32 list_entries(char* buff,uint32 n_entries)
+{
+    uint32 ret;
+
+    asm volatile("push %esi");
+    asm volatile("push %edi");
+
+
+    asm volatile("mov %0,%%edi":"=m"(buff));
+    asm volatile("mov %0,%%esi":"=m"(n_entries));
+    asm volatile("mov $0xC,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+    asm volatile("pop %esi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+
+    return ret;
+}
+
+uint32 make_directory(char* name)
+{
+    uint32 ret;
+    asm volatile("push %edi");
+
+    asm volatile("mov %0,%%edi":"=m"(name));
+    asm volatile("mov $0xD,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+    return ret;
+}
+
 uint32 strlen(char* str)
 {
 	uint32 ret;
