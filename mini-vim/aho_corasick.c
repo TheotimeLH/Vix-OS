@@ -82,7 +82,10 @@ trie_node_t* build_trie(int nb, char *patterns[])
 			{
 				chemin = chemin->fail_link;
 			}
-			actuel->fail_link = chemin->next[text_corr[i]];
+			if(chemin->root)
+				actuel->fail_link = chemin;
+			else
+				actuel->fail_link = chemin->next[text_corr[i]];
 		}
 		for(int i = 0; i < 256*256; i ++)
 		{
@@ -133,6 +136,8 @@ int add_char(trie_iterator_t* iterator, char c)
 }
 
 
+
+
 void test_aho_corasick() // une petite fonction pour tester aho_corasick
 {
 	char* pat[2];
@@ -162,7 +167,7 @@ void test_aho_corasick() // une petite fonction pour tester aho_corasick
 	pat[1] = "les";
 	truc.it = build_trie(2, pat); 
 	truc.root = truc.it;
-	char texte[30] = "Je collecte le camions";
+	char texte[30] = "Je collecte les camions";
 	int i = 0;
 	a = 0;
 	while(texte[i])
@@ -170,8 +175,8 @@ void test_aho_corasick() // une petite fonction pour tester aho_corasick
 		int c = add_char(&truc, texte[i++]);
 		if(c)
 		{
-			write(0, "fin de mot a ");
-			putchar(texte[i-1]);
+			//write(0, "fin de mot a ");
+			//putchar(texte[i-1]);
 			putchar('\n');
 		}
 		a = a + c;

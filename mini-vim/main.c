@@ -5,6 +5,7 @@
 #include "../common/malloc.h"
 #include "normal_automata.h"
 #include "aho_corasick.h"
+#include "syntax.h"
 
 #define MINI_VIM_PROGRAM 
 
@@ -14,7 +15,7 @@
 #define BUFF_SIZE 2000
 #define LINE_NUMBER 100
 
-#define REFRESH_RATE 50000
+#define REFRESH_RATE 100
 
 file_t file;
 line_t *screen_start;
@@ -240,6 +241,20 @@ int main(){
 	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=0, .dir=STILL}, "i");
 	// ---------------------
 
+
+	// -- creatino du handler de syntaxe
+	syntax_param_t param;
+	param.fg = RED;
+	param.bg = BLACK;
+	char *lexemes[3] = {"int", "void", "char"};
+	trie_node_t* root = build_trie(3, lexemes);
+	param.trie = (trie_iterator_t) {root, root};
+
+	syntax_config_t syntax = (syntax_config_t) {.n = 1, .conf = &param};
+
+	//
+
+
 	sub_mode_t submode = NONE;
 	//memset(buffer, 0, LINE_NUMBER * sizeof(line_t*));
 	// Au départ il y a juste le premier qui est initialisé
@@ -261,16 +276,18 @@ int main(){
 	while(running){ // main loop
 		// On va afficher à l'écran le buffer
 		// Il faut peut etre flush l'écran à chaque rafraichissement
+		// Ici on va faire la syntaxe
+
+		syntax_from_start(&file, syntax);
+
+
+		//
+		//
 		if(get_ticks() % REFRESH_RATE == 0){
 			for(int i = 0; i < VIDEO_W; i++)
 				for(int j = 0; j < VIDEO_H+2; j++)
 					print_screen(i, j, ' ', WHITE, BLACK);
 		}
-		/*
-		print_screen(3, 3, current_text->e.c, current_line_buff->e.fg, current_line_buff->e.bg);
-		if(current_text->prev != 0)
-				print_screen(4, 3, current_text->prev->e.c, current_line_buff->prev->e.fg, current_line_buff->prev->e.bg);
-		*/
 		render_banner(current_mode);
 		//
 		//
@@ -304,97 +321,11 @@ int main(){
 			if(ac_line == 0)
 				break;
 		}
-
-
-
-		/*
-		for(int i = 0; i < (VIDEO_H -2)*VIDEO_W; i++){
-			if(ac.cursor){
-				print_screen(i%VIDEO_W, i/VIDEO_W, ac.c, ac.bg, ac.fg);
-			}
-			else{
-				print_screen(i%VIDEO_W, i/VIDEO_W, ac.c, ac.fg, ac.bg);
-			}
-		}
-		*/
 		
-		// On a pas encore les gestions claviers
-		// Il faudrait plutot considerer ça ligne par ligne, parce que la on a le probleme que chaque ligne fait au plus 80 caracteres...
 		keyboard_t kp = get_keyboard();
 		switch (current_mode){
 			case NORMAL:
 				if(kp.type == 0){ // On va faire un handler simple
-					/*
-					switch (kp.k.ch){
-						
-						case 'h': // On va à gauche
-							if(current_text->prev != NULL)
-							{
-								current_text->e.cursor = 0;
-								current_text = current_text->prev;
-								current_text->e.cursor = 1;
-								cursorX--;
-							}
-							break;
-						case 'k': // On va en haut
-							if(current_line->prev != NULL)
-							{
-								current_text->e.cursor = 0; // Il faut connaitre la position x et y
-								current_line = current_line->prev;
-								cursorX = cursorX < current_line->size ? cursorX : current_line->size-1;
-								current_text = k_shift(current_line->line_buffer, cursorX);
-								current_text->e.cursor = 1;
-							}
-							break;
-						case 'j': // On va en bas
-							if(current_line->next != NULL)
-							{
-								current_text->e.cursor = 0; // Il faut connaitre la position x et y
-								current_line = current_line->next;
-								cursorX = cursorX < current_line->size ? cursorX : current_line->size-1;
-								current_text = k_shift(current_line->line_buffer, cursorX);
-								current_text->e.cursor = 1;
-							}
-							break;
-						case 'l': // On va à droite
-							if(current_text->next != NULL)
-							{
-								current_text->e.cursor = 0;
-								current_text = current_text->next;
-								current_text->e.cursor = 1;
-								cursorX ++;
-							}
-							break;
-						case 'i': // On passe en insert mode
-							current_mode = INSERT;
-							break;
-						case 'x': //
-							apply_delete(1);
-						break;
-						case 'o': // On va ajouter une ligne après et passer en INSERT mode
-							current_text->e.cursor = 0;
-							current_line = insert_after_line(current_line, init_list((text_t) {' ', WHITE, BLACK, 0}));
-							current_text = current_line->line_buffer;
-							current_text->e.cursor = 1;
-							current_mode = INSERT;
-							cursorX = 0;
-						break;
-						case 'd':
-							if(submode == NORMAL)
-								submode = DELETE;
-							else if (submode == DELETE)
-							{ // on va supprimer la ligne actuelle
-								apply_delete(3);
-								submode = NORMAL;
-							}
-						break;
-						case ':':
-							// On passe en mode commande
-							current_mode = COMMAND;
-						
-						break;
-					}
-					*/
 				if(kp.k.ch)
 				{
 					command_t* command = enter_char(&automata, kp.k.ch);
