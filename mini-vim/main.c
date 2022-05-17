@@ -4,6 +4,7 @@
 #include "command_handler.h"
 #include "../common/malloc.h"
 #include "normal_automata.h"
+#include "aho_corasick.h"
 
 #define MINI_VIM_PROGRAM 
 
@@ -13,7 +14,7 @@
 #define BUFF_SIZE 2000
 #define LINE_NUMBER 100
 
-#define REFRESH_RATE 100
+#define REFRESH_RATE 50000
 
 file_t file;
 line_t *screen_start;
@@ -212,6 +213,7 @@ int main(){
 	int running = 1;
 	init_banner();
 	int line_under = 0; // la premiere ligne affichée à l'écran
+	test_aho_corasick();
 
 	automata_t automata = new_automata();
 
