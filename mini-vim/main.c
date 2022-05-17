@@ -70,7 +70,7 @@ void apply_move(direction_t dir)
 				current_text = k_shift(current_line->line_buffer, cursorX);
 				current_text->e.cursor = 1;
 				cursorY++;
-				if(cursorY > VIDEO_H)
+				if(cursorY >= VIDEO_H)
 				{
 					screen_start = screen_start->next;
 					cursorY = VIDEO_H;

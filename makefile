@@ -4,7 +4,7 @@ COMMON_INCLUDE_SRC = $(wildcard common/*.c) $(wildcard common/*.s) $(wildcard co
 COMMON_INCLUDE = $(COMMON_INCLUDE_SRC:.c=.o) #$(COMMON_INCLUDE_SRC:.c=.o) $(COMMON_INCLUDE_SRC:.cpp=.o)
 KERNEL_INCLUDE_SRC = $(wildcard kernel/*.c) $(wildcard kernel/*.s) $(wildcard kernel/*.cpp)
 KERNEL_INCLUDE = $(KERNEL_INCLUDE_SRC:.s=.o) $(KERNEL_INCLUDE_SRC:.c=.o) $(KERNEL_INCLUDE_SRC:.cpp=.o)
-dirs = ./ kernel ata_driver fat_driver common video sound
+dirs = ./ kernel ata_driver fat_driver common video 
 
 find_c_src = $(wildcard $(dir)/*.c)
 find_cpp_src = $(wildcard $(dir)/*.cpp)
