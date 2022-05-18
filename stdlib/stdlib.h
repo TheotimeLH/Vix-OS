@@ -40,6 +40,7 @@ void print_screen(uint32 x,uint32 y,char car,uint8 fg_color,uint8 bg_color);
 keyboard_t get_keyboard();
 uint32 open(char* filename);
 void exec(char* filename);
+void execa(char* filename,char* arg);
 uint32 get_pid();
 void exit(uint32 i);
 uint32 wait(uint32* status);

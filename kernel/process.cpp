@@ -34,6 +34,11 @@ void init_process_tab()
 
 uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,uint32 ppid)
 {
+    exec(filename,afs,infos,dir,ppid,"");
+}
+
+uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,uint32 ppid,char* arg)
+{
 
     Fat_entry entries[10];
     int i;
@@ -58,7 +63,7 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,u
     uint32 cluster_count=(size+infos->byte_per_cluster-1)/infos->byte_per_cluster;
     uint8 buff[cluster_count*infos->byte_per_cluster];
     entries[i].read_data(buff,cluster_count,infos,afs);
-    uint32 pid=load_process(buff,ppid);
+    uint32 pid=load_process(buff,ppid,arg);
     if(pid==-1)
         return pid;
     tab_process[pid].current_dir=*dir;
@@ -71,8 +76,16 @@ uint32 exec(char* filename,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,u
     return pid;
 }
 
-uint32 load_process(uint8* elf,uint32 ppid)
+uint32 load_process(uint8* elf,uint32 ppid,char* arg)
 {
+    uint32 len=strlen(arg);
+    char kernel_stack_arg[len+1];
+    for(uint32 i=0;i<len;i++)
+    {
+        kernel_stack_arg[i]=arg[i];
+    }
+    kernel_stack_arg[len]=0;
+
     uint32 pid;
     for(pid=0;pid<n_process;pid++)
     {
@@ -123,6 +136,7 @@ uint32 load_process(uint8* elf,uint32 ppid)
     
     uint32 pg_header=get_uint32(elf,0x1C);
     uint16 n_entry=get_uint16(elf,0x2C);
+    uint32 max_addr(0);
     for(uint16 i=0;i<n_entry;i++)
     {
         uint32 seg_header=pg_header+i*32;
@@ -135,6 +149,8 @@ uint32 load_process(uint8* elf,uint32 ppid)
         uint32 size_in_mem=get_uint32(elf,seg_header+0x14);
         uint8* seg_in_mem=(uint8*)get_uint32(elf,seg_header+0x8);
         uint8* seg_in_file=elf+get_uint32(elf,seg_header+0x4);
+        if((uint32)seg_in_mem+size_in_mem>=max_addr)
+            max_addr=(uint32)seg_in_mem+size_in_mem;
         for(uint32 j=0;j<size_in_mem;j++)
         {
             if(j<size_in_file)
@@ -147,8 +163,17 @@ uint32 load_process(uint8* elf,uint32 ppid)
             }
         }
     }
+    if(max_addr!=0)
+    {
+        len=strlen(kernel_stack_arg);
+        for(uint32 i=0;i<len;i++)
+        {
+            ((uint8*)max_addr)[i]=kernel_stack_arg[i];
+        }
+        ((uint8*)max_addr)[len]=0;
+        proc->saved_context.edi=max_addr;
+    }
     proc->state=RUNNABLE;
-    switch_page_directory(current_directory);
     return pid;
 }
 
@@ -162,6 +187,7 @@ void run_process(uint32 pid)
     switch_page_directory(proc->directory);
     current_pid=pid;
     current_proc=proc;
+    asm volatile("mov %0,%%edi"::"a"(proc->saved_context.edi));
     asm volatile("jmp *%0"::"a"(proc->saved_context.eip));
     switch_page_directory(kernel_directory);
 }
@@ -210,6 +236,23 @@ extern "C" void switch_context(uint32 curr_esp)
     do
     {
         current_pid=(current_pid+1)%n_process;
+        if(tab_process[current_pid].state==ZOMBIE)
+        {
+            for(uint32 i=0;i<n_process;i++)
+            {
+                if((tab_process[i].state!=FREE)&&tab_process[i].ppid==current_pid)
+                {
+                    tab_process[i].ppid=-1;                    
+                }
+            }
+            if(tab_process[current_pid].ppid==-1)
+            {
+                tab_process[current_pid].state=FREE;
+                print_string("processus sans pere termine, avec le status : ");
+                print_int(tab_process[current_pid].status);
+                print_new_line();
+            }
+        }
         if(tab_process[current_pid].state==WAITING)
         {
             global_pid=sys_wait(&tab_process[current_pid].status,current_pid);

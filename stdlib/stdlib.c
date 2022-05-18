@@ -172,14 +172,22 @@ uint32 open(char* filename)
 
 void exec(char* filename)
 {
+    execa(filename,"");
+}
+
+void execa(char* filename,char* arg)
+{
     asm volatile("push %edi");
+    asm volatile("push %esi");
     asm volatile("push %eax");
 
     asm volatile("mov %0,%%edi":"=m"(filename));
+    asm volatile("mov %0,%%esi":"=m"(arg));
     asm volatile("mov $6,%eax");
     asm volatile("int $0x42");
 
     asm volatile("pop %eax");
+    asm volatile("pop %esi");
     asm volatile("pop %edi");
 }
 

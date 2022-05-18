@@ -9,7 +9,7 @@ stack_top:
 _start:
 	mov $stack_top, %esp
 
-	call main
+	call crt0_main
 
 1:
 	jmp 1b

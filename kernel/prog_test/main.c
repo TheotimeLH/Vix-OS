@@ -7,22 +7,24 @@ void pause()
     while(get_ticks()<=ticks+500);
 }
 
-int main()
+int main(char* arg)
 {
-    write(0,"coucou");
+    write(0,arg);
+    write(0,"coucou\n");
     if(get_pid()==0)
     {
-        exec("PROG");
-        int status;
-        int pid=wait(&status);
-        if(pid!=-1)
-            print_int(status);
+        execa("PROG","ceci est un autre argument\n");
+        // int status;
+        // int pid=wait(&status);
+        // if(pid!=-1)
+            // print_int(status);
+        // write(0,"\n");
     }
     else
     {
-        exit(42);
+        pause();
+        return 42;
     }
-    while(1);
 
-    return 0;	
+    return 69;	
 }
