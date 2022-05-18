@@ -134,11 +134,16 @@ void apply_delete(int del_mode)
 		// Comment delete juste le caractere actuel
 	if(current_text->next != NULL) 
 	{
+		int r = current_text->prev == NULL;
 		current_text = current_text->next;
 		current_text->e.cursor= 1;
 		delete_node(current_text->prev);
+		if(r)
+		{
+			current_line->line_buffer = current_text;
+		}
 	}
-	else if(current_text->prev !=0)
+	else if(current_text->prev != NULL)
 	{
 		current_text = current_text->prev;
 		current_text->e.cursor= 1;
@@ -152,7 +157,6 @@ void apply_delete(int del_mode)
 	}
 	if(del_mode == 3) // on va supprimer toute la ligne
 	{
-		write(0, "MODE 3");
 		if(current_line->next != NULL)
 		{
 			current_line = current_line->next; 
