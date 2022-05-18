@@ -67,10 +67,19 @@ trie_node_t* build_trie(int nb, char *patterns[])
 			{
 				chemin = chemin->fail_link;
 			}
-			if(chemin->root)
-				actuel->fail_link = chemin;
-			else
-				actuel->fail_link = chemin->next[text_corr[i]];
+			if(actuel->prev->root)
+				actuel->fail_link = actuel->prev;
+			else{
+				if(chemin->root)
+				{
+					if(chemin->next[text_corr[i]])
+						actuel->fail_link = chemin->next[text_corr[i]];
+					else
+						actuel->fail_link = chemin;
+				}
+				else
+					actuel->fail_link = chemin->next[text_corr[i]];
+			}
 		}
 		for(int i = 0; i < 256*256; i ++)
 		{
@@ -101,8 +110,9 @@ int add_char(trie_iterator_t* iterator, char c)
 		{
 			iterator->it = iterator->it->fail_link;
 		}
-		else
+		if(iterator->it->next[c])
 		{
+			iterator->it = iterator->it->next[c];
 		}
 		return 0;
 	}
