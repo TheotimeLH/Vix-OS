@@ -285,6 +285,21 @@ uint32 make_directory(char* name)
     return ret;
 }
 
+uint32 remove_entry(char* name)
+{
+    uint32 ret;
+    asm volatile("push %edi");
+
+    asm volatile("mov %0,%%edi":"=m"(name));
+    asm volatile("mov $0xE,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+    return ret;
+}
+
 uint32 strlen(char* str)
 {
 	uint32 ret;

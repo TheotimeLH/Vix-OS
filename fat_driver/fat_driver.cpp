@@ -586,7 +586,107 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
     return true;
 }
 
-Fat_entry open(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+bool Fat_entry::delete_entry(char* name,Fat_infos* infos,Fat_system *intf)
+{
+    init_offset();
+    if(!m_is_directory)
+        return 0;
+    
+    uint32_t buff_size=(m_first_cluster==0)?infos->sector_size:infos->byte_per_cluster;
+    uint8_t buff[buff_size];
+    uint16_t entry_per_buff=buff_size/32;
+    bool buff_empty(true);
+    uint32 buff_addr(0);
+    uint32_t last_cluster=fat_last_cluster(infos);
+    Fat_entry temp;
+
+    while(1)
+    {
+        if(m_current_entry_offset>=entry_per_buff)//update cluster si on peut
+        {
+            m_current_entry_offset=0;
+            if(m_first_cluster==0)
+            {
+                if(m_current_cluster==infos->root_size-1)
+                {
+                    return false;
+                }
+                else
+                    m_current_cluster++;
+            }
+            else
+            {
+                uint32_t next_cluster=fat_next_cluster(m_current_cluster,intf,infos);
+                if(next_cluster>=last_cluster)
+                {
+                    return false;
+                }
+                else
+                    m_current_cluster=next_cluster;
+            }
+            
+        }
+
+        if(m_current_entry_offset==0||buff_empty)//recharger de la memoire
+        {
+            if(m_first_cluster==0)
+            {
+                intf->read(1,infos->root+m_current_cluster,buff,infos->sector_size);
+                buff_addr=infos->root+m_current_cluster;
+            }
+            else
+            {
+                intf->read(infos->cluster_size,
+                    infos->data+(m_current_cluster-2)*infos->cluster_size,
+                    buff,
+                    infos->sector_size);
+                buff_addr=infos->data+(m_current_cluster-2)*infos->cluster_size;
+            }
+            buff_empty=false;
+        }
+
+        if(buff[32*m_current_entry_offset]==0)
+        {
+            return false;
+        }
+        if(buff[32*m_current_entry_offset]==0x05
+            ||buff[32*m_current_entry_offset]==0xE5
+            ||(buff[32*m_current_entry_offset+0x0B]&0x8)==0x8)
+        {
+            m_current_entry_offset++;
+            continue;
+        }
+
+        bool is_directory=(buff[32*m_current_entry_offset+0x0B]&0x10)==0x10;
+        uint32_t first_cluster=buff_8_16(buff,32*m_current_entry_offset+0x1A);
+        if(infos->fat_type==32)
+        {
+            first_cluster=first_cluster|(buff_8_16(buff,32*m_current_entry_offset+0x14)<<16);
+        }
+        uint32_t size=buff_8_32(buff,32*m_current_entry_offset+0X1C);
+        temp=Fat_entry(first_cluster,is_directory,(char*)(buff+32*m_current_entry_offset),size,
+            buff_addr+(m_current_entry_offset*32)/((uint32)infos->sector_size),(m_current_entry_offset*32)%((uint32)infos->sector_size));
+        if(strcmp(temp.m_name,name))
+        {
+            break;
+        }
+        m_current_entry_offset++;
+    }
+
+    buff[32*m_current_entry_offset]=0xE5;
+    intf->write(buff_size/infos->sector_size,buff_addr,buff,infos->sector_size);
+    while(1)
+    {
+        temp.m_current_cluster=fat_next_cluster(temp.m_first_cluster,intf,infos);
+        set_fat_cluster(temp.m_first_cluster,0,intf,infos);
+        if(temp.m_current_cluster>=last_cluster)
+            break;
+        temp.m_first_cluster=temp.m_current_cluster;
+    }
+    return true;
+}
+
+Fat_entry open(char* name,Fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
 {
     Fat_entry entries[10];
     int i;
@@ -610,7 +710,7 @@ Fat_entry open(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bo
     }
 }
 
-Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+Fat_entry open_file(char* name,Fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
 {
     Fat_entry ret=open(name,afs,infos,dir,ok);
     if(!(*ok))
@@ -623,7 +723,7 @@ Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *d
     return ret;
 }
 
-Fat_entry open_dir(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
+Fat_entry open_dir(char* name,Fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
 {
     Fat_entry ret=open(name,afs,infos,dir,ok);
     if(!(*ok))

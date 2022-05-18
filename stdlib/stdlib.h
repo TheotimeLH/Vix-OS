@@ -55,6 +55,7 @@ uint32 change_directory(char* name);//1 si c'est ok, 0 sinon
 //revenir à la première entrée
 uint32 list_entries(char* buff,uint32 n_entries);
 uint32 make_directory(char* name);
+uint32 remove_entry(char* name);
 
 uint32 strlen(char* str);
 

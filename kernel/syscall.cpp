@@ -232,6 +232,14 @@ static void syscall(registers_t regs)
         ok=current_proc->current_dir.add_entry((char*)regs.edi,true,&fat_entry,infos,afs);
         *eax=(ok)?1:0;
         break;
+    case 0xE://rm
+        if(strcmp((char*)regs.edi,".")||strcmp((char*)regs.edi,".."))
+        {
+            *eax=false;
+            break;
+        }
+        *eax=current_proc->current_dir.delete_entry((char*)regs.edi,infos,afs);
+        break;
     default:
         break;
     }

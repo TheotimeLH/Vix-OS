@@ -101,6 +101,7 @@ public:
     //  - sinon, infos.byte_per_cluster/32
     uint32_t read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf);
     bool add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_infos* infos,Fat_system* intf);
+    bool delete_entry(char* name,Fat_infos* infos,Fat_system *intf);
 private:
     bool m_is_directory;
     uint32_t m_first_cluster;//0 for root (FAT12/16)
@@ -130,7 +131,7 @@ struct Fat_infos
     Fat_entry root_fat_entry;
 };
 
-Fat_entry open_file(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok);
-Fat_entry open_dir(char* name,Ata_fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok);
+Fat_entry open_file(char* name,Fat_system *intf,Fat_infos* infos,Fat_entry *dir,bool* ok);
+Fat_entry open_dir(char* name,Fat_system *intf,Fat_infos* infos,Fat_entry *dir,bool* ok);
 
 #endif
