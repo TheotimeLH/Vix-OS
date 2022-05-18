@@ -21,7 +21,5 @@ typedef struct {
 
 cmd_t parse_cmd() ;
 
-int eval_cmd(cmd_t c) ;
-
 #endif 
 
