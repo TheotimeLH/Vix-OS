@@ -1,6 +1,5 @@
 %{
-	#include "ast.h"
-	#include "stdlib.h"
+	#include "parser.h"
 
 	char next_char()
 	{

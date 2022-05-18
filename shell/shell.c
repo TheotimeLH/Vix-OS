@@ -1,18 +1,18 @@
 
-#include "ast.h"
-
-int exec_cmd(char** fun, char** arg)
-{
-	return 1 ; // TODO
-}
+#include "parser.h"
 
 int eval_cmd(cmd_t c)
 {
 	if (c.cs == SKIP) return 0 ;
-	if (c.cs == SYST) return exec_cmd(cs.fst, cs.snd) ;
 	if (c.cs == PIPE) return 1 ; // TODO
+
+	if (c.cs == SYST) {
+		if (cs.snd == NULL) return exec(cs.fst) ;
+		else return execa(cs.fst, cs.snd) ;
+	}
 	cmd_t left = *(cmd_t*) c.fst ;
 	cmd_t right = *(cmd_t*) c.snd ;
+
 	if (c.cs == SEQ) {
 		eval_cmd(left) ;
 		return eval_cmd(right) ;
@@ -27,5 +27,11 @@ int eval_cmd(cmd_t c)
 		if (a==0) return a ;
 		else return eval_cmd(right) ;
 	}
+}
+
+int main()
+{
+	cmd_t cmd = parse_cmd() ;
+	return eval_cmd(cmd) ;
 }
 
