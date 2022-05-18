@@ -2,9 +2,8 @@
 #define VGA_H
 #include "../common/common.h"
 
-#define VGA_ADDRESS_TEXT 0xB8000
 #define BUFSIZE 2200
-
+#define VGA_ADDRESS_TEXT 0xB8000
 #define TEXT_WIDTH 80
 #define TEXT_HEIGHT 25 
 
@@ -27,12 +26,6 @@ void scroll();
 #ifdef __cplusplus
 }
 #endif
-
-
-enum vga_mode {
-	TEXT,
-	GRAPHIC,
-};
 
 enum vga_color {
 	BLACK,
