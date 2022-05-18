@@ -31,7 +31,11 @@ int eval_cmd(cmd_t c)
 
 int main()
 {
-	cmd_t cmd = parse_cmd() ;
-	return eval_cmd(cmd) ;
+	while (1)
+	{
+		cmd_t cmd = parse_cmd() ;
+		if (eval_cmd(cmd) != 0)
+			write(0, "ERREUR\n") ;
+	}	
 }
 

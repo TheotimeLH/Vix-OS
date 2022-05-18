@@ -6,6 +6,7 @@
 		keyboard_t kb = get_keyboard() ;
 		if (k.type == 0) return kb.k.ch ;
 		if (kb.k.sp == SPACE) return ' ' ;
+		if (kb.k.sp == TAB) return '\t' ;
 		if (kb.k.sp == ENTER) return '\n' ;
 		else return next_char() ;
 	}
@@ -18,8 +19,9 @@
     }
 %}
 
-char [a-zA-Z0-9]|_|.|-|/
+char [a-zA-Z0-9]|_|.|-|\/
 ident char*
+space [ \t]
 
 %%
 
@@ -30,5 +32,6 @@ ident char*
 | 			{ return PIPE ; }
 (				{ return LPAR ; }
 )				{ return RPAR ; }
+{space} 
 
 %%

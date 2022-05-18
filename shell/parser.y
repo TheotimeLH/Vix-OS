@@ -1,7 +1,7 @@
 %{
 	#include "parser.h"
 
-	cmd ret ;
+	cmd ret = init_cmd(SKIP, NULL, NULL) ;
 	cmd_t init_cmd(cmd_case c, void* f, void* s)
 	{
 		ret.cs = c ;
@@ -35,5 +35,6 @@ commande: %empty					{ $$ = & init_cmd(SKIP, NULL, NULL) }
 cmd_t parse_cmd()
 {
 	if (yyparse() == 0) return ret ;
-	// TODO : error handling
+	write(0, "ECHEC\n") ;
+	return parse_cmd() ;
 }
