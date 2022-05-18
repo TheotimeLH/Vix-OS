@@ -172,14 +172,22 @@ uint32 open(char* filename)
 
 void exec(char* filename)
 {
+    execa(filename,"");
+}
+
+void execa(char* filename,char* arg)
+{
     asm volatile("push %edi");
+    asm volatile("push %esi");
     asm volatile("push %eax");
 
     asm volatile("mov %0,%%edi":"=m"(filename));
+    asm volatile("mov %0,%%esi":"=m"(arg));
     asm volatile("mov $6,%eax");
     asm volatile("int $0x42");
 
     asm volatile("pop %eax");
+    asm volatile("pop %esi");
     asm volatile("pop %edi");
 }
 
@@ -277,6 +285,21 @@ uint32 make_directory(char* name)
 
     asm volatile("mov %0,%%edi":"=m"(name));
     asm volatile("mov $0xD,%eax");
+    asm volatile("int $0x42");
+
+    asm volatile("pop %edi");
+
+    asm volatile("mov %%eax,%0"::"m"(ret));
+    return ret;
+}
+
+uint32 remove_entry(char* name)
+{
+    uint32 ret;
+    asm volatile("push %edi");
+
+    asm volatile("mov %0,%%edi":"=m"(name));
+    asm volatile("mov $0xE,%eax");
     asm volatile("int $0x42");
 
     asm volatile("pop %edi");

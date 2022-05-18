@@ -40,6 +40,7 @@ void print_screen(uint32 x,uint32 y,char car,uint8 fg_color,uint8 bg_color);
 keyboard_t get_keyboard();
 uint32 open(char* filename);
 void exec(char* filename);
+void execa(char* filename,char* arg);
 uint32 get_pid();
 void exit(uint32 i);
 uint32 wait(uint32* status);
@@ -55,6 +56,7 @@ uint32 change_directory(char* name);//1 si c'est ok, 0 sinon
 //revenir à la première entrée
 uint32 list_entries(char* buff,uint32 n_entries);
 uint32 make_directory(char* name);
+uint32 remove_entry(char* name);
 
 uint32 strlen(char* str);
 

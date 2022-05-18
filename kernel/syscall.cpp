@@ -153,7 +153,7 @@ static void syscall(registers_t regs)
         break;
     case 6://exec
         asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
-        global_save_pid=exec((char*)regs.edi,afs,infos,&current_proc->current_dir,current_pid_save);
+        global_save_pid=exec((char*)regs.edi,afs,infos,&current_proc->current_dir,current_pid_save,(char*)regs.esi);
         if(global_save_pid==(uint32)-1)
         {
             break;
@@ -174,13 +174,8 @@ static void syscall(registers_t regs)
         asm volatile("mov %0,%%esp"::"a"(&kernel_stack));
         switch_page_directory(kernel_directory);
         free_dir(current_proc->directory);
-        if(current_proc->ppid==(uint32)-1)
-            current_proc->state=FREE;
-        else
-        {
-            current_proc->state=ZOMBIE;
-            current_proc->status=global_var;
-        }
+        current_proc->state=ZOMBIE;
+        current_proc->status=global_var;
         current_pid=global_save_pid;
         switch_context(global_var2);
         break;
@@ -231,6 +226,14 @@ static void syscall(registers_t regs)
         }
         ok=current_proc->current_dir.add_entry((char*)regs.edi,true,&fat_entry,infos,afs);
         *eax=(ok)?1:0;
+        break;
+    case 0xE://rm
+        if(strcmp((char*)regs.edi,".")||strcmp((char*)regs.edi,".."))
+        {
+            *eax=false;
+            break;
+        }
+        *eax=current_proc->current_dir.delete_entry((char*)regs.edi,infos,afs);
         break;
     default:
         break;
