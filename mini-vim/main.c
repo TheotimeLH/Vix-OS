@@ -254,7 +254,16 @@ int main(){
 	trie_node_t* root = build_trie(3, lexemes);
 	param.trie = (trie_iterator_t) {root, root};
 
-	syntax_config_t syntax = (syntax_config_t) {.n = 1, .conf = &param};
+	syntax_param_t param_stmt;
+	param_stmt.fg = BLUE;
+	param_stmt.bg = BLACK;
+	char *stmts[6] = {"if", "else", "sizeof", "case", "while", "for"};
+	trie_node_t* root_stmt = build_trie(6, stmts);
+	param_stmt.trie = (trie_iterator_t) {root_stmt, root_stmt};
+
+	syntax_param_t parametres[2] = {param, param_stmt};
+
+	syntax_config_t syntax = (syntax_config_t) {.n = 2, .conf = parametres};
 
 	//
 
