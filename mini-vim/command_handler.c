@@ -39,7 +39,7 @@ uint32 interpret_command(char* com_buff, file_t* file)
 	{
 		// On doit ouvrir un fichier
 		file->filename = comm; // ALERT : IL FAUT REALLOUER SINON PROBLEME
-		file->file_buffer = buffer_from_file(parm, 100);
+		file->file_buffer = buffer_from_file(parm, 10000);
 		return 1; // On va faire un bitmask pour dire ce qui a été modifié
 	}
 	if(strcmp(comm, "q"))
