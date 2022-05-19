@@ -30,7 +30,11 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_paging(memory_detection(mbd,magic));
 
     init_timer(1000);
+<<<<<<< HEAD
     uint32 pid=exec("SHELL",&afs,&fi,&(fi.root_fat_entry),-1,"ceci est un argument\n");
+=======
+    uint32 pid=exec("PACMAN",&afs,&fi,&(fi.root_fat_entry),-1,"ceci est un argument\n");
+>>>>>>> 15d02e05ba57df665d76db25cb8c1d3123059fdb
 
     init_vga(0x07,0x0);
     if(pid!=uint32(-1))

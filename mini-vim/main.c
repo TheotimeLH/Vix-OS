@@ -28,6 +28,7 @@ char* mode_text[4];
 int mode_size[4];
 
 
+
 void new_file()
 {
 	current_line = (line_t*) malloc(sizeof(line_t));
@@ -250,16 +251,41 @@ int main(){
 	syntax_param_t param;
 	param.fg = RED;
 	param.bg = BLACK;
-	char *lexemes[3] = {"int", "void", "char"};
-	trie_node_t* root = build_trie(3, lexemes);
+	char *lexemes[6] = {
+											"\nint ", 
+											"\nvoid ", 
+											"\nchar ",
+											"\nshort ",
+											" int ", 
+											" void ", 
+											" char ",
+											" short ",
+											};
+	trie_node_t* root = build_trie(6, lexemes);
 	param.trie = (trie_iterator_t) {root, root};
 
 	syntax_param_t param_stmt;
 	param_stmt.fg = BLUE;
 	param_stmt.bg = BLACK;
-	char *stmts[6] = {"if", "else", "sizeof", "case", "while", "for"};
-	trie_node_t* root_stmt = build_trie(6, stmts);
+	char *stmts[12] = {
+										"\nif ", 
+										"\nelse ", 
+										"\nsizeof ", 
+										"\ncase ", 
+										"\nwhile ", 
+										"\nfor ",
+										" if ", 
+										" else ", 
+										" sizeof ", 
+										" case ", 
+										" while ", 
+										" for "
+	};
+	trie_node_t* root_stmt = build_trie(12, stmts);
 	param_stmt.trie = (trie_iterator_t) {root_stmt, root_stmt};
+
+	add_char(&param_stmt.trie, '\n');
+	add_char(&param.trie, '\n');
 
 	syntax_param_t parametres[2] = {param, param_stmt};
 
@@ -381,6 +407,7 @@ int main(){
 				else{
 					if(kp.type == 1){
 						int premier;
+						text_list_t *nouveau;
 						switch (kp.k.sp){
 							case ESCAPE:
 								current_mode = NORMAL;
@@ -388,7 +415,21 @@ int main(){
 							case SPACE:
 								premier = (current_text->prev == 0); // Si c'est le premier de la liste
 								current_line->size++;
-								text_list_t *nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
+								nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
+								if(premier)
+									current_line->line_buffer = nouveau;
+								cursorX++;
+								break;
+							case TAB:
+								premier = (current_text->prev == 0); // Si c'est le premier de la liste
+								current_line->size++;
+								nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
+								if(premier)
+									current_line->line_buffer = nouveau;
+								cursorX++;
+								premier = (current_text->prev == 0); // Si c'est le premier de la liste
+								current_line->size++;
+								nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
 								if(premier)
 									current_line->line_buffer = nouveau;
 								cursorX++;

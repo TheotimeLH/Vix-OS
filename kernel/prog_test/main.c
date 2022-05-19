@@ -9,6 +9,7 @@ void pause()
 
 int main(char* arg)
 {
+<<<<<<< HEAD
 		while(1)
 		{
 			keyboard_t k=get_keyboard();
@@ -26,3 +27,19 @@ int main(char* arg)
 
     return 69;	
 }
+=======
+    if(get_pid()==0)
+    {
+        exec("PROG");
+    }
+
+    while(1)
+    {
+        write(0,"prog ");
+        print_int(get_pid());
+        write(0,"\n");
+    }
+
+    return 0;	
+}
+>>>>>>> 15d02e05ba57df665d76db25cb8c1d3123059fdb
