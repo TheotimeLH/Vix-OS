@@ -237,6 +237,7 @@ int main(){
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=1, .mov=1, .dir=LEFT}, "dh");
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=3, .mov=0, .dir=STILL}, "dd");
 	add_command(&automata, (command_t) {.new_mode=NORMAL, .del=1, .mov=0, .dir=STILL}, "x");
+	add_command(&automata, (command_t) {.new_mode=INSERT, .del=1, .mov=0, .dir=STILL}, "s");
 	//Ajout en mode insertion
 	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=DOWN}, "o");
 	add_command(&automata, (command_t) {.new_mode=INSERT, .del=0, .mov=1, .dir=UP}, "O");
