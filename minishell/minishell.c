@@ -28,13 +28,29 @@ int main()
       {
         init_vga();
         buffer[buff_pos]=0;
+        if(buffer[0]=='l'&&buffer[1]=='s'&&buffer[2]==0)
+        {
+          change_directory(".");
+          int n_entries=list_entries(buffer,10);
+          for(int i=0;i<n_entries;i++)
+          {
+            write(0,buffer+i*10);
+            write(0,"\n");
+          }
+          do
+          {
+            k=get_keyboard();
+          } while (k.type!=1||k.k.sp!=ENTER);
+          init_vga();
+          change_directory(".");
+          break;
+        }
         exec(buffer);
         int status;
         int pid=wait(&status);
         print_screen(0,0,' ',WHITE,BLACK);
         init_vga();
-        write(0,buffer);
-        print_int(pid);
+        print_int(status);
         write(0,"\n");
         break;
       }
