@@ -3,7 +3,7 @@
 
 line_t* buffer_from_file(char* filename, uint32 size){
 	char buff[size]; 
-	//write(0, filename);
+	// write(0, filename);
 	uint32 file = open(filename);
 	uint32 size_file = read(file, buff, size);
 	buff[size_file+1] = 0;
