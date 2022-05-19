@@ -9,22 +9,17 @@ void pause()
 
 int main(char* arg)
 {
-    write(0,arg);
-    write(0,"coucou\n");
     if(get_pid()==0)
     {
-        execa("PROG","ceci est un autre argument\n");
-        // int status;
-        // int pid=wait(&status);
-        // if(pid!=-1)
-            // print_int(status);
-        // write(0,"\n");
-    }
-    else
-    {
-        pause();
-        return 42;
+        exec("PROG");
     }
 
-    return 69;	
+    while(1)
+    {
+        write(0,"prog ");
+        print_int(get_pid());
+        write(0,"\n");
+    }
+
+    return 0;	
 }
