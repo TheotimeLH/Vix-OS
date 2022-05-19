@@ -45,10 +45,10 @@ static char shifter(char c){
 			case '_':
 				return '8';
 				break;
-			case 'ç':
+			case '9': // ç
 				return '9';
 				break;
-			case 'à':
+			case '0': // à
 				return '0';
 				break;
 			case ')':
@@ -97,10 +97,10 @@ keyboard_t azerty_config(uint8 code){
 				res.ch = '_';
 			break;
 		case 0x0a:
-				res.ch = 'ç';
+				res.ch = '9';
 			break;
 		case 0x0b:
-				res.ch = 'à';
+				res.ch = '0';
 			break;
 		case 0x0c:
 				res.ch = ')';
