@@ -249,8 +249,9 @@ int main(){
 
 	// -- creatino du handler de syntaxe
 	syntax_param_t param;
-	param.fg = RED;
+	param.fg = BRIGHT_RED;
 	param.bg = BLACK;
+	/*
 	char *lexemes[6] = {
 											"\nint ", 
 											"\nvoid ", 
@@ -261,12 +262,21 @@ int main(){
 											" char ",
 											" short ",
 											};
-	trie_node_t* root = build_trie(6, lexemes);
+											*/
+	char *lexemes[4] = 
+	{
+		"int",
+		"void",
+		"char",
+		"short",
+	};
+	trie_node_t* root = build_trie(4, lexemes);
 	param.trie = (trie_iterator_t) {root, root};
 
 	syntax_param_t param_stmt;
-	param_stmt.fg = BLUE;
+	param_stmt.fg = BRIGHT_BLUE;
 	param_stmt.bg = BLACK;
+	/*
 	char *stmts[12] = {
 										"\nif ", 
 										"\nelse ", 
@@ -281,7 +291,18 @@ int main(){
 										" while ", 
 										" for "
 	};
-	trie_node_t* root_stmt = build_trie(12, stmts);
+	*/
+	char *stmts[6] =
+	{
+		"if",
+		"else",
+		"sizeof",
+		"case",
+		"while",
+		"for",
+		
+	};
+	trie_node_t* root_stmt = build_trie(6 , stmts);
 	param_stmt.trie = (trie_iterator_t) {root_stmt, root_stmt};
 
 	add_char(&param_stmt.trie, '\n');
