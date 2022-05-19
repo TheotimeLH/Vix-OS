@@ -14,7 +14,7 @@ INCLUDE_CPP = $(foreach dir, $(dirs), $(find_cpp_src))
 INCLUDE_S = $(foreach dir, $(dirs), $(find_s_src))
 
 INCLUDES = $(INCLUDE_C:.c=.o) $(INCLUDE_CPP:.cpp=.o) $(INCLUDE_S:.s=.o)#$(COMMON_INCLUDE) $(KERNEL_INCLUDE) ata_driver/ata_driver.o fat_driver/fat_driver.o video/vga_driver.o
-all : run
+all : programs run
 
 programs : 
 	@echo "COMPILATION DES PROGRAMMES UTILISATEURS"
