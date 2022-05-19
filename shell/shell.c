@@ -1,4 +1,5 @@
 
+#include "shell.h"
 #include "parser.h"
 
 int eval_cmd(cmd_t c)

@@ -1,10 +1,13 @@
+
+%option noyywrap
+
 %{
-	#include "parser.h"
+	#include "shell.h"
 
 	char next_char()
 	{
 		keyboard_t kb = get_keyboard() ;
-		if (k.type == 0) return kb.k.ch ;
+		if (kb.type == 0) return kb.k.ch ;
 		if (kb.k.sp == SPACE) return ' ' ;
 		if (kb.k.sp == TAB) return '\t' ;
 		if (kb.k.sp == ENTER) return '\n' ;
@@ -27,11 +30,11 @@ space [ \t]
 
 {ident} { return ID ; }
 ; 			{ return SEQ ; }
-"||" 		{ return OR ; }
-"&&"		{ return AND ; }
-| 			{ return PIPE ; }
-(				{ return LPAR ; }
-)				{ return RPAR ; }
+\|\|		{ return OR ; }
+&&			{ return AND ; }
+\|			{ return PIPE ; }
+\(			{ return LPAR ; }
+\)			{ return RPAR ; }
 {space} 
 
 %%
