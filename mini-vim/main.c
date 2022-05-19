@@ -28,6 +28,7 @@ char* mode_text[4];
 int mode_size[4];
 
 
+
 void new_file()
 {
 	current_line = (line_t*) malloc(sizeof(line_t));
@@ -250,16 +251,41 @@ int main(){
 	syntax_param_t param;
 	param.fg = RED;
 	param.bg = BLACK;
-	char *lexemes[3] = {"int", "void", "char"};
-	trie_node_t* root = build_trie(3, lexemes);
+	char *lexemes[6] = {
+											"\nint ", 
+											"\nvoid ", 
+											"\nchar ",
+											"\nshort ",
+											" int ", 
+											" void ", 
+											" char ",
+											" short ",
+											};
+	trie_node_t* root = build_trie(6, lexemes);
 	param.trie = (trie_iterator_t) {root, root};
 
 	syntax_param_t param_stmt;
 	param_stmt.fg = BLUE;
 	param_stmt.bg = BLACK;
-	char *stmts[6] = {"if", "else", "sizeof", "case", "while", "for"};
-	trie_node_t* root_stmt = build_trie(6, stmts);
+	char *stmts[12] = {
+										"\nif ", 
+										"\nelse ", 
+										"\nsizeof ", 
+										"\ncase ", 
+										"\nwhile ", 
+										"\nfor ",
+										" if ", 
+										" else ", 
+										" sizeof ", 
+										" case ", 
+										" while ", 
+										" for "
+	};
+	trie_node_t* root_stmt = build_trie(12, stmts);
 	param_stmt.trie = (trie_iterator_t) {root_stmt, root_stmt};
+
+	add_char(&param_stmt.trie, '\n');
+	add_char(&param.trie, '\n');
 
 	syntax_param_t parametres[2] = {param, param_stmt};
 
