@@ -5,7 +5,6 @@ all:minishell ../kernel/disque
 	sudo cp minishell disque_mnt/mshell
 	sudo umount ../kernel/disque
 	rm -rf disque_mnt
-	cd ../&&make
 
 ../kernel/disque:
 	cd ../kernel && make disque

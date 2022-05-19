@@ -27,12 +27,14 @@ int main()
       else if(k.type==1&&k.k.sp==ENTER)
       {
         init_vga();
+        buffer[buff_pos]=0;
         exec(buffer);
         int status;
-        wait(&status);
+        int pid=wait(&status);
         print_screen(0,0,' ',WHITE,BLACK);
         init_vga();
-        print_int(status);
+        write(0,buffer);
+        print_int(pid);
         write(0,"\n");
         break;
       }
