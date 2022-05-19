@@ -35,8 +35,8 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
     init_vga(0x07,0x0);
     if(pid!=uint32(-1))
     {
-		print_string("Lancement du programme\n");
-        run_process(pid);
+			print_string("Lancement du programme\n");
+			run_process(pid);
     }
     else
     {

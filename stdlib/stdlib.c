@@ -314,3 +314,9 @@ uint32 strlen(char* str)
 	for(ret=0;str[ret]!=0;ret++);
 	return ret;
 }
+
+void memcpy(char* dest, const char* src , uint32 size)
+{
+	for (int i=0 ; i<size ; i++) dest[i] = src[i] ;
+}
+

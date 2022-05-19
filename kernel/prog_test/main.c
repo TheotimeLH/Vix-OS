@@ -9,17 +9,20 @@ void pause()
 
 int main(char* arg)
 {
-    if(get_pid()==0)
-    {
-        exec("PROG");
-    }
+		while(1)
+		{
+			keyboard_t k=get_keyboard();
+			if(k.type==1)
+				write(0,"\n");
+			else
+			{
+				char str[2];
+				str[1]=0;
+				str[0]=k.k.ch;
+				write(0,str);
+			}
+		}
 
-    while(1)
-    {
-        write(0,"prog ");
-        print_int(get_pid());
-        write(0,"\n");
-    }
 
-    return 0;	
+    return 69;	
 }
