@@ -14,28 +14,32 @@ int main()
   init_vga();
   while(1)
   {
-    int buff_pos=0;
+    uint32 buff_pos=0;
     while(1)
     {
       keyboard_t k=get_keyboard();
       if(k.type==0&&k.k.ch!=0)
       {
-        char str[2];
-        str[0]=k.k.ch;
-        str[1]=0;
-        write(0,str);
+        print_screen(buff_pos,0,k.k.ch,WHITE,BLACK);
         buffer[buff_pos]=k.k.ch;
         buff_pos++;
       }
       else if(k.type==1&&k.k.sp==ENTER)
       {
+        init_vga();
         exec(buffer);
         int status;
         wait(&status);
+        print_screen(0,0,' ',WHITE,BLACK);
         init_vga();
         print_int(status);
         write(0,"\n");
         break;
+      }
+      else if (k.type==1&&k.k.sp==BACKSPACE&&buff_pos>=1&&buff_pos<100)
+      {
+        buff_pos--;
+        print_screen(buff_pos,0,' ',WHITE,BLACK);
       }
     }
   }
