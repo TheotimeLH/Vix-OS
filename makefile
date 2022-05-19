@@ -75,5 +75,8 @@ clean :
 	cd fat_driver && make clean
 	cd ata_driver && make clean
 	cd video && make clean
+	cd pacman&&make clean
+	cd mini-vim&&make clean
+	cd minishell&&make clean
 
 .PHONY : all run clean common ata_driver fat_driver video kernel

@@ -158,31 +158,64 @@ int main(char* arg)
 
   uint32 random_x=get_ticks();
 
+  uint32 vim_bindings=0;
+
   while(1)
   {
     keyboard_t k=get_keyboard();
     if(k.type==0)
     {
-      switch (k.k.ch)
+      if(k.k.ch=='a')
       {
-      case 'i':
-        perso_next_dir.x=0;
-        perso_next_dir.y=-1;
-        break;
-      case 'k':
-        perso_next_dir.x=0;
-        perso_next_dir.y=1;
-        break;
-      case 'l':
-        perso_next_dir.x=1;
-        perso_next_dir.y=0;
-        break;
-      case 'j':
-        perso_next_dir.x=-1;
-        perso_next_dir.y=0;
-        break;
-      default:
-        break;
+        vim_bindings=!vim_bindings;
+      }
+      if(vim_bindings)
+      {
+        switch (k.k.ch)
+        {
+        case 'k':
+          perso_next_dir.x=0;
+          perso_next_dir.y=-1;
+          break;
+        case 'j':
+          perso_next_dir.x=0;
+          perso_next_dir.y=1;
+          break;
+        case 'l':
+          perso_next_dir.x=1;
+          perso_next_dir.y=0;
+          break;
+        case 'h':
+          perso_next_dir.x=-1;
+          perso_next_dir.y=0;
+          break;
+        default:
+          break;
+        }
+      }
+      else
+      {
+        switch (k.k.ch)
+        {
+        case 'i':
+          perso_next_dir.x=0;
+          perso_next_dir.y=-1;
+          break;
+        case 'k':
+          perso_next_dir.x=0;
+          perso_next_dir.y=1;
+          break;
+        case 'l':
+          perso_next_dir.x=1;
+          perso_next_dir.y=0;
+          break;
+        case 'j':
+          perso_next_dir.x=-1;
+          perso_next_dir.y=0;
+          break;
+        default:
+          break;
+        }
       }
     }
     if(is_possible(perso_next_dir,possible_dir(perso)))
