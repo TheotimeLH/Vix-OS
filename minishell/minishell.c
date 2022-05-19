@@ -45,6 +45,10 @@ int main()
           change_directory(".");
           break;
         }
+        else if(buffer[0]==':'&&buffer[1]=='q'&&buffer[2]==0)
+        {
+          return 1515;
+        }
         exec(buffer);
         int status;
         int pid=wait(&status);
