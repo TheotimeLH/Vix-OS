@@ -381,6 +381,7 @@ int main(){
 				else{
 					if(kp.type == 1){
 						int premier;
+						text_list_t *nouveau;
 						switch (kp.k.sp){
 							case ESCAPE:
 								current_mode = NORMAL;
@@ -388,7 +389,21 @@ int main(){
 							case SPACE:
 								premier = (current_text->prev == 0); // Si c'est le premier de la liste
 								current_line->size++;
-								text_list_t *nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
+								nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
+								if(premier)
+									current_line->line_buffer = nouveau;
+								cursorX++;
+								break;
+							case TAB:
+								premier = (current_text->prev == 0); // Si c'est le premier de la liste
+								current_line->size++;
+								nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
+								if(premier)
+									current_line->line_buffer = nouveau;
+								cursorX++;
+								premier = (current_text->prev == 0); // Si c'est le premier de la liste
+								current_line->size++;
+								nouveau = insert_before(current_text , (text_t) {' ', WHITE, BLACK, 0});
 								if(premier)
 									current_line->line_buffer = nouveau;
 								cursorX++;

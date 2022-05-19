@@ -17,6 +17,48 @@ static char shifter(char c){
 	if(0x61 <= c && c <= 0x7a){ // 
 		return c-0x20;
 	}
+	else
+	{
+		switch(c)
+		{
+			case '&':
+				return '1';
+				break;
+			case '{':
+				return '2';
+				break;
+			case '"':
+				return '3';
+				break;
+			case '\'':
+				return '4';
+				break;
+			case '(':
+				return '5';
+				break;
+			case '-':
+				return '6';
+				break;
+			case '}':
+				return '7';
+				break;
+			case '_':
+				return '8';
+				break;
+			case 'ç':
+				return '9';
+				break;
+			case 'à':
+				return '0';
+				break;
+			case ')':
+				return '°';
+				break;
+			case '=':
+				return '+';
+				break;
+		}
+	}
 	return c;
 }
 
@@ -34,7 +76,7 @@ keyboard_t azerty_config(uint8 code){
 				res.ch = '&';
 			break;
 		case 0x03:
-				res.ch = 'é';
+				res.ch = '{'; // é
 			break;
 		case 0x04:
 				res.ch = '"';
@@ -49,7 +91,7 @@ keyboard_t azerty_config(uint8 code){
 				res.ch = '-';
 			break;
 		case 0x08:
-				res.ch = 'è';
+				res.ch = '}'; // è
 			break;
 		case 0x09:
 				res.ch = '_';
