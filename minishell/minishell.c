@@ -45,6 +45,24 @@ int main()
           change_directory(".");
           break;
         }
+        else if(buffer[0]==':'&&buffer[1]=='q'&&buffer[2]==0)
+        {
+          return 1515;
+        }
+        else if(buffer[0]==':'&&buffer[1]=='e'&&buffer[2]==0)
+        {
+          uint32 f=open("FILE");
+          uint32 size=read(f,buffer,99);
+          buffer[size]=0;
+          write(0,buffer);
+          do
+          {
+            k=get_keyboard();
+          } while (k.type!=1||k.k.sp!=ENTER);
+          init_vga();
+          change_directory(".");
+          break;
+        }
         exec(buffer);
         int status;
         int pid=wait(&status);
