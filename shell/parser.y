@@ -1,5 +1,14 @@
 %{
-	#include "ast.c"
+	#include "parser.h"
+
+	cmd ret = init_cmd(SKIP, NULL, NULL) ;
+	cmd_t init_cmd(cmd_case c, void* f, void* s)
+	{
+		ret.cs = c ;
+		ret.fst = f ;
+		ret.snd = s ;
+		return ret ;
+	}
 %}
 
 %token <char*> ID
@@ -9,16 +18,23 @@
 %token PIPE
 %token EOL
 
-%%
-
-ligne: commande EOL { $$ = $1 }
-
-commande: %empty				{ $$ = init_cmd(SKIP, NULL, NULL) }
-	| ID ID			 					{ $$ = init_cmd(SYST, &$1, &$2) }
-	| ID SEQ ID 		 			{ $$ = init_cmd(SEQ, &$1, &$2) }
-	| ID OR ID 		 				{ $$ = init_cmd(OR, &$1, &$2) }
-	| ID AND ID 			 		{ $$ = init_cmd(AND, &$1, &$2) }
-	| ID PIPE ID	 		 		{ $$ = init_cmd(PIPE, &$1, &$2) }				
-	| LPAR commande RPAR	{ $$ = $2 }
+%type <cmd_t> commande
 
 %%
+
+commande: %empty					{ $$ = & init_cmd(SKIP, NULL, NULL) }
+	| ID ID			 						{ $$ = & init_cmd(EXEC, $1, $3) }
+	| commande SEQ commande	{ $$ = & init_cmd(SEQ, $1, $3) }
+	| commande OR commande 	{ $$ = & init_cmd(OR, $1, $3) }
+	| commande AND commande	{ $$ = & init_cmd(AND, $1, $3) }
+	| ID PIPE commande	 		{ $$ = & init_cmd(PIPE, $1, $3) }				
+	| LPAR commande RPAR		{ $$ = $2 }
+
+%%
+
+cmd_t parse_cmd()
+{
+	if (yyparse() == 0) return ret ;
+	write(0, "ECHEC\n") ;
+	return parse_cmd() ;
+}
