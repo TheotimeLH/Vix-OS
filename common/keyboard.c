@@ -486,16 +486,5 @@ keyboard_t keyboard_handler(){
 		code = get_scancode();
 		available = 0;
 	}
-	/*
-	if(!available && (get_ticks() > last_tick + 10*get_freq())){
-		available = 1;
-		last_tick = get_ticks();
-	}
-	*/
-	/*
-	if(code & 0x2A){
-		shift_key = 1;
-	}
-	*/
 	return azerty_config(code);
 }
