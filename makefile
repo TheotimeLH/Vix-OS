@@ -16,6 +16,9 @@ INCLUDE_S = $(foreach dir, $(dirs), $(find_s_src))
 INCLUDES = $(INCLUDE_C:.c=.o) $(INCLUDE_CPP:.cpp=.o) $(INCLUDE_S:.s=.o)#$(COMMON_INCLUDE) $(KERNEL_INCLUDE) ata_driver/ata_driver.o fat_driver/fat_driver.o video/vga_driver.o
 all : programs run
 
+unmount: 
+	sudo umount kernel/disque
+
 programs : 
 	@echo "COMPILATION DES PROGRAMMES UTILISATEURS"
 	make --directory=pacman
