@@ -14,7 +14,7 @@ clean:
 	i686-elf-g++ -o $@ -c $< -ffreestanding  -Wall -Wextra -fno-exceptions -fno-rtti
 
 disque:prog_test/prog.s prog_test/main.c
-	dd if=/dev/zero of=disque count=100
+	dd if=/dev/zero of=disque count=500
 	mkfs.fat disque
 	make --directory=prog_test
 	sudo rm -rf disque_mnt
