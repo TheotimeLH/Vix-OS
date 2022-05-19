@@ -20,13 +20,13 @@
 stackBottom:
 
 # define the maximum size of stack to 512 bytes
-.skip 0x10000
+.skip 0x100000
 
 
 # set the stack top which grows from higher to lower
 stackTop:
 
-.skip 0x5000
+.skip 0x100000
 
 .global kernel_stack
 kernel_stack:

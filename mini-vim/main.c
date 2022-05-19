@@ -507,6 +507,7 @@ int main(){
 							{
 								running = 0;
 								write(0, "PROGRAM STOPPING");
+								exit(42);
 							}
 							if(bm & 0x4) // Une sauvegarde
 							{
