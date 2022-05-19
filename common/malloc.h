@@ -7,7 +7,7 @@ extern "C" {
 
 void init_tas();
 void *malloc(uint32 n);
-void free(uint8* bloc);
+void free(void* bloc);
 
 #ifdef __cplusplus
 }

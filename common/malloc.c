@@ -134,8 +134,9 @@ uint8* find(uint32 n)
 }
 
 // Libère un bloc alloué
-void free(uint8* bloc)
+void free(void* ptr)
 {
+	uint8* bloc = ptr ;
 	bloc -= 5 ;
 	uint32 n = size(bloc) ;
 	uint8* deb = bloc ;
