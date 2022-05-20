@@ -42,7 +42,7 @@ uint8* sbrk(uint32 n)
 static void init_base()
 {
 	for(int i = 0; i < 30; i ++)
-		base[i] = (void*) brk +i;
+		base[i] = (void*) brk+i ;
 }
 
 void init_tas()
@@ -143,10 +143,10 @@ void free(void* ptr)
 	uint8* fin = bloc+n ;
 	uint8* prev = deb-1 ;
 	uint8* next = fin+1 ;
-	if (*next & 1) {
+	if (next != brk && *next & 1) {
 		fin = next + size(next) ;
 		unlink(next) ; }
-	if (*prev & 1) {
+	if (deb != end *prev & 1) {
 		if (*prev & 8) deb -= *prev >> 4 ;
 		else deb = **(uint8***) (prev-4) ;
 		unlink(deb) ;	}
@@ -166,7 +166,7 @@ void* malloc(uint32 n)
 		if (*brk & 1) {
 			if (*brk & 8) nbrk -= *brk >> 4 ;
 			else brk -= size(**(uint8***) (brk-4)) ; }
-		bloc = sbrk(nbrk)-n-5 ;	}
+		bloc = sbrk(nbrk)-n-6 ;	}
 	*(bloc+n+5) = *bloc = 0	;
 	*(uint32*) ++bloc = n ;
 	return bloc+4 ;
