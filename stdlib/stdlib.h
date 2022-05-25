@@ -59,6 +59,6 @@ uint32 make_directory(char* name);
 uint32 remove_entry(char* name);
 
 uint32 strlen(char* str);
-void memcpy(char*, const char*, uint32) ;
+int strCmp(char *, char*);
 
 #endif

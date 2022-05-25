@@ -315,8 +315,9 @@ uint32 strlen(char* str)
 	return ret;
 }
 
-void memcpy(char* dest, const char* src , uint32 size)
+int strCmp(char *s, char *t)
 {
-	for (int i=0 ; i<size ; i++) dest[i] = src[i] ;
+	for ( ; *s && *s==*t ; s++, t++) ;
+	return *t-*s ;
 }
 
