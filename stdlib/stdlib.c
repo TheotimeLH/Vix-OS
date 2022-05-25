@@ -315,9 +315,10 @@ uint32 strlen(char* str)
 	return ret;
 }
 
-int strCmp(char *s, char *t)
+int strCmp(const char *s, const char *t, int n)
 {
-	for ( ; *s && *s==*t ; s++, t++) ;
-	return *t-*s ;
+	int i ;
+	for (i=0 ; s[i] && s[i]==t[i] && i<n; i++) ;
+	return t[i]-s[i] ;
 }
 

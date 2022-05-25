@@ -59,6 +59,6 @@ uint32 make_directory(char* name);
 uint32 remove_entry(char* name);
 
 uint32 strlen(char* str);
-int strCmp(char *, char*);
+int strCmp(const char*, const char*, int);
 
 #endif

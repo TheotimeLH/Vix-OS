@@ -2,24 +2,24 @@
 
 void init_vga()
 {
-  for(int i=0 ; i<26 ; i++) write(0,"\n") ;
+  for(int i=0 ; i<26 ; i++) write(0, "\n") ;
 }
 
-void empty_line(char line[81])
+void empty_line(char line[82])
 {
-	for (int i=0 ; i<81 ; i++) line[i] = '\0' ;
+	for (int i=0 ; i<82 ; i++) line[i] = '\0' ;
 }
 
-void print_lines(char bufs[22][81], int x)
+void print_lines(char bufs[22][82], int x)
 {
 	for (int i=0 ; i<22 ; i++)
 		for (int j=0 ; j<81 ; j++)
-			print_screen(j, (x+1-i)%22, bufs[i][j], WHITE, BLACK) ;
+			print_screen(j, i-x-1+(i<x+1?22:0), bufs[i][j], WHITE, BLACK) ;
 }
 
-void eval(char line[81])
+void eval(char line[82])
 {
-	if (strCmp(line, "ls")==0)
+	if (strCmp(line, "ls", 2)==0)
 	{
 		char buf[100] ;
 		change_directory(".") ;
@@ -33,7 +33,13 @@ void eval(char line[81])
 		init_vga() ;
 		change_directory(".") ;
 	}
-	else if(strCmp(line,":e")==0)
+	else if (strCmp(line, "cd ", 3)==0)	change_directory(line+3) ;
+
+	else if (strCmp(line, "mkdir ", 6)==0) make_directory(line+6) ;
+
+	else if (strCmp(line, "rm ", 3)==0) ; // TODO
+
+	else if (strCmp(line, ":e", 2)==0)
 	{
 		char buf[100] ;
 		uint32 f = open("FILE") ;
@@ -48,19 +54,25 @@ void eval(char line[81])
 	}
 	else
 	{
-		exec(line) ;
+		int i ;
+		for (i=0 ; line[i] && line[i]!=' ' ; i++) ;
+		if (line[i]==' ')	{
+			line[i] = '\0' ;
+			execa(line, line+i+1) ;
+			line[i] = ' ' ; }
+		else exec(line) ;
 		int status ;
 		int pid = wait(&status) ;
 		print_screen(0, 0, ' ', WHITE, BLACK) ;
 		init_vga() ;
 		print_int(status) ;
-		write(0,"\n") ;
+		write(0, "\n") ;
 	}
 }
 
 int main()
 {
-  char bufs[22][81] ;
+  char bufs[22][82] ;
 	for (int i=0 ; i<22 ; i++) empty_line(bufs[i]) ;
   init_vga() ;
 	int x=0, y=0 ;
@@ -89,7 +101,7 @@ int main()
 		else if (k.k.sp==ENTER)
 		{
 			init_vga() ;
-			if(strCmp(bufs[x], ":q")==0) return 1515 ;
+			if(strCmp(bufs[x], ":q", 2)==0) return 1515 ;
 			eval(bufs[x]) ;
 			y=0 ;
 			x = ++x % 22 ;
