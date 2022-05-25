@@ -17,6 +17,18 @@ void print_lines(char bufs[22][82], int x)
 			print_screen(j, i-x-1+(i<x+1?22:0), bufs[i][j], WHITE, BLACK) ;
 }
 
+void rec_rm(char* dossier)
+{
+	change_directory(dossier) ;
+	char buf[10] ;
+	while (list_entries(buf, 1))
+		if (strCmp(buf, ".", 1)==0 || strCmp(buf, "..", 2)==0) ;
+		else if (buf[9]=='d') rec_rm(buf) ;
+		else remove_entry(buf) ;
+	change_directory("..") ;
+	remove_entry(dossier) ;
+}
+
 void eval(char line[82])
 {
 	if (strCmp(line, "ls", 2)==0)
@@ -33,12 +45,20 @@ void eval(char line[82])
 		init_vga() ;
 		change_directory(".") ;
 	}
-	else if (strCmp(line, "cd ", 3)==0)	change_directory(line+3) ;
+	else if (strCmp(line, "cd ", 2)==0)	change_directory(line+3) ;
 
-	else if (strCmp(line, "mkdir ", 6)==0) make_directory(line+6) ;
+	else if (strCmp(line, "mkdir ", 5)==0) make_directory(line+6) ;
 
-	else if (strCmp(line, "rm ", 3)==0) ; // TODO
-
+	else if (strCmp(line, "rm ", 2)==0)
+	{
+		char buf[10] ;
+		while (list_entries(buf, 1))
+			if (strCmp(line+3, buf, 8)==0) {
+				if (buf[9]=='d') rec_rm(buf) ;
+				else remove_entry(buf) ;
+				break ;	}
+		change_directory(".") ;
+	}
 	else if (strCmp(line, ":e", 2)==0)
 	{
 		char buf[100] ;
