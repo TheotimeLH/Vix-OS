@@ -18,8 +18,13 @@ void print_lines(int x)
 
 int ls()
 {
-	int n = list_entries(bufs[x]+1, 8) ;
-	for (int i=0 ; i<9 ; i++) bufs[x][i*10] = '\0' ;
+	int n = list_entries(bufs[x]+2, 8) ;
+	for (int i=0 ; i<n ; i++)
+	{
+		int j ;
+		for (j=0 ; bufs[x][j+10*i+2] ; j++) ;
+		for ( ; j<10 ; j++) bufs[x][j+10*i+2] = '\0' ;
+	}
 	return n ;
 }
 
@@ -45,6 +50,7 @@ void eval()
 		do empty_line(x = ++x % 22) ;
 		while (ls()) ;
 		change_directory(".") ;
+		x-- ;
 	}
 	else if (strCmp(line, "cd ", 2)==0)	change_directory(line+3) ;
 
@@ -63,8 +69,10 @@ void eval()
 	else if (strCmp(line, "cat ", 3)==0)
 	{
 		uint32 f = open(line+4) ;
-		while (read(f, bufs[x = ++x % 22], 81)) ;
+		do empty_line(x = ++x % 22) ;
+		while (read(f, bufs[x], 81)) ;
 		change_directory(".") ;
+		x-- ;
 	}
 	else
 	{

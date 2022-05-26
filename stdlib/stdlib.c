@@ -322,3 +322,8 @@ int strCmp(const char *s, const char *t, int n)
 	return t[i]-s[i] ;
 }
 
+void strcpy(char* to, const char* from)
+{
+	while (*to++ = *from++) ;
+}
+

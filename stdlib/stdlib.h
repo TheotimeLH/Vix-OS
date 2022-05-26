@@ -60,5 +60,6 @@ uint32 remove_entry(char* name);
 
 uint32 strlen(char* str);
 int strCmp(const char*, const char*, int);
+void strcpy(char*, const char*) ;
 
 #endif
