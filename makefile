@@ -23,7 +23,7 @@ programs :
 	@echo "COMPILATION DES PROGRAMMES UTILISATEURS"
 	make --directory=pacman
 	make --directory=mini-vim 
-	make --directory=minishell
+	make --directory=shell
 
 
 get_includes :
@@ -77,6 +77,6 @@ clean :
 	cd video && make clean
 	cd pacman&&make clean
 	cd mini-vim&&make clean
-	cd minishell&&make clean
+	cd shell&&make clean
 
 .PHONY : all run clean common ata_driver fat_driver video kernel

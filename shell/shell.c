@@ -1,14 +1,17 @@
+
 #include "../stdlib/stdlib.h"
 
-int x,y ;
-char bufs[22][82] ;
-
+int x,y ; // Position courante
+char bufs[22][82] ; // Caractères à l'écran
+   
+// Vide une ligne de bufs
 void empty_line(int n)
 {
 	for (int i=0 ; i<82 ; i++) bufs[n][i] = '\0' ;
-	bufs[n][0] = '$' ; bufs[n][1] = ' ' ;
+	bufs[n][0] = '$' ; // Prompt
 }
 
+// Actualise l'affichage
 void print_lines(int x)
 {
 	for (int i=0 ; i<22 ; i++)
@@ -16,18 +19,18 @@ void print_lines(int x)
 			print_screen(j, i-x-1+(i<x+1?22:0), bufs[i][j], WHITE, BLACK) ;
 }
 
-int ls()
+// Charge les entrées dans bufs
+int load_ls()
 {
 	int n = list_entries(bufs[x]+2, 8) ;
-	for (int i=0 ; i<n ; i++)
-	{
-		int j ;
-		for (j=0 ; bufs[x][j+10*i+2] ; j++) ;
-		for ( ; j<10 ; j++) bufs[x][j+10*i+2] = '\0' ;
-	}
+	for (int i=2 ; i<10*n+2 ; i++)
+		if (bufs[x][i]=='\0')
+			for ( ; i%10-2 ; i++)
+				bufs[x][i] = '\0' ;
 	return n ;
 }
 
+// Remove dossier en profondeur
 void rec_rm(char* dossier)
 {
 	change_directory(dossier) ;
@@ -40,15 +43,18 @@ void rec_rm(char* dossier)
 	remove_entry(dossier) ;
 }
 
+// Exécute la dernière ligne de commande
 void eval()
 {
+	// Ligne à évalué
 	char line[80] ;
-	strcpy(line, bufs[x]+2) ;
+	strcpy(line, bufs[x]+2) ; 
+
 	if (strCmp(line, "ls", 2)==0)
 	{
 		change_directory(".") ;
 		do empty_line(x = ++x % 22) ;
-		while (ls()) ;
+		while (load_ls()) ;
 		change_directory(".") ;
 		x-- ;
 	}
@@ -78,11 +84,11 @@ void eval()
 	{
 		int i ;
 		for (i=0 ; line[i] && line[i]!=' ' ; i++) ;
-		if (line[i]==' ')	{
+		if (line[i]==' ')	{ // Avec argument
 			line[i] = '\0' ;
 			execa(line, line+i+1) ;
 			line[i] = ' ' ; }
-		else exec(line) ;
+		else exec(line) ; // Sans argument
 		int status ;
 		int pid = wait(&status) ;
 	}
@@ -96,15 +102,13 @@ int main()
 	print_lines(x) ;
   while(1)
   {
-
-		print_screen(y, 21, b++&(1<<18)?'_':' ', WHITE, BLACK) ;
+		print_screen(y, 21, b++&(1<<18)?'_':' ', WHITE, BLACK) ; // Curseur
 		keyboard_t k = get_keyboard() ;
 		if (k.type==0)
 		{
 			if (y<81 && k.k.ch!='\0')	{
 				print_screen(y, 21, k.k.ch, WHITE, BLACK) ;
-				bufs[x][y++] = k.k.ch ;
-			}
+				bufs[x][y++] = k.k.ch ;	}
 		}
 		else if (k.k.sp==SPACE && y<81)
 		{
