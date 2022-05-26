@@ -1,20 +1,26 @@
 #include "../stdlib/stdlib.h"
 
-void init_vga()
+int x,y ;
+char bufs[22][82] ;
+
+void empty_line(int n)
 {
-  for(int i=0 ; i<26 ; i++) write(0, "\n") ;
+	for (int i=0 ; i<82 ; i++) bufs[n][i] = '\0' ;
+	bufs[n][0] = '$' ; bufs[n][1] = ' ' ;
 }
 
-void empty_line(char line[82])
-{
-	for (int i=0 ; i<82 ; i++) line[i] = '\0' ;
-}
-
-void print_lines(char bufs[22][82], int x)
+void print_lines(int x)
 {
 	for (int i=0 ; i<22 ; i++)
 		for (int j=0 ; j<81 ; j++)
 			print_screen(j, i-x-1+(i<x+1?22:0), bufs[i][j], WHITE, BLACK) ;
+}
+
+int ls()
+{
+	int n = list_entries(bufs[x]+1, 8) ;
+	for (int i=0 ; i<9 ; i++) bufs[x][i*10] = '\0' ;
+	return n ;
 }
 
 void rec_rm(char* dossier)
@@ -29,20 +35,15 @@ void rec_rm(char* dossier)
 	remove_entry(dossier) ;
 }
 
-void eval(char line[82])
+void eval()
 {
+	char line[80] ;
+	strcpy(line, bufs[x]+2) ;
 	if (strCmp(line, "ls", 2)==0)
 	{
-		char buf[100] ;
 		change_directory(".") ;
-		int n_entries = list_entries(buf, 10) ;
-		for(int i=0 ; i<n_entries ; i++) {
-			write(0, buf+i*10) ;
-			write(0, "\n") ; }
-		keyboard_t k ;
-		do k = get_keyboard() ;
-		while (k.type!=1 || k.k.sp!=ENTER) ;
-		init_vga() ;
+		do empty_line(x = ++x % 22) ;
+		while (ls()) ;
 		change_directory(".") ;
 	}
 	else if (strCmp(line, "cd ", 2)==0)	change_directory(line+3) ;
@@ -59,18 +60,11 @@ void eval(char line[82])
 				break ;	}
 		change_directory(".") ;
 	}
-	else if (strCmp(line, ":e", 2)==0)
+	else if (strCmp(line, "cat ", 3)==0)
 	{
-		char buf[100] ;
-		uint32 f = open("FILE") ;
-		uint32 size = read(f, buf, 99) ;
-		buf[size] = '\0' ;
-		write(0, buf) ;
-		keyboard_t k ;
-		do k=get_keyboard() ;
-		while (k.type!=1 || k.k.sp!=ENTER) ;
-		init_vga();
-		change_directory(".");
+		uint32 f = open(line+4) ;
+		while (read(f, bufs[x = ++x % 22], 81)) ;
+		change_directory(".") ;
 	}
 	else
 	{
@@ -83,21 +77,19 @@ void eval(char line[82])
 		else exec(line) ;
 		int status ;
 		int pid = wait(&status) ;
-		print_screen(0, 0, ' ', WHITE, BLACK) ;
-		init_vga() ;
-		print_int(status) ;
-		write(0, "\n") ;
 	}
 }
 
 int main()
 {
-  char bufs[22][82] ;
-	for (int i=0 ; i<22 ; i++) empty_line(bufs[i]) ;
-  init_vga() ;
-	int x=0, y=0 ;
+	int b=0 ;
+	x=0 ;	y=2 ;
+	for (int i=0 ; i<22 ; i++) empty_line(i) ;
+	print_lines(x) ;
   while(1)
   {
+
+		print_screen(y, 21, b++&(1<<18)?'_':' ', WHITE, BLACK) ;
 		keyboard_t k = get_keyboard() ;
 		if (k.type==0)
 		{
@@ -111,7 +103,7 @@ int main()
 			print_screen(y, 21, ' ', WHITE, BLACK) ;
 			bufs[x][y++] = ' ' ;
 		}
-		else if (k.k.sp==BACKSPACE && y>0)
+		else if (k.k.sp==BACKSPACE && y>2)
 		{
 			for (int i=--y ; i<81 ; i++) {
 				bufs[x][i] = (i==80) ? '\0' : bufs[x][i+1] ;
@@ -120,13 +112,11 @@ int main()
 		}
 		else if (k.k.sp==ENTER)
 		{
-			init_vga() ;
-			if(strCmp(bufs[x], ":q", 2)==0) return 1515 ;
-			eval(bufs[x]) ;
-			y=0 ;
-			x = ++x % 22 ;
-			empty_line(bufs[x]) ;
-			print_lines(bufs, x) ;
+			if(strCmp(bufs[x]+2, "exit", 4)==0) return 1515 ;
+			eval() ;
+			x = ++x % 22 ; y=2 ;
+			empty_line(x) ;
+			print_lines(x) ;
 		}
   }
 }
