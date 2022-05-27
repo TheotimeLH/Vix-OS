@@ -18,24 +18,30 @@ void logo();
 
 extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
 {
+    //initialisations diverses
     init_descriptor_tables();
     init_vga(0x07,0x0);
+    //affichage du logo
     logo();
+    //encore des initialisations
     Ata_fat_system afs(hda);
     init_disk(&fi,&afs);
     
     init_syscalls(&afs,&fi);
     init_process_tab();
-		init_keyboard();
+    init_keyboard();
     init_paging(memory_detection(mbd,magic));
 
     init_timer(1000);
+    //création du processus shell
     uint32 pid=exec("SHELL",&afs,&fi,&(fi.root_fat_entry),-1,"ceci est un argument\n");
 
+    //on efface le logo
     init_vga(0x07,0x0);
     if(pid!=uint32(-1))
     {
 			print_string("Lancement du programme\n");
+            //on lance le shell
 			run_process(pid);
     }
     else
@@ -43,6 +49,7 @@ extern "C" void kernel_main(multiboot_info_t* mbd,uint32 magic)
         print_string("Erreur lors du chargement");
     }
 
+    //normalement on arrivera pas juste là, mais au cas ou...
     while (1);
 }
 

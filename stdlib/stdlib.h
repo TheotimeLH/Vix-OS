@@ -32,6 +32,7 @@ void putchar(char c);
 void print_int(int i);
 void print_hexa(uint32 x);
 
+//les fonctions de wrapping pour les appels systèmes
 uint32 get_ticks();
 void write(uint32 file_desc,char *str);
 void fwrite(uint32 file_desc,uint8 *data,uint32 size);

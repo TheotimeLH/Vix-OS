@@ -4,6 +4,7 @@ extern int main(char* arg);
 
 void crt0_main()
 {
+  //on commence par charger l'argument sur la pile du processus (il en aura fait du chemin lui)
   char* arg;
   asm volatile("mov %%edi,%0":"=a"(arg));
 
@@ -15,6 +16,7 @@ void crt0_main()
   }
   my_stack_arg[len]=0;
 
+  //on execute main, puis on exit
   exit(main(my_stack_arg));
 
   while(1);

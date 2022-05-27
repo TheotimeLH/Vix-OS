@@ -125,7 +125,7 @@ void free_dir(page_directory_t *dir)
 void init_paging(uint32 mem_size){
 	uint32 mem_end_page = mem_size+0x100000;
 	nframes = mem_end_page / 0x1000;//nombre de frames
-	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes)*4);// je sais pas pourquoi index_from_bit donc je rajoute *4 (du coup je l'ai enlevé, ca a l'air de mieux marcher...) (je l'ai remis)
+	frames = (uint32*)kmalloc(INDEX_FROM_BIT(nframes)*4);// je sais pas pourquoi index_from_bit donc je rajoute *4 (du coup je l'ai enlevé, ca a l'air de mieux marcher...) (pas du tout donc je l'ai remis)
 	memset(frames, 0, INDEX_FROM_BIT(nframes));
 	kernel_directory = (page_directory_t*)kmalloc_a(sizeof(page_directory_t));
 	memset(kernel_directory, 0, sizeof(page_directory_t));

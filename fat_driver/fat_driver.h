@@ -8,6 +8,7 @@
 
 typedef struct Fat_infos Fat_infos;
 
+//interface entre le driver disque et le driver fat
 class Fat_system
 {
 public:
@@ -17,6 +18,7 @@ public:
     virtual uint32_t get_sectorsize(){return 512;};
 };
 
+//implémentation pour le driver ata
 class Ata_fat_system:public Fat_system
 {
 public:
@@ -31,6 +33,7 @@ private:
     Drive m_drive;
 };
 
+//une entrée dans le système fat (fichier ou dossier)
 class Fat_entry
 {
 public:
@@ -79,10 +82,13 @@ public:
     }
     char* get_name(){return m_name;};
     bool is_directory(){return m_is_directory;};
+
+    //réinitialise le curseur à 0 dans le fichier/dossier
     void init_offset(){m_current_cluster=m_first_cluster;m_current_entry_offset=0;m_last_entry=false;};
     uint32_t get_size(){return m_size;};
 
     //uniquement pour les fichiers
+
     //renvoit la taille lue en octet
     //si elle est inférieure à cluster_count*infos.byte_per_cluster (la taille du buffer),
     //c'est que la fin du fichier a été atteinte
@@ -92,6 +98,7 @@ public:
     bool write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system* intf);//append data at the end of the file
 
     //uniquement pour les répertoires
+
     //renvoit le nombre d'entrées lues, s'il est inférieur à size,
     //c'est que toutes les entrées du répertoire ont été lues
     //(size est la taille du buffer)
@@ -100,6 +107,9 @@ public:
     //  - pour la racine en fat12/16 : infos.sector_size/32
     //  - sinon, infos.byte_per_cluster/32
     uint32_t read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf);
+
+    //entry_ret est un pointeur vers un objet Fat_entry non initialisé
+    //l'entrée créée est renvoyé dans ce pointeur
     bool add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_infos* infos,Fat_system* intf);
     bool delete_entry(char* name,Fat_infos* infos,Fat_system *intf);
 private:
@@ -107,7 +117,7 @@ private:
     uint32_t m_first_cluster;//0 for root (FAT12/16)
     uint32_t m_current_cluster;//sector offset for fat12/16 root
     uint32_t m_current_entry_offset;//for directory
-    bool m_last_entry;//..
+    bool m_last_entry;//for directory
     uint32_t m_size;//en octets
     char m_name[9];
     uint32 m_entry_sector;//addresse des infos sur l'entrée en secteur
@@ -128,7 +138,7 @@ struct Fat_infos
     uint32_t root_size;//en secteur
     uint32_t data;//...
     uint32_t data_size;//...
-    Fat_entry root_fat_entry;
+    Fat_entry root_fat_entry;//la racine
 };
 
 Fat_entry open_file(char* name,Fat_system *intf,Fat_infos* infos,Fat_entry *dir,bool* ok);

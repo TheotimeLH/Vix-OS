@@ -26,7 +26,7 @@ typedef enum
 
 Drive_id ata_identify(Drive d);
 bool ata_read(Drive d,uint8_t count,uint32_t lba,uint16_t* buffer);//true si la lecture s'est bien passée
-bool ata_write(Drive d,uint8_t count,uint32_t lba,uint16_t *buffer);//same
+bool ata_write(Drive d,uint8_t count,uint32_t lba,uint16_t *buffer);//pareil
 
 #ifdef __cplusplus
 }

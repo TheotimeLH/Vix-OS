@@ -1,5 +1,6 @@
 #include "fat_driver.h"
 
+//renvoit le numéro maximal d'un cluster
 uint32 fat_last_cluster(Fat_infos *infos)
 {
     uint32_t last_cluster;
@@ -21,6 +22,7 @@ uint32 fat_last_cluster(Fat_infos *infos)
 Ata_fat_system::Ata_fat_system(Drive d)
 :m_drive(d)
 {
+    //on initialise le disque
     m_id=ata_identify(d);
     if(!is_ready())
     {
@@ -36,6 +38,7 @@ bool Ata_fat_system::read(uint8_t count,uint32_t addr,uint8_t* buffer,uint16_t s
     uint8_t logical_per_ph=sector_size/m_id.taille_secteur;
     for(int i=0;i<10;i++)
     {
+        //il peut arriver qu'il y ait des erreurs, donc on essaye plusieurs fois
         if(ata_read(m_drive,count*logical_per_ph,addr*logical_per_ph,(uint16_t*)buffer))
             return true;
     }
@@ -55,6 +58,7 @@ void Ata_fat_system::err(char* msg)
     print_string(msg);
 }
 
+//quelques fonction utiles
 uint32_t inline max(uint32_t a,uint32_t b)
 {
     return (a<b)?b:a;
@@ -75,6 +79,7 @@ uint32_t inline buff_8_32(uint8_t* buff,const uint32_t i)
     return *(uint32_t*)(&buff[i]);        
 }
 
+//fonction pour récupérer les informations sur le systeme fat
 Fat_infos fat_init(Fat_system* intf)
 {
     Fat_infos ret;
@@ -140,6 +145,7 @@ Fat_infos fat_init(Fat_system* intf)
     return ret;
 }
 
+//renvoit le cluster suivant dans la fat
 uint32_t fat_next_cluster(uint32_t current_cluster,Fat_system* intf,Fat_infos* infos)
 {
     uint8_t byte_per_entry=(infos->fat_type==12)?3:(infos->fat_type/8);
@@ -147,6 +153,8 @@ uint32_t fat_next_cluster(uint32_t current_cluster,Fat_system* intf,Fat_infos* i
     uint32_t sector_offset=(entry_no*byte_per_entry)/(uint32_t)infos->sector_size;
     uint16_t entry_offset=entry_no%(infos->sector_size/(uint16_t)byte_per_entry);
     
+    //on doit charger 2 secteurs puisque en fat12, une entrée de la fat peut
+    //etre à cheval sur 2 secteurs
     uint8_t buffer[infos->sector_size*2];
     intf->read(2,sector_offset+infos->fat,buffer,infos->sector_size);
 
@@ -182,6 +190,7 @@ uint32_t fat_next_cluster(uint32_t current_cluster,Fat_system* intf,Fat_infos* i
     return (entry_val&mask)>>shift;
 }
 
+//renvoit le premier cluster libre dans la fat
 uint32 fat_free_cluster(Fat_system* intf,Fat_infos* infos)
 {
     uint32 current_cluster;
@@ -196,11 +205,13 @@ uint32 fat_free_cluster(Fat_system* intf,Fat_infos* infos)
         uint16_t entry_offset=entry_no%(infos->sector_size/(uint16_t)byte_per_entry);
         if(sector_offset>=infos->fat_size)
         {
+            //si on a atteint la fin de la fat, pas de cluster libre
             return fat_last_cluster(infos);
         }
         
         if((current_sector!=sector_offset)||empty_buffer)
         {
+            //on charge une nouvelle page de la fat
             empty_buffer=false;
             current_sector=sector_offset;
             intf->read(2,sector_offset+infos->fat,buffer,infos->sector_size);
@@ -236,11 +247,13 @@ uint32 fat_free_cluster(Fat_system* intf,Fat_infos* infos)
         }
         if((entry_val&mask)>>shift==0)
         {
+            //si l'entrée courante dans la fat est nulle, c'est que le cluster associé est libre
             return current_cluster;
         }
     }
 }
 
+//écrit une valeur dans la fat
 bool set_fat_cluster(uint32 cluster,uint32 val,Fat_system* intf,Fat_infos* infos)
 {
     uint8_t byte_per_entry=(infos->fat_type==12)?3:(infos->fat_type/8);
@@ -292,6 +305,7 @@ bool set_fat_cluster(uint32 cluster,uint32 val,Fat_system* intf,Fat_infos* infos
     return true;
 }
 
+//remplit un cluster de 0, utile pour l'initialisation des dossiers
 void fill_zeros(uint32 cluster,Fat_system* intf,Fat_infos* infos)
 {
     uint8 buff[infos->byte_per_cluster];
@@ -305,6 +319,7 @@ void fill_zeros(uint32 cluster,Fat_system* intf,Fat_infos* infos)
         infos->sector_size);
 }
 
+//créé les entrées . et .. dans un dossier vide
 void init_dir(uint32 cluster,uint32 parent,Fat_system* intf,Fat_infos* infos)
 {
     uint8 buff[infos->sector_size];
@@ -313,6 +328,7 @@ void init_dir(uint32 cluster,uint32 parent,Fat_system* intf,Fat_infos* infos)
         buff[i]=0;
     }
 
+    //entrée .
     buff[0x0]='.';
     for(int i=0x1;i<0x8;i++)
     {
@@ -322,6 +338,7 @@ void init_dir(uint32 cluster,uint32 parent,Fat_system* intf,Fat_infos* infos)
     *(uint16*)&buff[0x1A]=cluster&0xFFFF;
     *(uint16*)&buff[0x14]=(cluster>>16)&0xFFFF;
 
+    //entrée ..
     buff[0x0+0x20]='.';
     buff[0x1+0x20]='.';
     for(int i=0x2;i<0x8;i++)
@@ -338,6 +355,7 @@ void init_dir(uint32 cluster,uint32 parent,Fat_system* intf,Fat_infos* infos)
         infos->sector_size);
 }
 
+//lecture de données dans un fichier
 uint32_t Fat_entry::read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* infos,Fat_system* intf)
 {
     if(m_is_directory)
@@ -350,13 +368,16 @@ uint32_t Fat_entry::read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* 
 
     for(uint32_t i=0;i<cluster_count;i++)
     {
+        //on lit cluster par cluster
         intf->read(infos->cluster_size,
             infos->data+(m_current_cluster-2)*infos->cluster_size,
             buffer+i*infos->byte_per_cluster,
             infos->sector_size);
-
+            
+        //on passe au cluster suivant
         m_current_cluster=fat_next_cluster(m_current_cluster,intf,infos);
 
+        //si on arrive au dernier cluster, on s'arrête
         if(m_current_cluster>=last_cluster)
             return i*infos->byte_per_cluster+m_size%infos->byte_per_cluster;
     }
@@ -364,6 +385,7 @@ uint32_t Fat_entry::read_data(uint8_t *buffer,uint32_t cluster_count,Fat_infos* 
     return cluster_count*infos->byte_per_cluster;
 }
 
+//lecture de données dans un dossier
 uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* infos,Fat_system* intf)
 {
     if((!m_is_directory)||m_last_entry)
@@ -385,7 +407,7 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
         if(m_current_entry_offset>=entry_per_buff)//update cluster si on peut
         {
             m_current_entry_offset=0;
-            if(m_first_cluster==0)
+            if(m_first_cluster==0)//si on est à la racine en fat12/16
             {
                 if(m_current_cluster==infos->root_size-1)
                 {
@@ -413,7 +435,7 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
 
         if(m_current_entry_offset==0||buff_empty)//recharger de la memoire
         {
-            if(m_first_cluster==0)
+            if(m_first_cluster==0)//si on est à la racine en fat12/16
             {
                 intf->read(1,infos->root+m_current_cluster,buff,infos->sector_size);
                 buff_addr=infos->root+m_current_cluster;
@@ -429,19 +451,20 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
             buff_empty=false;
         }
 
-        if(buff[32*m_current_entry_offset]==0)
+        if(buff[32*m_current_entry_offset]==0)//si c'est la dernière entrée du dossier
         {
             m_last_entry=true;
             break;
         }
         if(buff[32*m_current_entry_offset]==0x05
             ||buff[32*m_current_entry_offset]==0xE5
-            ||(buff[32*m_current_entry_offset+0x0B]&0x8)==0x8)
+            ||(buff[32*m_current_entry_offset+0x0B]&0x8)==0x8)//l'entrée a été supprimée
         {
             m_current_entry_offset++;
             continue;
         }
 
+        //on récupère les données sur l'entrée
         bool is_directory=(buff[32*m_current_entry_offset+0x0B]&0x10)==0x10;
         uint32_t first_cluster=buff_8_16(buff,32*m_current_entry_offset+0x1A);
         if(infos->fat_type==32)
@@ -458,11 +481,13 @@ uint32_t Fat_entry::read_entries(Fat_entry* buffer,uint32_t size,Fat_infos* info
     return read;
 }
 
+//créé un fichier ou un dossier
 bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_infos* infos,Fat_system* intf)
 {
     if(!m_is_directory)
         return false;
     
+    //on se place au début du dossier
     init_offset();
     uint32_t buff_size=(m_first_cluster==0)?infos->sector_size:infos->byte_per_cluster;
     uint8_t buff[buff_size];
@@ -522,7 +547,7 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
 
         if(buff[32*m_current_entry_offset]==0x05
             ||buff[32*m_current_entry_offset]==0xE5
-            ||buff[32*m_current_entry_offset]==0)
+            ||buff[32*m_current_entry_offset]==0)//si on a trouvé une entrée libre
         {
             break;
         }
@@ -534,9 +559,10 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
 
     }
 
-
     if(m_last_entry)
     {
+        //s'il n'y a plus de place dans le dossier, et qu'on est pas dans la racine en fat12/16,
+        //on rajoute un cluster dans notre dossier
         uint32 next_cluster=fat_free_cluster(intf,infos);
         if(next_cluster>=last_cluster)
             return false;
@@ -553,7 +579,7 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
     //on met l'entrée dans m_current_cluster, à l'offset m_current_entry_offset
     //(buff contient déjà le contenu de ce cluster)
     buff[32*m_current_entry_offset+0x0B]=(is_directory)?0x10:0;
-    uint32_t first_cluster=fat_free_cluster(intf,infos);
+    uint32_t first_cluster=fat_free_cluster(intf,infos);//le premier cluster de notre nouvelle entrée
     if(first_cluster>=last_cluster)
         return false;
     set_fat_cluster(first_cluster,0xFFFFFFFF,intf,infos);
@@ -586,6 +612,9 @@ bool Fat_entry::add_entry(char* name,bool is_directory,Fat_entry* entry_ret,Fat_
     return true;
 }
 
+//supprime une entrée
+//attention, non récursif pour les dossier, donc peut entrainer une fuite de mémoire
+//sur le disque, si le dossier contient des fichiers
 bool Fat_entry::delete_entry(char* name,Fat_infos* infos,Fat_system *intf)
 {
     init_offset();
@@ -600,6 +629,7 @@ bool Fat_entry::delete_entry(char* name,Fat_infos* infos,Fat_system *intf)
     uint32_t last_cluster=fat_last_cluster(infos);
     Fat_entry temp;
 
+    //on commence par chercher l'entrée à supprimer
     while(1)
     {
         if(m_current_entry_offset>=entry_per_buff)//update cluster si on peut
@@ -673,10 +703,12 @@ bool Fat_entry::delete_entry(char* name,Fat_infos* infos,Fat_system *intf)
         m_current_entry_offset++;
     }
 
+    //on marque l'entrée comme supprimée dans le dossier
     buff[32*m_current_entry_offset]=0xE5;
     intf->write(buff_size/infos->sector_size,buff_addr,buff,infos->sector_size);
     while(1)
     {
+        //on libère les cluster utilisés par l'entrée
         temp.m_current_cluster=fat_next_cluster(temp.m_first_cluster,intf,infos);
         set_fat_cluster(temp.m_first_cluster,0,intf,infos);
         if(temp.m_current_cluster>=last_cluster)
@@ -686,6 +718,7 @@ bool Fat_entry::delete_entry(char* name,Fat_infos* infos,Fat_system *intf)
     return true;
 }
 
+//trouve une certaine entrée dans un dossier
 Fat_entry open(char* name,Fat_system *afs,Fat_infos* infos,Fat_entry *dir,bool* ok)
 {
     Fat_entry entries[10];
@@ -736,14 +769,17 @@ Fat_entry open_dir(char* name,Fat_system *afs,Fat_infos* infos,Fat_entry *dir,bo
     return ret;
 }
 
-
+//écriture de données pour un fichier
 bool Fat_entry::write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system* intf)
 {
     if(m_is_directory)
         return false;
+    //on se place au début du fichier
     init_offset();
+
     uint32 last_cluster=fat_last_cluster(infos);
     uint32 next_cluster=m_current_cluster;
+    //on cherche la fin du fichier
     while(next_cluster<last_cluster)
     {
         m_current_cluster=next_cluster;
@@ -753,9 +789,11 @@ bool Fat_entry::write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system
     uint32 write_size(0);
     uint8 buffer_cluster[infos->byte_per_cluster];
     bool empty_buffer(true);
+
+    //on ajoute les données à écrire
     while(write_size<size)
     {
-        if(offset==0&&m_size!=0)
+        if(offset==0&&m_size!=0)//on rajoute un cluster au fichier si nécessaire
         {
             next_cluster=fat_free_cluster(intf,infos);
             if(next_cluster>=last_cluster)
@@ -766,7 +804,7 @@ bool Fat_entry::write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system
                 return false;
             m_current_cluster=next_cluster;
         }
-        if(offset==0||empty_buffer)
+        if(offset==0||empty_buffer)//on lit les données du cluster courant si nécessaire
         {
             empty_buffer=false;
             intf->read(infos->cluster_size,
@@ -778,7 +816,7 @@ bool Fat_entry::write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system
         write_size++;
         offset++;
         m_size++;
-        if(offset==infos->byte_per_cluster||write_size==size)
+        if(offset==infos->byte_per_cluster||write_size==size)//on écrit les données dans le custer si nécessaire
         {
             offset=0;
             intf->write(infos->cluster_size,
@@ -788,6 +826,7 @@ bool Fat_entry::write_data(uint8* buffer,uint32 size,Fat_infos* infos,Fat_system
         }
     }
     
+    //on ecrit la nouvelle taille du fichier dans le bon dossier
     if(!intf->read(1,m_entry_sector,buffer_cluster,infos->sector_size))
         return false;
     *((uint32*)&buffer_cluster[m_entry_offset+0X1C])=m_size;
