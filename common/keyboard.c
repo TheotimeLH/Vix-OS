@@ -57,6 +57,12 @@ static char shifter(char c){
 			case '=':
 				return '+';
 				break;
+			case ';':
+				return '.';
+				break;
+			case ':':
+				return '/';
+				break;
 		}
 	}
 	return c;
